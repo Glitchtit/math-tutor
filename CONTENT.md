@@ -62,6 +62,9 @@ export default {
 `matlab` checks: `{ var: 'I', value: 1.8, tol?: 1e-6 }` (value may be a MATLAB expression string),
 `{ var: 'f', isFunction: true }`, `{ var: 'v', size: 10 }`, `{ figure: true }`, `{ uses: 'integral' }`,
 `{ notUses: 'syms' }`, `{ output: 'text' }`, `{ noWarning: true }`; each may carry a `message`.
+`value` checks compare the first element, so for vectors check `size` plus a scalar the student stores
+(e.g. `last = a(end)`). Starter code must not use `...` as a placeholder (it is MATLAB line continuation);
+write `f = @(x) 0;  % replace 0 by the formula`.
 
 Live Script blocks (`livescript.blocks`, assignment `solution`, `writeupTemplate`):
 `{ type: 'title'|'heading'|'heading2'|'text'|'equation'|'code', content }`. Text blocks support
