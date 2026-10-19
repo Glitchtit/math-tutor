@@ -1145,7 +1145,9 @@ WIDGETS.phasor = (container, cfg) => {
   const sumRe = () => ph.reduce((s, p) => s + p.amp * Math.cos(omega * t + p.phase * Math.PI / 180), 0);
   const sumIm = () => ph.reduce((s, p) => s + p.amp * Math.sin(omega * t + p.phase * Math.PI / 180), 0);
   pc.onDraw((pl) => {
-    pl.fn((x) => Math.sqrt(Math.max(0, amax * amax / 1.44 - x * x)), { color: col.muted, width: 0.6, alpha: 0.4 });
+    const rc = amax / 1.2;
+    pl.fn((x) => Math.sqrt(Math.max(0, rc * rc - x * x)), { color: col.muted, width: 0.6, alpha: 0.4, from: -rc, to: rc, samples: 400 });
+    pl.fn((x) => -Math.sqrt(Math.max(0, rc * rc - x * x)), { color: col.muted, width: 0.6, alpha: 0.4, from: -rc, to: rc, samples: 400 });
     let ox = 0, oy = 0;
     ph.forEach((p) => {
       const ang = omega * t + p.phase * Math.PI / 180;
