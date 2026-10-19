@@ -1,0 +1,12 @@
+{
+  "name": "math-tutor",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Calculus course web app with MATLAB Live Editor practice and an AI tutor",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "license": "MIT"
+}

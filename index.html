@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calculus Studio</title>
+  <meta name="description" content="Interactive calculus course from basics to integration, ODEs and series, with MATLAB Live Editor practice and an AI tutor.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232563eb'/%3E%3Ctext x='16' y='23' font-size='20' text-anchor='middle' fill='white' font-family='serif'%3E%E2%88%AB%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <script defer src="vendor/katex/katex.min.js"></script>
+  <script defer src="vendor/katex/auto-render.min.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <button id="menu-btn" class="icon-btn menu-btn" aria-label="Toggle navigation">☰</button>
+    <a href="#/" class="brand"><span class="brand-mark">∫</span> Calculus Studio</a>
+    <div class="topbar-spacer"></div>
+    <a class="btn btn-small btn-ghost hide-sm" href="#/editor">Live Script editor</a>
+    <button id="tutor-btn" class="btn btn-small btn-primary">AI tutor</button>
+  </header>
+  <div class="layout">
+    <nav id="nav" class="sidebar" aria-label="Course modules"></nav>
+    <main id="main" class="main" tabindex="-1"><p class="muted">Loading…</p></main>
+  </div>
+  <noscript>This course needs JavaScript.</noscript>
+  <script type="module">
+    // KaTeX loads with `defer`; start the app once it is available.
+    const start = () => import('./js/app.js').catch((e) => {
+      document.getElementById('main').innerHTML = '<div class="callout warn"><b>Failed to start:</b> ' + e.message + '</div>';
+      console.error(e);
+    });
+    if (window.katex && window.renderMathInElement) start();
+    else window.addEventListener('DOMContentLoaded', start);
+  </script>
+</body>
+</html>
