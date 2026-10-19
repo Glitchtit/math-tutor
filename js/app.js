@@ -26,10 +26,10 @@ const courseModules = (id = currentCourse) => MODULES.filter((m) => m.course ===
 
 // ------------------------------------------------------------------ theme
 function applyTheme(t) {
-  if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
-  else document.documentElement.removeAttribute('data-theme');
+  document.documentElement.setAttribute('data-theme', ['light', 'dark', 'auto'].includes(t) ? t : 'dark');
+  window.dispatchEvent(new Event('themechange'));
 }
-applyTheme(store.get('theme', 'auto'));
+applyTheme(store.get('theme', 'dark'));
 
 // ------------------------------------------------------------------ tutor
 const tutor = new TutorPanel({
@@ -111,7 +111,7 @@ function home() {
   const map = h('section', { class: 'course-map' });
   for (const part of PARTS.filter((p) => p.course === currentCourse)) {
     const pmods = mods.filter((m) => m.part === part.id);
-    if (!pmods.length) { map.append(h('div', { class: 'part-head' }, h('h2', {}, part.title), h('p', { class: 'muted' }, `${part.desc} — modules coming with the course assignments.`))); continue; }
+    if (!pmods.length) { map.append(h('div', { class: 'map-part-head' }, h('h2', {}, part.title), h('p', { class: 'muted' }, `${part.desc} — modules coming with the course assignments.`))); continue; }
     const grid = h('div', { class: 'mod-grid' });
     pmods.forEach((m) => {
       const st = progress.moduleStats(m);
@@ -121,7 +121,7 @@ function home() {
         h('div', { class: 'mod-card-sum' }, m.summary),
         progressBar(st.pct)));
     });
-    map.append(h('div', { class: 'part-head' }, h('h2', {}, part.title), h('p', { class: 'muted' }, part.desc)), grid);
+    map.append(h('div', { class: 'map-part-head' }, h('h2', {}, part.title), h('p', { class: 'muted' }, part.desc)), grid);
   }
   page(course.title, hero, how, map);
 }
@@ -333,7 +333,7 @@ function practiceItemPage(id) {
 }
 
 function settingsPage() {
-  const theme = h('select', {}, ...[['auto', 'Follow system'], ['light', 'Light'], ['dark', 'Dark']].map(([v, t]) => h('option', { value: v, selected: store.get('theme', 'auto') === v }, t)));
+  const theme = h('select', {}, ...[['dark', 'Dark (default)'], ['light', 'Light'], ['auto', 'Follow system']].map(([v, t]) => h('option', { value: v, selected: store.get('theme', 'dark') === v }, t)));
   theme.addEventListener('change', () => { store.set('theme', theme.value); applyTheme(theme.value); });
   const imp = h('input', { type: 'file', accept: '.json' });
   imp.addEventListener('change', async () => { try { progress.import(await imp.files[0].text()); buildNav(); alert('Progress imported.'); } catch (e) { alert('Import failed: ' + e.message); } });

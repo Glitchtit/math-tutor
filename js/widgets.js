@@ -10,13 +10,20 @@ import { h, renderMath } from './util.js';
 const C = {
   accent: 'var(--accent)',
 };
-const PALETTE = ['#2563eb', '#e8590c', '#2f9e44', '#9c36b5', '#c2255c', '#0c8599', '#5c940d'];
+const PALETTE_LIGHT = ['#2563eb', '#e8590c', '#2f9e44', '#9c36b5', '#c2255c', '#0c8599', '#5c940d'];
+const PALETTE_DARK = ['#7c9cff', '#ff9f5a', '#4ade80', '#c084fc', '#f472b6', '#22d3ee', '#a3e635'];
+function pal(i) {
+  const light = document.documentElement.getAttribute('data-theme') === 'light' ||
+    (document.documentElement.getAttribute('data-theme') === 'auto' && window.matchMedia('(prefers-color-scheme: light)').matches);
+  const p = light ? PALETTE_LIGHT : PALETTE_DARK;
+  return p[((i % p.length) + p.length) % p.length];
+}
 function css(name, fb) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fb; }
 const col = {
-  get a() { return css('--viz-1', PALETTE[0]); },
-  get b() { return css('--viz-2', PALETTE[1]); },
-  get c() { return css('--viz-3', PALETTE[2]); },
-  get d() { return css('--viz-4', PALETTE[3]); },
+  get a() { return css('--viz-1', pal(0)); },
+  get b() { return css('--viz-2', pal(1)); },
+  get c() { return css('--viz-3', pal(2)); },
+  get d() { return css('--viz-4', pal(3)); },
   get neg() { return css('--viz-neg', '#e03131'); },
   get muted() { return css('--text-muted', '#777'); },
 };
@@ -137,7 +144,7 @@ WIDGETS.plot = (container, cfg) => {
   const params = cfg.params || {};
   const names = Object.keys(params);
   const vals = Object.fromEntries(names.map((k) => [k, params[k].value ?? params[k].min ?? 0]));
-  const fns = (cfg.functions || []).map((f, i) => ({ ...f, color: f.color || PALETTE[i % PALETTE.length], fn: compile(f.expr, ['x', ...names]) }));
+  const fns = (cfg.functions || []).map((f, i) => ({ ...f, color: f.color || pal(i), fn: compile(f.expr, ['x', ...names]) }));
   const shadeFn = cfg.shade ? compile(cfg.shade.expr, ['x', ...names]) : null;
   const shadeLo = cfg.shade?.lower ? compile(cfg.shade.lower, ['x', ...names]) : null;
   const sf = cfg.slopeField ? compile(cfg.slopeField, ['x', 'y', ...names]) : null;
@@ -414,7 +421,7 @@ WIDGETS.convergence = (container, cfg) => {
     left: (n) => { const d = (b - a) / n; let s = 0; for (let k = 0; k < n; k++) s += f(a + k * d); return s * d; },
   };
   const ns = [2, 4, 8, 16, 32, 64, 128, 256, 512];
-  const series = (cfg.methods || ['left', 'trap', 'mid', 'simpson']).map((m, i) => ({ m, color: PALETTE[i], pts: ns.map((n) => [Math.log10(n), Math.log10(Math.abs(rules[m](n) - exact) || 1e-16)]) }));
+  const series = (cfg.methods || ['left', 'trap', 'mid', 'simpson']).map((m, i) => ({ m, color: pal(i), pts: ns.map((n) => [Math.log10(n), Math.log10(Math.abs(rules[m](n) - exact) || 1e-16)]) }));
   const ys = series.flatMap((s) => s.pts.map((q) => q[1]));
   const p = new Plot(stage, { height: 300, xlabel: 'log₁₀ n', ylabel: 'log₁₀ |error|' });
   p.setView(0, 3, Math.max(-16, Math.min(...ys)) - 0.5, Math.max(...ys) + 0.5);
@@ -700,7 +707,7 @@ WIDGETS.trigsub = (container, cfg) => {
 // Partial fractions: individual terms add up to the rational function.
 WIDGETS.partialFractions = (container, cfg) => {
   const { stage, controls, readout } = frame(container, cfg);
-  const terms = cfg.terms.map((t, i) => ({ ...t, fn: compile(t.expr), color: PALETTE[(i + 1) % PALETTE.length], on: true }));
+  const terms = cfg.terms.map((t, i) => ({ ...t, fn: compile(t.expr), color: pal(i + 1), on: true }));
   const total = compile(cfg.f);
   const p = makePlot(stage, cfg);
   let showSum = true;
@@ -792,8 +799,8 @@ WIDGETS.slopefield = (container, cfg) => {
     (cfg.hlines || []).forEach((y) => pl.hline(typeof y === 'string' ? compile(y, names)(...arg()) : y, { color: col.d, dash: [6, 4], width: 1.5 }));
     curves.forEach((c, i) => {
       const [xs, ys] = integrateCurve(c.x0, c.y0);
-      pl.polyline(xs, ys, { color: PALETTE[i % PALETTE.length], width: 2.5 });
-      pl.point(c.x0, c.y0, { r: 4, color: PALETTE[i % PALETTE.length] });
+      pl.polyline(xs, ys, { color: pal(i), width: 2.5 });
+      pl.point(c.x0, c.y0, { r: 4, color: pal(i) });
     });
     if (sol && cfg.showFamily) for (let Cc = -3; Cc <= 3; Cc += 1) pl.fn((x) => sol(x, Cc, ...arg()), { color: col.muted, width: 1, dash: [3, 3] });
   });
@@ -1131,7 +1138,7 @@ WIDGETS.unitcircle = (container, cfg) => {
 // cfg: { phasors:[{amp, phase (degrees), label, color}], omega (rad/s, default 2π), showSum, T (seconds shown) }
 WIDGETS.phasor = (container, cfg) => {
   const { stage, controls, readout } = frame(container, cfg);
-  const ph = (cfg.phasors || [{ amp: 1, phase: 0, label: 'V' }]).map((p, i) => ({ ...p, color: p.color || PALETTE[i % PALETTE.length] }));
+  const ph = (cfg.phasors || [{ amp: 1, phase: 0, label: 'V' }]).map((p, i) => ({ ...p, color: p.color || pal(i) }));
   const omega = cfg.omega ?? 2 * Math.PI;
   const T = cfg.T ?? 2 * (2 * Math.PI / omega);
   let t = 0, showSum = cfg.showSum ?? ph.length > 1;

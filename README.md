@@ -20,6 +20,8 @@ your progress, and generates new mini-lessons and auto-checkable practice proble
 
 ## Screenshots
 
+The app uses a dark theme by default, including dark MATLAB figures; a light theme is available in Settings.
+
 ![Course map](docs/screenshots/course-map.png)
 
 **Learn — interactive visuals first**
@@ -50,9 +52,9 @@ A MATLAB page with runnable code, inline output and figures:
 
 ![AI tutor](docs/screenshots/ai-tutor.png)
 
-| Dark mode | Mobile (electrical engineering course) |
+| Light theme (Settings → Theme) | Mobile (electrical engineering course) |
 |---|---|
-| ![Dark mode](docs/screenshots/dark-mode.png) | ![Mobile](docs/screenshots/mobile-ee.png) |
+| ![Light theme](docs/screenshots/light-mode.png) | ![Mobile](docs/screenshots/mobile-ee.png) |
 
 ## Running
 

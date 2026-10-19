@@ -27,6 +27,25 @@ function fmtTick(v, step) {
   return v.toFixed(d);
 }
 
+// MATLAB's default line colours, and brighter variants for a dark figure background
+const MATLAB_ORDER = ['#0072BD', '#D95319', '#EDB120', '#7E2F8E', '#77AC30', '#4DBEEE', '#A2142F'];
+const MATLAB_DARK = ['#4fa8ff', '#ff8a4c', '#f5c242', '#c47ae6', '#8fd65e', '#72d8f7', '#ff5c7a'];
+
+function isDarkFigure() {
+  const c = cssVar('--fig-bg', '#ffffff').replace('#', '');
+  if (c.length < 6) return false;
+  const [r, g, b] = [0, 2, 4].map((k) => parseInt(c.slice(k, k + 2), 16));
+  return 0.299 * r + 0.587 * g + 0.114 * b < 128;
+}
+
+function figColor(c) {
+  if (!isDarkFigure()) return c;
+  const k = MATLAB_ORDER.indexOf(String(c).toUpperCase());
+  if (k >= 0) return MATLAB_DARK[k];
+  if (/^#0{6}$|^#262626$|^black$/i.test(c)) return "#e7eaf0";
+  return c;
+}
+
 function cssVar(name, fallback) {
   const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   return v || fallback;
@@ -51,11 +70,13 @@ export class Plot {
       this.ro.observe(this.wrap);
     }
     this.bindPointer();
+    window.addEventListener('themechange', () => this.redraw());
   }
 
   colors() {
-    if (this.opts.theme === 'light') {
-      return { bg: '#ffffff', axis: '#262626', grid: '#e6e6e6', text: '#262626', muted: '#6b6b6b' };
+    if (this.opts.theme === 'figure') {
+      const dark = isDarkFigure();
+      return { bg: cssVar('--fig-bg', '#ffffff'), axis: dark ? '#b8c2d0' : '#262626', grid: dark ? '#262e3a' : '#e6e6e6', text: cssVar('--fig-text', '#262626'), muted: dark ? '#9aa6b8' : '#6b6b6b' };
     }
     return {
       bg: cssVar('--plot-bg', '#ffffff'),
@@ -393,7 +414,7 @@ export function renderFigure(container, fig) {
   const yl = fig.ylim || niceLimits(y0, y1);
   const area = document.createElement('div');
   box.appendChild(area);
-  const p = new Plot(area, { height: 300, grid: !!fig.grid, boxAxes: true, theme: 'light', axisEqual: fig.axisEqual, padding: { l: 52, r: 16, t: 10, b: 28 }, xlim: xl, ylim: yl });
+  const p = new Plot(area, { height: 300, grid: !!fig.grid, boxAxes: true, theme: 'figure', axisEqual: fig.axisEqual, padding: { l: 52, r: 16, t: 10, b: 28 }, xlim: xl, ylim: yl });
   p.setView(xl[0], xl[1], yl[0], yl[1]);
   p.onDraw((pl) => {
     for (const s of fig.series) drawSeries(pl, s);
@@ -410,7 +431,7 @@ export function renderFigure(container, fig) {
       const row = document.createElement('div');
       const sw = document.createElement('span');
       sw.className = 'mfig-swatch';
-      sw.style.background = s.color;
+      sw.style.background = figColor(s.color);
       const lab = document.createElement('span');
       if (fig.legendLatex) setLabel(lab, name, true); else lab.textContent = name;
       row.append(sw, lab);
@@ -454,7 +475,8 @@ function drawMarker(p, x, y, marker, color, size) {
   }
 }
 
-function drawSeries(p, s) {
+function drawSeries(p, sIn) {
+  const s = { ...sIn, color: figColor(sIn.color) };
   const style = { color: s.color, width: Math.max(0.8, s.width * 1.4), dash: dashFor(s.style) };
   const marker = s.marker && s.marker !== 'none' ? s.marker : null;
   switch (s.type) {
@@ -474,7 +496,7 @@ function drawSeries(p, s) {
       p.fillPoly(s.x.map((x, k) => [x, s.y[k]]).concat([[s.x[s.x.length - 1], 0], [s.x[0], 0]]), { color: s.color, alpha: 0.6, stroke: s.color });
       break;
     case 'fill':
-      p.fillPoly(s.x.map((x, k) => [x, s.y[k]]), { color: s.color, alpha: 0.6, stroke: '#000' });
+      p.fillPoly(s.x.map((x, k) => [x, s.y[k]]), { color: s.color, alpha: 0.6, stroke: p.colors().axis });
       break;
     case 'quiver':
       s.x.forEach((x, k) => {
@@ -487,7 +509,7 @@ function drawSeries(p, s) {
       break;
     case 'xline': p.vline(s.value, { color: s.color, dash: dashFor(s.style), width: Math.max(1, s.width * 1.4) }); break;
     case 'yline': p.hline(s.value, { color: s.color, dash: dashFor(s.style), width: Math.max(1, s.width * 1.4) }); break;
-    case 'text': p.text(s.x, s.y, s.text, { color: '#000' }); break;
+    case 'text': p.text(s.x, s.y, s.text, { color: p.colors().text }); break;
     default: break;
   }
 }
