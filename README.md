@@ -18,6 +18,42 @@ An **AI tutor** (Anthropic API) is built into every page: it answers questions w
 as context, diagnoses wrong answers, reviews Live Script write-ups, recommends what to focus on from
 your progress, and generates new mini-lessons and auto-checkable practice problems on demand.
 
+## Screenshots
+
+![Course map](docs/screenshots/course-map.png)
+
+**Learn — interactive visuals first**
+
+| Riemann sums | Accumulation function (FTC) |
+|---|---|
+| ![Riemann sums](docs/screenshots/widget-riemann.png) | ![Accumulation function](docs/screenshots/widget-accumulate.png) |
+| **Solids of revolution** | **Slope field with solution curves** |
+| ![Solid of revolution](docs/screenshots/widget-solid.png) | ![Slope field](docs/screenshots/widget-slopefield.png) |
+| **Mass–spring–damper** | **Taylor polynomials** |
+| ![Spring](docs/screenshots/widget-spring.png) | ![Taylor polynomials](docs/screenshots/widget-taylor.png) |
+
+**Write it — MATLAB Live Editor format**
+
+The Live Script editor with the Homework 0 model solution opened from its `.mlx` file:
+
+![Live Script editor](docs/screenshots/live-script-editor.png)
+
+A MATLAB page with runnable code, inline output and figures:
+
+![MATLAB page](docs/screenshots/matlab-page.png)
+
+**Prove it — auto-checked assignments** (antiderivatives are accepted up to a constant)
+
+![Assignments](docs/screenshots/assignments.png)
+
+**AI tutor** (response shown is from a local test stub)
+
+![AI tutor](docs/screenshots/ai-tutor.png)
+
+| Dark mode | Mobile (electrical engineering course) |
+|---|---|
+| ![Dark mode](docs/screenshots/dark-mode.png) | ![Mobile](docs/screenshots/mobile-ee.png) |
+
 ## Running
 
 No build step. Requires Node 18+ only for the local server.
