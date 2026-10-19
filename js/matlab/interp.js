@@ -945,6 +945,14 @@ delete MATHFN.sinc;
 
 // ---------------------------------------------------------------- builtins
 
+function dims(args, name) {
+  if (!args.length) return [1, 1];
+  const a = toMat(args[0]);
+  if (args.length === 1 && a.n === 2) return [a.re[0], a.re[1]];
+  const r = argNum(args, 0, name);
+  return [r, args.length > 1 ? argNum(args, 1, name) : r];
+}
+
 function argNum(args, k, name, def) {
   if (args[k] === undefined) { if (def !== undefined) return def; throw new MatlabError(`Not enough input arguments for ${name}.`); }
   return toNumber(args[k], `argument ${k + 1} of ${name}`);
@@ -1076,10 +1084,10 @@ const BUILTINS = {
   },
 
   // array construction
-  zeros(args) { const r = argNum(args, 0, 'zeros', 1), c = args.length > 1 ? argNum(args, 1, 'zeros') : r; return new Mat(r, c); },
-  ones(args) { const r = argNum(args, 0, 'ones', 1), c = args.length > 1 ? argNum(args, 1, 'ones') : r; const m = new Mat(r, c); m.re.fill(1); return m; },
+  zeros(args) { const [r, c] = dims(args, 'zeros'); return new Mat(r, c); },
+  ones(args) { const [r, c] = dims(args, 'ones'); const m = new Mat(r, c); m.re.fill(1); return m; },
   eye(args) { const r = argNum(args, 0, 'eye', 1), c = args.length > 1 ? argNum(args, 1, 'eye') : r; const m = new Mat(r, c); for (let k = 0; k < Math.min(r, c); k++) m.set(k, k, 1); return m; },
-  rand(args) { const r = argNum(args, 0, 'rand', 1), c = args.length > 1 ? argNum(args, 1, 'rand') : r; const m = new Mat(r, c); for (let k = 0; k < m.n; k++) m.re[k] = Math.random(); return m; },
+  rand(args) { const [r, c] = dims(args, 'rand'); const m = new Mat(r, c); for (let k = 0; k < m.n; k++) m.re[k] = Math.random(); return m; },
   randn(args) { const r = argNum(args, 0, 'randn', 1), c = args.length > 1 ? argNum(args, 1, 'randn') : r; const m = new Mat(r, c); for (let k = 0; k < m.n; k++) m.re[k] = Math.sqrt(-2 * Math.log(Math.random() || 1e-300)) * Math.cos(2 * Math.PI * Math.random()); return m; },
   linspace(args) {
     const a = argNum(args, 0, 'linspace'), b = argNum(args, 1, 'linspace'), n = Math.floor(argNum(args, 2, 'linspace', 100));

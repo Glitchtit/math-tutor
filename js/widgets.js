@@ -541,8 +541,10 @@ WIDGETS.solid = (container, cfg) => {
       // revolve about the y-axis: radius = x, height = f(x)-g(x)
       const xmax = Math.max(Math.abs(a), Math.abs(b));
       let hmax = 0; for (let k = 0; k <= 100; k++) { const x = a + (b - a) * k / 100; hmax = Math.max(hmax, R(x) - r(x)); }
-      const sx = (w / 2 - pad) / xmax, sy = (H - 2 * pad) / (hmax * 1.3 || 1);
-      const cx = w / 2, base = H - pad;
+      const sx = Math.min((w / 2 - pad) / xmax, 0.4 * H / (2 * xmax * tilt));
+      const ry = xmax * sx * tilt;
+      const cx = w / 2, base = H - 8 - ry;
+      const sy = (base - 8 - ry) / (hmax || 1);
       const ell = (rad, y, color, fill = false, alpha = 1) => { ctx.beginPath(); ctx.ellipse(cx, base - y * sy, rad * sx, rad * sx * tilt, 0, 0, Math.PI * 2); ctx.globalAlpha = alpha; if (fill) { ctx.fillStyle = color; ctx.fill(); } ctx.strokeStyle = color; ctx.stroke(); ctx.globalAlpha = 1; };
       // outline of the solid
       for (let k = 0; k <= 12; k++) { const x = a + (b - a) * k / 12; ell(x, R(x), col.muted, false, 0.5); }

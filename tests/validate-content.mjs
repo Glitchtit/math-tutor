@@ -23,7 +23,7 @@ const EXPR_KEYS = {
 const LOST_BACKSLASH = /(^|[^\\a-zA-Z])(d?frac|sqrt|infty|cdot|mathrm|mathbb|lim|sum|int|left|right|alpha|beta|gamma|theta|varepsilon|epsilon|omega|sin|cos|tan|exp|ln|quad|text|approx|times|pm|Big|begin|end)(?![a-zA-Z])/;
 
 function texErrors(src, where, issues) {
-  const lost = LOST_BACKSLASH.exec(src);
+  const lost = LOST_BACKSLASH.exec(String(src).replace(/\\(text|mathrm|operatorname|textrm|mathit)\{[^}]*\}/g, ' '));
   if (lost) issues.push(`${where}: "${lost[2]}" without a backslash in "${src.slice(0, 80)}" — a non-raw JS string ate the backslash? Use String.raw.`);
   try { katex.renderToString(src, { throwOnError: true, strict: 'ignore', displayMode: true }); } catch (e) {
     issues.push(`${where}: LaTeX error in "${src.slice(0, 80)}": ${e.message.replace(/^KaTeX parse error: /, '')}`);
