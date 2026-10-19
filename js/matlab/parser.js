@@ -540,8 +540,7 @@ class Parser {
         const close = t.value === '[' ? ']' : '}';
         const rows = [];
         let row = [];
-        const saveEnd = this.endDepth;
-        this.endDepth = 0;
+        const saveEnd = this.endDepth; // `end` stays valid inside [ ] within an index, e.g. w([1 end])
         while (true) {
           const k = this.peek();
           if (k.type === 'op' && k.value === close) { this.next(); break; }

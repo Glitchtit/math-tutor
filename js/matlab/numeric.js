@@ -33,6 +33,9 @@ function gk15(fv, a, b) {
   return { val: K * h, err: Math.abs((K - G) * h) };
 }
 
+// at x = ±Inf the transformed integrand is taken as 0 (it must decay for convergence)
+const fin = (v, x) => (Number.isFinite(x) || Number.isFinite(v) ? v : 0);
+
 export function integrate(fv, a, b, { absTol = 1e-10, relTol = 1e-6, maxIntervals = 650 } = {}) {
   if (a === b) return { value: 0, warning: null };
   if (a > b) { const r = integrate(fv, b, a, { absTol, relTol, maxIntervals }); return { value: -r.value, warning: r.warning }; }
@@ -40,13 +43,13 @@ export function integrate(fv, a, b, { absTol = 1e-10, relTol = 1e-6, maxInterval
   let lo = a, hi = b;
   // map infinite ranges to finite ones
   if (!Number.isFinite(a) && !Number.isFinite(b)) {
-    g = (ts) => { const xs = ts.map((t) => t / (1 - t * t)); const ys = fv(xs); return ys.map((y, i) => y * (1 + ts[i] * ts[i]) / (1 - ts[i] * ts[i]) ** 2); };
+    g = (ts) => { const xs = ts.map((t) => t / (1 - t * t)); const ys = fv(xs); return ys.map((y, i) => fin(y * (1 + ts[i] * ts[i]) / (1 - ts[i] * ts[i]) ** 2, xs[i])); };
     lo = -1; hi = 1;
   } else if (!Number.isFinite(b)) {
-    g = (ts) => { const xs = ts.map((t) => a + t / (1 - t)); const ys = fv(xs); return ys.map((y, i) => y / (1 - ts[i]) ** 2); };
+    g = (ts) => { const xs = ts.map((t) => a + t / (1 - t)); const ys = fv(xs); return ys.map((y, i) => fin(y / (1 - ts[i]) ** 2, xs[i])); };
     lo = 0; hi = 1;
   } else if (!Number.isFinite(a)) {
-    g = (ts) => { const xs = ts.map((t) => b - (1 - t) / t); const ys = fv(xs); return ys.map((y, i) => y / (ts[i] * ts[i])); };
+    g = (ts) => { const xs = ts.map((t) => b - (1 - t) / t); const ys = fv(xs); return ys.map((y, i) => fin(y / (ts[i] * ts[i]), xs[i])); };
     lo = 0; hi = 1;
   }
   // start with 10 subintervals, as MATLAB does
@@ -176,7 +179,7 @@ export function polyRoots(coeffs) {
     }
     for (const r of z) {
       const scale = Math.max(1, Math.hypot(r.re, r.im));
-      out.push({ re: r.re, im: Math.abs(r.im) < 1e-10 * scale ? 0 : r.im });
+      out.push({ re: r.re, im: Math.abs(r.im) < 1e-7 * scale ? 0 : r.im });
     }
   }
   for (let k = 0; k < zerosAtEnd; k++) out.push({ re: 0, im: 0 });

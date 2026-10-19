@@ -125,14 +125,14 @@ export default {
       title: 'Partial sums with cumsum, remainder bounds with integral',
       blocks: [
         { type: 'text', html: String.raw`<p><code>cumsum</code> turns a vector of terms into the vector of partial sums: <code>S(N)</code> is $S_N$. Plot the partial sums with dots and compare with the claimed sum.</p>` },
-        { type: 'code', caption: 'Partial sums of the telescoping series Σ 2/((n+1)(n+3)) and its sum 5/6.', editable: true, code: String.raw`n = 1:60;
+        { type: 'code', caption: 'Partial sums of the telescoping series Σ 2/((n+1)(n+3)) and its sum 5/6.', editable: true, code: String.raw`n = 1:500;
 a = 2 ./ ((n + 1) .* (n + 3));
 S = cumsum(a);
 plot(n, S, '.')
 yline(5/6)
 grid on
 xlabel('N'), ylabel('S_N')
-fprintf('S_60 = %.8f,  5/6 = %.8f\n', S(end), 5/6)` },
+fprintf('S_500 = %.8f,  5/6 = %.8f\n', S(end), 5/6)` },
         { type: 'text', html: String.raw`<p>For the integral-test bounds, <code>integral</code> accepts <code>Inf</code> as a limit. Print the resulting interval with <code>fprintf</code>, and always say in text that the pre-conditions (continuous, positive, decreasing) were checked by hand.</p>` },
         { type: 'code', caption: 'Bounds for Σ 1/n³ from S_5: S_5 + ∫_6^∞ f ≤ S ≤ S_5 + ∫_5^∞ f.', editable: true, code: String.raw`f = @(x) 1 ./ x.^3;
 N = 5;
@@ -155,7 +155,7 @@ fprintf('%.6f <= S <= %.6f\n', lower, upper)` },
           { type: 'heading', content: 'Problem (Attempted)' },
           { type: 'text', content: String.raw`We show that $\sum_{n=1}^{\infty} \frac{\sqrt{n} + 2}{n^2 + 1}$ converges with the limit comparison test. For large $n$ the term behaves like $\sqrt n / n^2 = n^{-3/2}$, so we compare with $b_n = n^{-3/2}$. Both sequences are positive, and` },
           { type: 'equation', content: String.raw`\lim_{n\to\infty} \frac{a_n}{b_n} = \lim_{n\to\infty} \frac{(\sqrt n + 2)\,n^{3/2}}{n^2 + 1} = \lim_{n\to\infty} \frac{1 + 2n^{-1/2}}{1 + n^{-2}} = 1 \in (0, \infty).` },
-          { type: 'text', content: String.raw`Since $\sum n^{-3/2}$ is a convergent $p$-series ($p = 3/2 > 1$), the given series converges by the limit comparison test. Numerically the partial sums level off:` },
+          { type: 'text', content: String.raw`Since $\sum n^{-3/2}$ is a convergent $p$-series ($p = 3/2 > 1$), the given series converges by the limit comparison test. Numerically the partial sums grow ever more slowly; by the integral test the tail after $N$ terms is roughly $2/\sqrt N$:` },
           { type: 'code', content: String.raw`n = 1:5000;
 S = cumsum((sqrt(n) + 2) ./ (n.^2 + 1));
 fprintf('S_1000 = %.5f,  S_5000 = %.5f\n', S(1000), S(5000))` },

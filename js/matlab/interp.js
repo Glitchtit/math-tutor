@@ -1152,7 +1152,13 @@ const BUILTINS = {
     const I = new Mat(m.r, m.c); idx.forEach((k, t) => { I.re[t] = k + 1; });
     return nargout > 1 ? [o, I] : [o];
   },
-  find(args) { const m = toMat(args[0]); const out = []; for (let k = 0; k < m.n; k++) if (m.re[k] !== 0) out.push(k + 1); if (args[1]) out.splice(toNumber(args[1])); return Mat.fromArray(out, m.c === 1 && m.r > 1); },
+  find(args) {
+    const m = toMat(args[0]);
+    let out = [];
+    for (let k = 0; k < m.n; k++) if (m.re[k] !== 0) out.push(k + 1);
+    if (args[1]) { const k = toNumber(args[1]); out = args[2] && toStr(args[2]).toLowerCase() === 'last' ? out.slice(Math.max(0, out.length - k)) : out.slice(0, k); }
+    return Mat.fromArray(out, m.c === 1 && m.r > 1);
+  },
   any(args) { const m = toMat(args[0]); return Mat.bool(m.re.some((x) => x !== 0)); },
   all(args) { const m = toMat(args[0]); return Mat.bool(m.re.every((x) => x !== 0)); },
   norm(args) { const m = toMat(args[0]); return Mat.scalar(Math.sqrt(m.re.reduce((s, x) => s + x * x, 0))); },
@@ -1254,6 +1260,16 @@ const BUILTINS = {
   ode45(args, nargout) { return odeSolve.call(this, args, nargout, 'ode45'); },
   ode23(args, nargout) { return odeSolve.call(this, args, nargout, 'ode23'); },
   odeset(args) { const o = new Obj('struct', {}); for (let k = 0; k + 1 < args.length; k += 2) o.props[toStr(args[k])] = args[k + 1]; return o; },
+  interp1(args) {
+    const X = Array.from(toMat(args[0]).re), Y = Array.from(toMat(args[1]).re), q = toMat(args[2]);
+    if (X.length !== Y.length) throw new MatlabError('The grid vectors must have the same length.');
+    return map(q, (x) => {
+      if (x < Math.min(X[0], X[X.length - 1]) || x > Math.max(X[0], X[X.length - 1])) return NaN;
+      let k = 1; while (k < X.length - 1 && (X[k] - x) * (X[1] - X[0]) < 0) k++;
+      const s = (x - X[k - 1]) / (X[k] - X[k - 1]);
+      return Y[k - 1] + s * (Y[k] - Y[k - 1]);
+    });
+  },
   deval(args) {
     const sol = args[0], t = toMat(args[1]);
     const T = Array.from(toMat(sol.props.x).re), Y = toMat(sol.props.y);
