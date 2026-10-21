@@ -4,15 +4,24 @@ An interactive course web app that teaches calculus from the basics up to the le
 MATH.APP.160 homework (integration, applications, techniques, improper integrals, ODEs, sequences
 and series), plus a second course skeleton for electrical engineering.
 
-Every module follows the same arc:
+Every module follows the same arc, built so that no step is ever skipped:
 
-1. **Learn** — interactive graphs and animations first (Riemann sums, accumulation functions,
-   solids of revolution, slope fields, a mass–spring–damper, Taylor polynomials, phasors, …).
+1. **Learn** — each idea starts with an interactive graph or animation (Riemann sums, accumulation
+   functions, solids of revolution, slope fields, a mass–spring–damper, Taylor polynomials, phasors, …),
+   then follows **I do → we do → you do**:
+   - a **worked example** where every line of algebra is written out with the reason for it, and an
+     "I don't follow this step" button on each line that asks the tutor to fill the gap;
+   - a **guided exercise** of the same type with new numbers, solved one small step at a time, with a hint
+     and "show me this step" for each step;
+   - **refreshers** of prerequisite skills (inequalities, log rules, completing the square, …) placed
+     exactly where they are needed.
 2. **MATLAB Live Editor** — the same mathematics written the way homework and exams are written:
    LaTeX equations (Ctrl+Shift+L), English explanation before each step, MATLAB code for plots and
    numerical checks, never `syms`.
-3. **Assignments** — homework-level problems with automatic checking of numbers, functions (up to a
-   constant for antiderivatives) and choices, plus write-up problems with Live Script model solutions.
+3. **Assignments** — only problem types that were already worked and practised (each links back to its
+   example), with automatic checking, a hint ladder (nudge → method → first step), a full step-by-step
+   walkthrough, and an "I'm stuck — coach me" button. The content validator refuses any assignment
+   without a worked example and guided exercise of its type.
 
 An **AI tutor** (Anthropic API) is built into every page: it answers questions with the current page
 as context, diagnoses wrong answers, reviews Live Script write-ups, recommends what to focus on from

@@ -104,10 +104,10 @@ function home() {
       h('button', { class: 'btn', onclick: () => { tutor.open(); tutor.focus(); } }, 'Ask the tutor what to focus on'),
       h('a', { class: 'btn btn-ghost', href: '#/editor' }, 'Open the Live Script editor')));
   const how = h('section', { class: 'how' },
-    h('div', { class: 'how-step' }, h('b', {}, '1 · See it'), h('span', {}, 'Each lesson starts with an interactive graph or animation.')),
-    h('div', { class: 'how-step' }, h('b', {}, '2 · Write it'), h('span', {}, 'Then you write the same mathematics in Live Editor LaTeX and MATLAB, step by step.')),
-    h('div', { class: 'how-step' }, h('b', {}, '3 · Prove it'), h('span', {}, 'Each module ends with auto-checked assignments at homework level.')),
-    h('div', { class: 'how-step' }, h('b', {}, '4 · Ask'), h('span', {}, 'The AI tutor explains, diagnoses mistakes and generates new practice on demand.')));
+    h('div', { class: 'how-step' }, h('b', {}, '1 · See it'), h('span', {}, 'Each idea starts with a graph or animation you can move.')),
+    h('div', { class: 'how-step' }, h('b', {}, '2 · Watch it done'), h('span', {}, 'A fully worked example: every line of algebra, each with the reason for it. Stuck on a line? "I don\'t follow this step" asks the tutor to fill the gap.')),
+    h('div', { class: 'how-step' }, h('b', {}, '3 · Do it with help'), h('span', {}, 'The same kind of problem with new numbers, one small step at a time, with a hint and "show me" for each step.')),
+    h('div', { class: 'how-step' }, h('b', {}, '4 · Do it yourself'), h('span', {}, 'Assignments only use problem types you have already seen worked and practised — each links back to its example, with hints and a full walkthrough.')));
   const map = h('section', { class: 'course-map' });
   for (const part of PARTS.filter((p) => p.course === currentCourse)) {
     const pmods = mods.filter((m) => m.part === part.id);
@@ -140,9 +140,9 @@ function modulePage(m) {
   const intro = h('div', { class: 'prose' });
   intro.innerHTML = m.intro || `<p>${m.summary}</p>`;
   const cols = h('div', { class: 'mod-cols' },
-    h('section', { class: 'mod-col' }, h('h3', {}, '1 · Learn'), h('p', { class: 'muted small' }, 'Visual lessons with interactive graphs and animations.'), moduleNavList(m, 'learn', m.lessons || [])),
+    h('section', { class: 'mod-col' }, h('h3', {}, '1 · Learn'), h('p', { class: 'muted small' }, 'Graphs first, then fully worked examples and step-by-step guided practice.'), moduleNavList(m, 'learn', m.lessons || [])),
     h('section', { class: 'mod-col' }, h('h3', {}, '2 · MATLAB Live Editor'), h('p', { class: 'muted small' }, 'Write the same mathematics as in your homework.'), moduleNavList(m, 'matlab', m.matlab || [])),
-    h('section', { class: 'mod-col' }, h('h3', {}, '3 · Assignments'), h('p', { class: 'muted small' }, 'Auto-checked problems at homework level.'),
+    h('section', { class: 'mod-col' }, h('h3', {}, '3 · Assignments'), h('p', { class: 'muted small' }, 'Only problem types you have already practised, with hints and walkthroughs.'),
       h('ol', { class: 'lesson-list' }, ...(m.assignments || []).map((a) => h('li', { class: progress.isDone(`${m.id}/assign/${a.id}`) ? 'done' : '' }, h('a', { href: `#/module/${m.id}/assign#${a.id}` }, a.title), progress.isDone(`${m.id}/assign/${a.id}`) ? h('span', { class: 'check' }, '✓') : null))),
       h('a', { class: 'btn btn-small', href: `#/module/${m.id}/assign` }, 'Open assignments')));
   const aiRow = h('div', { class: 'row' },
