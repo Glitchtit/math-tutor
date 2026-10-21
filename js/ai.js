@@ -82,12 +82,14 @@ The app's MATLAB sandbox supports: scalars/vectors/matrices, element-wise operat
 Courses and modules (id | part | title: summary):
 ${courseOutline}
 
-How to tutor:
-- Be concise and precise, engineering-level. No emojis. Prefer short paragraphs and numbered steps.
-- Write mathematics in LaTeX with $...$ inline and $$...$$ for display. Write MATLAB in \`\`\`matlab fences, and use element-wise operators so code works with integral and fplot.
+How to tutor — this student wants maximum hand-holding and gets lost when steps are skipped:
+- Never skip algebra. Write every intermediate line, one transformation per line, and after each line say in plain words what was done and which rule allows it (e.g. "divide both sides by 3", "exponent rule $x^a x^b = x^{a+b}$"). If a rule might be rusty, remind the student of it with a tiny numeric example.
+- Never ask the student to solve a type of problem you have not first shown them fully worked. When they ask how to do something, first show a complete worked example of a similar problem (different numbers), then offer the same type for them to try.
+- When coaching ("I'm stuck"), give only the next small step and why, ask them to do it, and wait for their answer. If they get it wrong, explain the specific slip, then let them retry.
+- Define every symbol and term the first time it appears. Prefer concrete numbers before general formulas.
 - Diagnose before explaining: identify the specific misconception, then fix it. Check claims numerically when useful (show the MATLAB one-liner).
-- Socratic by default for exercises: give the next step or a hint first; give a full solution only when the student explicitly asks for it or after they have made a real attempt.
-- If the student pastes what is clearly a currently graded homework problem, coach them through method and checks rather than producing a finished write-up to submit.
+- Be precise and calm. No emojis. Write mathematics in LaTeX with $...$ inline and $$...$$ for display. Write MATLAB in \`\`\`matlab fences with element-wise operators.
+- If the student pastes what is clearly a currently graded homework problem, teach the method with a similar worked example and coach them step by step rather than producing a finished write-up to submit.
 - When recommending what to study, refer to modules by id and title and link them as [Title](#/module/<id>).
 - Model good Live Script style when showing a written solution: a sentence of English, then the equation, then the next sentence.`;
 }
@@ -133,10 +135,20 @@ export async function chat(messages, { onText, onThinking, signal } = {}) {
 // ------------------------------------------------------------------ structured generation
 
 const STR = { type: 'string' };
+const STEP_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['do', 'why'],
+  properties: {
+    do: { type: 'string', description: 'One line of mathematics (Markdown with $LaTeX$): exactly one transformation' },
+    why: { type: 'string', description: 'Plain-words reason for this line: what was done and which rule allows it' },
+  },
+};
+
 const PART_SCHEMA = {
   type: 'object',
   additionalProperties: false,
-  required: ['label', 'prompt', 'kind', 'answer', 'variable', 'upToConstant', 'choices', 'hint', 'solution'],
+  required: ['label', 'prompt', 'kind', 'answer', 'variable', 'upToConstant', 'choices', 'hints', 'walkthrough', 'solution'],
   properties: {
     label: { type: 'string', description: 'Part label like "(a)"' },
     prompt: { type: 'string', description: 'What to compute, Markdown with $LaTeX$' },
@@ -145,7 +157,8 @@ const PART_SCHEMA = {
     variable: { type: 'string', description: 'Variable name for kind=expression, else empty string' },
     upToConstant: { type: 'boolean', description: 'true for antiderivatives (answers may differ by a constant)' },
     choices: { type: 'array', items: STR, description: 'Choices for kind=choice (Markdown/LaTeX), else empty array' },
-    hint: { type: 'string', description: 'One hint that points to the method without giving the answer' },
+    hints: { type: 'array', items: STR, description: 'Exactly three hints of increasing help: 1) a nudge naming what to look at, 2) the method and why it fits, 3) the first step written out' },
+    walkthrough: { type: 'array', items: STEP_SCHEMA, description: 'The complete solution, one small step per item (6-15 steps), never skipping algebra' },
     solution: { type: 'string', description: 'Worked solution in Markdown with $LaTeX$: English sentence before each step, as in a Live Script' },
   },
 };
@@ -162,10 +175,17 @@ const ASSIGNMENT_SCHEMA = {
       items: {
         type: 'object',
         additionalProperties: false,
-        required: ['title', 'difficulty', 'statement', 'parts'],
+        required: ['title', 'difficulty', 'workedExample', 'statement', 'parts'],
         properties: {
           title: STR,
           difficulty: { type: 'string', enum: ['core', 'challenge', 'exam'] },
+          workedExample: {
+            type: 'object',
+            additionalProperties: false,
+            required: ['problem', 'steps'],
+            description: 'A fully worked example of the SAME type with different numbers, shown before the problem',
+            properties: { problem: STR, steps: { type: 'array', items: STEP_SCHEMA } },
+          },
           statement: { type: 'string', description: 'Problem statement in Markdown with $LaTeX$' },
           parts: { type: 'array', items: PART_SCHEMA },
         },
@@ -290,7 +310,7 @@ export async function generateAssignments({ topic, moduleTitle, course = 'calcul
   const prompt = `Create ${count} practice problems ${moduleTitle ? `for the module "${moduleTitle}"` : ''} on: ${topic}.
 Difficulty: ${difficulty}. ${course === 'ee' ? 'Match the level of an introductory university circuit-analysis course (SI units, numeric answers in base units).' : 'Match the style and level of MATH.APP.160 homework (Adams-style calculus).'} Each problem has 1-3 parts.
 Prefer auto-checkable parts: "numeric" (exact value as a MATLAB expression), "expression" (a function of one variable; set upToConstant for antiderivatives), or "choice". Use "writeup" only for proofs/explanations.
-Double-check every answer by working it out fully before writing it; the app will auto-grade with these answers.
+Before each problem, give a fully worked example of the same type with different numbers (workedExample), one small step per item with its reason. Never skip algebra anywhere. Double-check every answer by working it out fully before writing it; the app will auto-grade with these answers.
 Solutions must read like a good Live Script: an English sentence saying what is done next, then the mathematics.
 ${progressSummary ? `Student progress (focus on weaknesses):\n${progressSummary}` : ''}`;
   const set = await generate(ASSIGNMENT_SCHEMA, prompt, opts);
@@ -300,7 +320,7 @@ ${progressSummary ? `Student progress (focus on weaknesses):\n${progressSummary}
 
 export async function generateLesson({ topic, moduleTitle, course = 'calculus', level = '' }, opts) {
   const prompt = `Write a short interactive mini-lesson (3-5 sections) for the ${course === 'ee' ? 'electrical engineering' : 'calculus'} course on: ${topic}${moduleTitle ? ` (context: module "${moduleTitle}")` : ''}. ${level}
-Teach visually first: choose a widget for most sections and configure it carefully so the picture is meaningful (sensible xlim/ylim). Then show how the same idea is written in the MATLAB Live Editor (a LaTeX drill and/or a short MATLAB example, never syms). End each section with one multiple-choice check.
+Assume the student gets lost when steps are skipped: in every body, show worked examples line by line with the reason for each line. Teach visually first: choose a widget for most sections and configure it carefully so the picture is meaningful (sensible xlim/ylim). Then show how the same idea is written in the MATLAB Live Editor (a LaTeX drill and/or a short MATLAB example, never syms). End each section with one multiple-choice check.
 ${WIDGET_REFERENCE}`;
   const lesson = await generate(LESSON_SCHEMA, prompt, opts);
   for (const s of lesson.sections) {

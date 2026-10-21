@@ -50,7 +50,9 @@ export default {
 | `text` | `html` | Explanation. Short paragraphs. |
 | `callout` | `kind` (`note`, `key`, `warn`, `matlab`, `exam`, `def`, `thm`), `title?`, `html` | Definitions, theorems, warnings, exam tips. |
 | `widget` | `name`, `config` | Interactive graph or animation (see below). |
-| `steps` | `title?`, `steps: [html]` | Worked example revealed one step at a time. |
+| `steps` | `title?`, `problem?`, `kicker?`, `steps: [{do, why}]` | Worked example revealed one step at a time. `do` is one line of maths (one transformation), `why` the plain-words reason. Every step gets an "I don't follow this step" button that asks the tutor. |
+| `guided` | `title?`, `problem`, `steps: [{prompt, show?, why?} \| {prompt, ask, hint, reveal, why?}]`, `finale?` | "Your turn — step by step": the same type as the worked example, with new numbers. The student does one small step at a time; `ask` is a part object (`kind`, `answer`, …) checked like an assignment part; `reveal` is the worked line shown after a correct answer or "Show me this step". |
+| `refresher` | `title`, `html`, `steps?` | Collapsible reminder of a prerequisite skill (exponent rules, completing the square, …) placed right where it is needed. |
 | `quiz` | `question`, `choices: [html]`, `answer` (index or array of indices), `explain` | Concept check. |
 | `table` | `head: [html]`, `rows: [[html]]` | Reference tables (LaTeX command ↔ result, etc.). |
 | `latex` | `prompt`, `target`, `accept?: []`, `hint?` | Student retypes a formula in LaTeX; compared up to spacing, optional braces, `\left/\right`, `\mathrm d` vs `d`. |
@@ -116,6 +118,10 @@ unless stated. Parameters declared in `params` can be used in expressions and be
     { label: '(c)', kind: 'choice', choices: [html], answer: 1 },
     { label: '(d)', kind: 'writeup', prompt: '...' },   // free-form, self-assessed against the model solution
   ],
+  examples: ['lesson-id', ...],    // REQUIRED: lessons with the worked example + guided exercise of this exact type
+  // every numeric/expression/choice part also needs:
+  //   hints: [nudge, method, first step written out]       (at least 2, ideally 3)
+  //   walkthrough: [{ do, why }, ...]                      (numeric/expression: the full solution in small steps)
   writeup?: true,                  // offer a Live Script editor for the full solution
   writeupTemplate?: [liveScriptBlocks],
   solution?: [liveScriptBlocks],   // model solution in Live Script style
@@ -125,6 +131,25 @@ unless stated. Parameters declared in `params` can be used in expressions and be
 Numeric answers may be MATLAB expressions (`'24*sqrt(3)/5'`); students may type expressions too.
 Expression answers are compared at sample points in `domain` (default `[0.3, 2.7]`) — pick a domain
 where the function is defined. Antiderivatives use `upToConstant: true`.
+
+## The hand-holding standard (enforced by the validator)
+
+Learners must never meet a problem type they have not first seen fully worked and then practised
+with support. Each problem type follows **I do → we do → you do**:
+
+1. **I do — worked example** (`steps`): every line of algebra is written out, one transformation per
+   step, each with a `why` in plain words naming the rule used. Nothing is "obvious". If a step uses
+   a prerequisite skill (fractions, exponent laws, trig identities, completing the square, chain rule…),
+   put a `refresher` right before the example.
+2. **We do — guided exercise** (`guided`): the same type with different numbers. The student answers the
+   small steps (choose u, compute du, rewrite the integral, integrate, substitute back, evaluate) one at a
+   time, with a hint per step and "Show me this step".
+3. **You do — assignment**: the same type again, now unaided, but with `examples` linking back to 1–2,
+   a hint ladder (`hints`: nudge → method → first step) and a full `walkthrough`.
+
+Rules of thumb: introduce one new idea at a time; use concrete numbers before general formulas; define
+every symbol the first time; assignments within a module go from "same as the example with new numbers"
+to "small variation" to "combination" — and every variation must itself have been shown before.
 
 ## Pedagogy and house style
 

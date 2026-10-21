@@ -116,7 +116,32 @@ export function validateBlocks(blocks, where, issues) {
       case 'callout': mathIn(b.html, w, issues); mathIn(b.title, w, issues); break;
       case 'widget': checkWidget(b, w, issues); break;
       case 'table': (b.head || []).forEach((c) => mathIn(c, w, issues)); (b.rows || []).flat().forEach((c) => mathIn(c, w, issues)); break;
-      case 'steps': mathIn(b.title, w, issues); (b.steps || []).forEach((s) => mathIn(s, w, issues)); break;
+      case 'steps':
+        mathIn(b.title, w, issues); mathIn(b.problem, w, issues);
+        checkStepList(b.steps, w, issues, 3);
+        break;
+      case 'refresher':
+        mathIn(b.title, w, issues); mathIn(b.html, w, issues);
+        if (b.steps) checkStepList(b.steps, w, issues, 1);
+        break;
+      case 'guided': {
+        mathIn(b.title, w, issues); mathIn(b.problem, w, issues); mathIn(b.finale, w, issues);
+        if (!b.problem) issues.push(`${w}: guided exercise needs a problem`);
+        const st = b.steps || [];
+        if (st.length < 3) issues.push(`${w}: guided exercise needs at least 3 small steps`);
+        if (st.filter((x) => x.ask).length < 2) issues.push(`${w}: guided exercise needs at least 2 steps where the student answers (ask)`);
+        st.forEach((x, k) => {
+          const sw = `${w} step[${k}]`;
+          if (!x.prompt) issues.push(`${sw}: missing prompt`);
+          mathIn(x.prompt, sw, issues); mathIn(x.show, sw, issues); mathIn(x.why, sw, issues); mathIn(x.hint, sw, issues); mathIn(x.reveal, sw, issues);
+          if (x.ask) {
+            validatePart({ ...x.ask, prompt: '' }, sw, issues, { lenient: true });
+            if (!x.reveal) issues.push(`${sw}: an ask step needs "reveal" (the worked line shown after answering)`);
+            if (!x.hint) issues.push(`${sw}: an ask step needs a hint`);
+          }
+        });
+        break;
+      }
       case 'quiz':
         mathIn(b.question, w, issues); (b.choices || []).forEach((c) => mathIn(c, w, issues)); mathIn(b.explain, w, issues);
         if (!Array.isArray(b.choices) || b.choices.length < 2) issues.push(`${w}: quiz needs at least 2 choices`);
@@ -141,7 +166,21 @@ export function validateBlocks(blocks, where, issues) {
   });
 }
 
-function validatePart(p, w, issues) {
+function checkStepList(steps, w, issues, min) {
+  if (!Array.isArray(steps) || steps.length < min) { issues.push(`${w}: needs at least ${min} steps`); return; }
+  steps.forEach((st, k) => {
+    if (typeof st === 'string' || !st.do || !st.why) issues.push(`${w} step[${k}]: every worked step must be { do, why } — the line of maths and the reason in plain words`);
+    if (typeof st === 'string') mathIn(st, w, issues); else { mathIn(st.do, w, issues); mathIn(st.why, w, issues); }
+  });
+}
+
+function validatePart(p, w, issues, { lenient = false } = {}) {
+  if (!lenient) {
+    (p.hints || []).forEach((x) => mathIn(x, w, issues));
+    if (p.kind !== 'writeup' && (!p.hints || p.hints.length < 2)) issues.push(`${w}: needs a hint ladder "hints" with at least 2 levels (nudge, then method/first step)`);
+    if ((p.kind === 'numeric' || p.kind === 'expression') && !p.walkthrough) issues.push(`${w}: needs a step-by-step "walkthrough"`);
+    if (p.walkthrough) checkStepList(p.walkthrough, `${w} walkthrough`, issues, 3);
+  }
   mathIn(p.prompt, w, issues); mathIn(p.hint, w, issues); mathIn(p.solution, w, issues); mathIn(p.feedback, w, issues);
   (p.choices || []).forEach((c) => mathIn(c, w, issues));
   if (p.kind === 'numeric') {
@@ -154,6 +193,12 @@ function validatePart(p, w, issues) {
   } else if (p.kind === 'choice') {
     if (!(Number.isInteger(p.answer) && p.answer >= 0 && p.answer < (p.choices || []).length)) issues.push(`${w}: choice answer index invalid`);
   } else if (p.kind !== 'writeup') issues.push(`${w}: unknown part kind "${p.kind}"`);
+}
+
+function findLesson(ref, m) {
+  const [modId, id] = ref.includes('/') ? ref.split('/') : [m.id, ref];
+  const mod = MODULES.find((x) => x.id === modId);
+  return mod && [...(mod.lessons || []), ...(mod.matlab || [])].find((l) => l.id === id);
 }
 
 export function validateModule(m) {
@@ -180,7 +225,19 @@ export function validateModule(m) {
     (a.parts || []).forEach((p, i) => validatePart(p, `${aw} part[${i}]`, issues));
     if (a.solution) checkLiveBlocks(a.solution, `${aw} solution`, issues);
     if (a.writeupTemplate) checkLiveBlocks(a.writeupTemplate.filter((b) => b.type !== 'code'), `${aw} template`, issues);
+    // every problem type must have been shown worked and practised with support before
+    if (!a.examples || !a.examples.length) issues.push(`${aw}: needs "examples": the lesson ids that contain a worked example and a guided exercise of this exact problem type`);
+    else {
+      const refs = a.examples.map((r) => findLesson(r, m));
+      a.examples.forEach((r, k) => { if (!refs[k]) issues.push(`${aw}: example "${r}" is not a lesson id`); });
+      const blocks = refs.filter(Boolean).flatMap((l) => l.blocks || []);
+      if (!blocks.some((b) => b.type === 'steps')) issues.push(`${aw}: none of its example lessons contains a worked example (steps block)`);
+      if (!blocks.some((b) => b.type === 'guided')) issues.push(`${aw}: none of its example lessons contains a guided exercise`);
+    }
+    if ((a.parts || []).some((p) => p.kind === 'writeup') && !a.solution) issues.push(`${aw}: a writeup part needs a model "solution"`);
   }
+  const guided = [...(m.lessons || []), ...(m.matlab || [])].flatMap((l) => l.blocks || []).filter((b) => b.type === 'guided').length;
+  if ((m.assignments || []).length && guided < 2) issues.push(`${w}: needs at least 2 guided exercises before its assignments`);
   return issues;
 }
 

@@ -488,3 +488,25 @@ body {
 .msg-assistant .msg-body { border: 1px solid var(--border); }
 ::selection { background: color-mix(in srgb, var(--accent) 35%, transparent); }
 * { scrollbar-color: var(--border-strong) transparent; }
+
+/* ---------------------------------------------------------------- hand-holding: worked steps, guided practice, help ladder */
+.steps-kicker { font-size: .72rem; text-transform: uppercase; letter-spacing: .07em; color: var(--accent); font-weight: 650; margin-bottom: 2px; }
+.steps-kicker.guided { color: var(--ok); }
+.steps-problem { margin: 6px 0 4px; padding: 8px 12px; background: var(--surface-2); border-radius: 8px; border: 1px solid var(--border); }
+.steps-list li { padding: 6px 0; border-bottom: 1px dashed var(--border); }
+.steps-list li:last-child { border-bottom: 0; }
+.step-do { font-size: 1.02rem; }
+.step-why { font-size: .9rem; color: var(--text-muted); margin-top: 2px; padding-left: 10px; border-left: 2px solid var(--accent-soft); }
+.step-prompt { font-weight: 550; }
+.step-help { font: inherit; font-size: .75rem; color: var(--text-muted); background: none; border: 0; padding: 2px 0; cursor: pointer; text-decoration: underline dotted; }
+.step-help:hover { color: var(--accent); }
+.steps-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 6px; }
+.blk-guided { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--ok); border-radius: var(--radius); padding: 14px 16px; box-shadow: var(--shadow); }
+.guided-list li .answer-row { margin-top: 6px; }
+.guided-finale { margin-top: 10px; }
+details.refresher { border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; background: var(--surface); }
+details.refresher summary { color: var(--accent); }
+.help-box:empty { display: none; }
+.help-box { display: grid; gap: 6px; margin-top: 4px; }
+.walkthrough { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+.example-links { margin: 4px 0 6px; padding: 6px 10px; border-radius: 8px; background: var(--accent-soft); font-size: .9rem; }

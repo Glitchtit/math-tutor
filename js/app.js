@@ -240,15 +240,19 @@ function referencePage() {
 function mdToHtml(s) { return markdown(s || ''); }
 function mdInline(s) { return mdToHtml(s).replace(/^<p>([\s\S]*)<\/p>$/, '$1'); }
 
+function mdSteps(steps) { return (steps || []).map((st) => ({ do: mdInline(st.do), why: mdInline(st.why) })); }
+
 function generatedToAssignments(set) {
   return set.problems.map((p, i) => ({
     id: `p${i}`,
     title: p.title,
     difficulty: p.difficulty,
     statement: mdToHtml(p.statement),
+    preBlocks: p.workedExample && p.workedExample.steps?.length ? [{ type: 'steps', kicker: 'Worked example of the same type', problem: mdToHtml(p.workedExample.problem), steps: mdSteps(p.workedExample.steps) }] : undefined,
     parts: p.parts.map((pt) => ({
       label: pt.label, prompt: mdToHtml(pt.prompt), kind: pt.kind, answer: pt.answer, variable: pt.variable || 'x',
-      upToConstant: pt.upToConstant, choices: (pt.choices || []).map(mdInline), hint: pt.hint ? mdToHtml(pt.hint) : '', solution: mdToHtml(pt.solution),
+      upToConstant: pt.upToConstant, choices: (pt.choices || []).map(mdInline),
+      hints: (pt.hints || (pt.hint ? [pt.hint] : [])).map(mdInline), walkthrough: pt.walkthrough?.length ? mdSteps(pt.walkthrough) : undefined, solution: mdToHtml(pt.solution),
     })),
     writeup: p.parts.some((pt) => pt.kind === 'writeup'),
   }));

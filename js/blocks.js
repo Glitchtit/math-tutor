@@ -7,6 +7,7 @@ import { checkPart } from './check.js';
 import { runMatlabChecks } from './matlab/checks.js';
 import { LiveScript, renderLiveDoc } from './livescript.js';
 import { progress } from './progress.js';
+import { MODULES } from './content/index.js';
 
 export function askTutor(prompt, context = '') {
   window.dispatchEvent(new CustomEvent('tutor:ask', { detail: { prompt, context } }));
@@ -39,23 +40,130 @@ RENDER.table = (b) => {
   return h('div', { class: 'table-wrap' }, t);
 };
 
-RENDER.steps = (b) => {
-  const el = h('div', { class: 'blk-steps' });
-  if (b.title) el.appendChild(html(h('div', { class: 'steps-title' }), b.title));
+// A worked step is either an HTML string or { do: html, why: html }.
+// `do` is the line of mathematics, `why` says in plain words what was done and why it is allowed.
+function stepItem(step, i, steps, context) {
+  const st = typeof step === 'string' ? { do: step } : step;
+  const li = h('li', { class: 'step-in' });
+  li.appendChild(html(h('div', { class: 'step-do' }), st.do));
+  if (st.why) li.appendChild(html(h('div', { class: 'step-why' }), st.why));
+  const prev = i > 0 ? (typeof steps[i - 1] === 'string' ? steps[i - 1] : steps[i - 1].do) : '';
+  li.appendChild(h('button', { class: 'step-help', type: 'button', title: 'Ask the tutor to explain this step in smaller pieces', onclick: () => askTutor(
+    'I do not follow this step of a worked example. Explain how we get from the previous line to this line in the smallest possible steps: write every intermediate line of algebra, say which rule is used at each line (and remind me of that rule with a tiny numeric example), and do not skip anything. Then ask me one short question to check I understood.',
+    `${context ? `Worked example: ${stripHtml(context)}\n` : ''}Previous line: ${stripHtml(prev) || '(this is the first step)'}\nThis step: ${stripHtml(st.do)}${st.why ? `\nGiven reason: ${stripHtml(st.why)}` : ''}`) }, "I don't follow this step"));
+  return li;
+}
+
+export function renderStepList(container, steps, { title = '', context = '', oneAtATime = true, label = 'Next step →' } = {}) {
   const list = h('ol', { class: 'steps-list' });
-  el.appendChild(list);
+  container.appendChild(list);
   let shown = 0;
-  const btn = h('button', { class: 'btn btn-small' }, 'Next step →');
-  const all = h('button', { class: 'btn btn-small btn-ghost' }, 'Show all');
+  const btn = h('button', { class: 'btn btn-small' }, label);
+  const all = h('button', { class: 'btn btn-small btn-ghost' }, 'Show all steps');
+  const counter = h('span', { class: 'muted small' });
   const next = () => {
-    if (shown >= b.steps.length) return;
-    list.appendChild(html(h('li', { class: 'step-in' }), b.steps[shown++]));
-    if (shown >= b.steps.length) { btn.remove(); all.remove(); }
+    if (shown >= steps.length) return;
+    list.appendChild(stepItem(steps[shown], shown, steps, context || title));
+    shown++;
+    counter.textContent = `step ${shown} of ${steps.length}`;
+    if (shown >= steps.length) { btn.remove(); all.remove(); }
   };
   btn.onclick = next;
-  all.onclick = () => { while (shown < b.steps.length) next(); };
-  el.appendChild(h('div', { class: 'steps-controls' }, btn, all));
-  next();
+  all.onclick = () => { while (shown < steps.length) next(); };
+  container.appendChild(h('div', { class: 'steps-controls' }, btn, all, counter));
+  if (oneAtATime) next(); else all.onclick();
+  return list;
+}
+
+RENDER.steps = (b) => {
+  const el = h('div', { class: 'blk-steps' });
+  el.appendChild(h('div', { class: 'steps-kicker' }, b.kicker || 'Worked example'));
+  if (b.title) el.appendChild(html(h('div', { class: 'steps-title' }), b.title));
+  if (b.problem) el.appendChild(html(h('div', { class: 'steps-problem prose' }), b.problem));
+  renderStepList(el, b.steps, { title: `${b.title || ''} ${b.problem || ''}` });
+  return el;
+};
+
+// Collapsible refresher of a prerequisite skill (algebra, trig identities, ...)
+RENDER.refresher = (b) => {
+  const det = h('details', { class: 'refresher' }, h('summary', {}, `Refresher: ${b.title}`));
+  det.appendChild(html(h('div', { class: 'prose' }), b.html));
+  if (b.steps) renderStepList(det, b.steps, { title: b.title, oneAtATime: false });
+  return det;
+};
+
+// "Your turn, with support": the same kind of problem as the worked example, solved one step at a time.
+// steps: [{ prompt, show? } | { prompt, ask: {kind, answer, ...}, hint, reveal }]
+RENDER.guided = (b, ctx) => {
+  const el = h('div', { class: 'blk-guided' });
+  el.appendChild(h('div', { class: 'steps-kicker guided' }, b.kicker || 'Your turn — step by step'));
+  if (b.title) el.appendChild(html(h('div', { class: 'steps-title' }), b.title));
+  el.appendChild(html(h('div', { class: 'steps-problem prose' }), b.problem));
+  const list = h('ol', { class: 'steps-list guided-list' });
+  el.appendChild(list);
+  const key = ctx?.key ? `${ctx.key}/guided/${ctx.index}` : null;
+  let i = 0;
+  const finish = () => {
+    if (b.finale) list.after(html(h('div', { class: 'callout key guided-finale' }), b.finale));
+    if (key) progress.attempt(key, true, { module: ctx.module, kind: 'guided', label: stripHtml(b.title || b.problem).slice(0, 80) });
+  };
+  const nextStep = () => {
+    if (i >= b.steps.length) { finish(); return; }
+    const st = b.steps[i];
+    const idx = i++;
+    const li = h('li', { class: 'step-in' });
+    li.appendChild(html(h('div', { class: 'step-prompt' }), st.prompt));
+    list.appendChild(li);
+    if (!st.ask) {
+      if (st.show) li.appendChild(html(h('div', { class: 'step-do' }), st.show));
+      if (st.why) li.appendChild(html(h('div', { class: 'step-why' }), st.why));
+      const cont = h('button', { class: 'btn btn-small', onclick: () => { cont.remove(); nextStep(); } }, idx === b.steps.length - 1 ? 'Finish' : 'Continue →');
+      li.appendChild(h('div', { class: 'row' }, cont));
+      return;
+    }
+    const part = st.ask;
+    const fb = h('div', { class: 'feedback' });
+    const reveal = () => {
+      row.remove();
+      if (st.reveal) li.appendChild(html(h('div', { class: 'step-do' }), st.reveal));
+      if (st.why) li.appendChild(html(h('div', { class: 'step-why' }), st.why));
+      const cont = h('button', { class: 'btn btn-small', onclick: () => { cont.remove(); nextStep(); } }, idx === b.steps.length - 1 ? 'Finish' : 'Next step →');
+      li.appendChild(h('div', { class: 'row' }, cont));
+    };
+    let getInput;
+    if (part.kind === 'choice') {
+      const name = 'g' + Math.random().toString(36).slice(2);
+      const opts = part.choices.map((c, k) => { const inp = h('input', { type: 'radio', name, value: k }); return { inp, lab: h('label', { class: 'quiz-opt' }, inp, html(h('span'), c)) }; });
+      li.appendChild(h('div', { class: 'quiz-opts' }, ...opts.map((o) => o.lab)));
+      getInput = () => { const o = opts.findIndex((x) => x.inp.checked); return o < 0 ? '' : String(o); };
+    } else {
+      const inp = h('input', { class: 'answer-input mono', type: 'text', placeholder: inputHelp(part), autocomplete: 'off', spellcheck: 'false', 'aria-label': 'Your answer for this step' });
+      inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); check(); } });
+      li.appendChild(h('div', { class: 'answer-row' }, part.label ? h('span', { class: 'mono muted' }, part.label) : null, inp));
+      getInput = () => inp.value;
+      setTimeout(() => inp.focus({ preventScroll: true }), 30);
+    }
+    let tries = 0;
+    const check = () => {
+      const input = getInput();
+      if (input === '') { fb.className = 'feedback'; fb.textContent = 'Type your answer for this step first.'; return; }
+      let r;
+      try { r = checkPart(part, input); } catch (e) { r = { ok: false, error: e.message }; }
+      tries++;
+      fb.className = `feedback ${r.ok ? 'ok' : 'bad'}`;
+      if (r.ok) { fb.innerHTML = '<b>Right.</b>'; reveal(); return; }
+      html(fb, r.error ? r.error : `<b>Not yet.</b> ${tries === 1 && st.hint ? `Hint: ${st.hint}` : tries >= 2 ? 'You can look at this step — that is fine, it is how you learn the pattern.' : ''}`);
+      if (tries >= 2) showBtn.classList.add('btn-primary');
+    };
+    const showBtn = h('button', { class: 'btn btn-small btn-ghost', onclick: () => { fb.className = 'feedback'; fb.textContent = ''; reveal(); } }, 'Show me this step');
+    const row = h('div', { class: 'row' },
+      h('button', { class: 'btn btn-small btn-primary', onclick: check }, 'Check step'),
+      st.hint ? h('button', { class: 'btn btn-small btn-ghost', onclick: (e) => e.target.replaceWith(html(h('div', { class: 'hint' }), 'Hint: ' + st.hint)) }, 'Hint') : null,
+      showBtn,
+      h('button', { class: 'btn btn-small btn-ghost', onclick: () => askTutor('I am stuck on this step of a guided exercise. Explain only this step, in the smallest pieces, without solving the rest of the problem.', `Problem: ${stripHtml(b.problem)}\nThis step: ${stripHtml(st.prompt)}\nMy answer: ${getInput() || '(none yet)'}`) }, 'Ask tutor'));
+    li.append(row, fb);
+  };
+  nextStep();
   return el;
 };
 
@@ -209,7 +317,7 @@ export function renderPart(part, key, ctx = {}) {
     const prev = h('span', { class: 'answer-preview muted' });
     inp.addEventListener('input', () => { prev.textContent = ''; });
     inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); doCheck(); } });
-    el.appendChild(h('div', { class: 'answer-row' }, part.kind === 'expression' ? h('span', { class: 'mono muted' }, `${part.fname || (part.upToConstant ? 'F' : 'f')}(${part.variable || 'x'}) =`) : null, inp, prev));
+    el.appendChild(h('div', { class: 'answer-row' }, part.kind === 'expression' && (part.fname || part.upToConstant) ? h('span', { class: 'mono muted' }, `${part.fname || 'F'}(${part.variable || 'x'}) =`) : null, inp, prev));
     getInput = () => inp.value;
   } else {
     getInput = () => '';
@@ -227,19 +335,53 @@ export function renderPart(part, key, ctx = {}) {
     else html(fb, `<b>Not correct yet.</b>${part.kind === 'numeric' && r.value !== undefined ? ` Your value: ${+r.value.toPrecision(8)}.` : ''} ${part.feedback || ''}`);
     if (key) {
       const a = progress.attempt(key, !!r.ok, { module: ctx.module, kind: part.kind, label: `${ctx.title || ''} ${part.label || ''}`.trim(), input });
-      if (!r.ok && a.tries >= 2 && part.solution) solBtn.classList.remove('hidden');
+      if (!r.ok && a.tries >= 2 && part.solution && !part.walkthrough) solBtn.classList.remove('hidden');
+      if (!r.ok && a.tries >= 2 && part.walkthrough) walkBtn.classList.add('btn-primary');
     }
     ctx.onResult?.();
   };
-  const solBtn = h('button', { class: 'btn btn-small btn-ghost' + (part.solution ? '' : ' hidden'), onclick: () => { sol.classList.toggle('hidden'); if (!sol.innerHTML) html(sol, part.solution); } }, 'Show solution');
+  // Help ladder: hint 1 (nudge) -> hint 2 (method) -> hint 3 (first step) -> full step-by-step walkthrough
+  const hints = part.hints || (part.hint ? [part.hint] : []);
+  const helpBox = h('div', { class: 'help-box' });
+  let hintLevel = 0;
+  const hintBtn = h('button', { class: 'btn btn-small btn-ghost' }, hints.length ? `Hint 1 of ${hints.length}` : '');
+  hintBtn.onclick = () => {
+    helpBox.appendChild(html(h('div', { class: 'hint' }), `<b>Hint ${hintLevel + 1}.</b> ${hints[hintLevel]}`));
+    hintLevel++;
+    if (hintLevel >= hints.length) hintBtn.remove(); else hintBtn.textContent = `Hint ${hintLevel + 1} of ${hints.length}`;
+  };
+  const walkBtn = h('button', { class: 'btn btn-small btn-ghost' }, 'Walk me through it');
+  walkBtn.onclick = () => {
+    walkBtn.remove();
+    const box = h('div', { class: 'walkthrough' }, h('div', { class: 'steps-kicker' }, 'Step-by-step solution'));
+    helpBox.appendChild(box);
+    renderStepList(box, part.walkthrough, { context: `${stripHtml(ctx.statement || '')} ${stripHtml(part.prompt || '')}` });
+  };
+  const solBtn = h('button', { class: 'btn btn-small btn-ghost' + (part.solution && !part.walkthrough ? '' : ' hidden'), onclick: () => { sol.classList.toggle('hidden'); if (!sol.innerHTML) html(sol, part.solution); } }, 'Show solution');
   const row = h('div', { class: 'row' });
   if (part.kind !== 'writeup') row.appendChild(h('button', { class: 'btn btn-small btn-primary', onclick: doCheck }, 'Check'));
-  if (part.hint) row.appendChild(h('button', { class: 'btn btn-small btn-ghost', onclick: (e) => e.target.replaceWith(html(h('div', { class: 'hint' }), 'Hint: ' + part.hint)) }, 'Hint'));
+  if (hints.length) row.appendChild(hintBtn);
+  if (part.walkthrough) row.appendChild(walkBtn);
   row.appendChild(solBtn);
-  row.appendChild(h('button', { class: 'btn btn-small btn-ghost', onclick: () => askTutor(part.kind === 'writeup' ? 'Give me a hint for how to start this part. Do not solve it fully.' : 'My answer was marked wrong (or I am stuck). Give me a hint about what to reconsider, without giving the final answer straight away.', `Problem: ${stripHtml(ctx.statement || '')}\nPart ${part.label || ''}: ${stripHtml(part.prompt || '')}\nMy answer: ${getInput() || '(none yet)'}\nChecker: ${stripHtml(fb.innerHTML) || 'not checked'}`) }, 'Ask tutor'));
-  el.append(row, fb, sol);
+  row.appendChild(h('button', { class: 'btn btn-small btn-ghost', onclick: () => askTutor('I am stuck on this problem. Coach me through it one small step at a time: tell me only the next step and why, ask me to do it, and wait for my answer before going on. Never skip algebra.', `Problem: ${stripHtml(ctx.statement || '')}\nPart ${part.label || ''}: ${stripHtml(part.prompt || '')}\nMy answer so far: ${getInput() || '(none yet)'}\nChecker: ${stripHtml(fb.innerHTML) || 'not checked'}`) }, "I'm stuck — coach me"));
+  el.append(row, helpBox, fb, sol);
   if (key && progress.getAttempt(key)?.ok) { fb.className = 'feedback ok'; fb.innerHTML = '<b>Solved earlier.</b>'; }
   return el;
+}
+
+// "Seen this before?" links to the worked example and guided exercise of the same problem type
+function exampleLinks(examples, moduleId) {
+  const box = h('div', { class: 'example-links' }, h('span', { class: 'muted small' }, 'Same type, fully worked: '));
+  examples.forEach((ref, i) => {
+    const [modId, lessonId] = ref.includes('/') ? ref.split('/') : [moduleId, ref];
+    const m = MODULES.find((x) => x.id === modId);
+    const l = m && [...(m.lessons || []), ...(m.matlab || [])].find((x) => x.id === lessonId);
+    if (!l) return;
+    const kind = (m.lessons || []).includes(l) ? 'learn' : 'matlab';
+    if (i) box.appendChild(h('span', { class: 'muted small' }, ' · '));
+    box.appendChild(h('a', { href: `#/module/${m.id}/${kind}/${l.id}` }, l.title));
+  });
+  return box;
 }
 
 export function renderAssignment(container, a, ctx = {}) {
@@ -249,6 +391,8 @@ export function renderAssignment(container, a, ctx = {}) {
   if (a.difficulty) head.appendChild(h('span', { class: `tag tag-${a.difficulty}` }, a.difficulty));
   if (a.hw) head.appendChild(h('span', { class: 'tag' }, a.hw));
   card.appendChild(head);
+  if (a.examples && a.examples.length) card.appendChild(exampleLinks(a.examples, ctx.module));
+  if (a.preBlocks) renderBlocks(card, a.preBlocks, { key, module: ctx.module });
   card.appendChild(html(h('div', { class: 'prose statement' }), a.statement));
   if (a.blocks) renderBlocks(card, a.blocks, { key, module: ctx.module });
   const parts = a.parts || [];
