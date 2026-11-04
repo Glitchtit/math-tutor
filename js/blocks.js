@@ -8,6 +8,8 @@ import { runMatlabChecks } from './matlab/checks.js';
 import { LiveScript, renderLiveDoc } from './livescript.js';
 import { progress } from './progress.js';
 import { MODULES } from './content/index.js';
+import { renderDerive } from './derive.js';
+import { renderFigure, renderReveal, renderBlanks, renderExamQuiz } from './practice.js';
 
 export function askTutor(prompt, context = '') {
   window.dispatchEvent(new CustomEvent('tutor:ask', { detail: { prompt, context } }));
@@ -276,6 +278,12 @@ RENDER.livescript = (b, ctx) => {
   return el;
 };
 
+RENDER.derive = (b) => renderDerive(b);
+RENDER.figure = (b) => renderFigure(b);
+RENDER.reveal = (b, ctx) => renderReveal(b, ctx, renderBlocks);
+RENDER.blanks = (b) => renderBlanks(b);
+RENDER.examquiz = (b) => renderExamQuiz(b);
+
 RENDER.answer = (b, ctx) => renderPart(b.part, ctx?.key ? `${ctx.key}/answer/${ctx.index}` : null, ctx);
 
 export function renderBlocks(container, blocks, ctx = {}) {
@@ -355,9 +363,11 @@ export function renderPart(part, key, ctx = {}) {
     walkBtn.remove();
     const box = h('div', { class: 'walkthrough' }, h('div', { class: 'steps-kicker' }, 'Step-by-step solution'));
     helpBox.appendChild(box);
-    renderStepList(box, part.walkthrough, { context: `${stripHtml(ctx.statement || '')} ${stripHtml(part.prompt || '')}` });
+    // a walkthrough is either [{ do, why }] steps or lesson blocks (typically text + derive)
+    if (part.walkthrough[0]?.type) renderBlocks(box, part.walkthrough, { module: ctx.module });
+    else renderStepList(box, part.walkthrough, { context: `${stripHtml(ctx.statement || '')} ${stripHtml(part.prompt || '')}` });
   };
-  const solBtn = h('button', { class: 'btn btn-small btn-ghost' + (part.solution && !part.walkthrough ? '' : ' hidden'), onclick: () => { sol.classList.toggle('hidden'); if (!sol.innerHTML) html(sol, part.solution); } }, 'Show solution');
+  const solBtn = h('button', { class: 'btn btn-small btn-ghost' + (part.solution && !part.walkthrough ? '' : ' hidden'), onclick: () => { sol.classList.toggle('hidden'); if (!sol.childNodes.length) { if (Array.isArray(part.solution)) renderBlocks(sol, part.solution, { module: ctx.module }); else html(sol, part.solution); } } }, 'Show solution');
   const row = h('div', { class: 'row' });
   if (part.kind !== 'writeup') row.appendChild(h('button', { class: 'btn btn-small btn-primary', onclick: doCheck }, 'Check'));
   if (hints.length) row.appendChild(hintBtn);

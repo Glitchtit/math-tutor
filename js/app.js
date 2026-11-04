@@ -139,10 +139,12 @@ function modulePage(m) {
   const st = progress.moduleStats(m);
   const intro = h('div', { class: 'prose' });
   intro.innerHTML = m.intro || `<p>${m.summary}</p>`;
+  const hasMatlab = (m.matlab || []).length > 0;
   const cols = h('div', { class: 'mod-cols' },
     h('section', { class: 'mod-col' }, h('h3', {}, '1 · Learn'), h('p', { class: 'muted small' }, 'Graphs first, then fully worked examples and step-by-step guided practice.'), moduleNavList(m, 'learn', m.lessons || [])),
-    h('section', { class: 'mod-col' }, h('h3', {}, '2 · MATLAB Live Editor'), h('p', { class: 'muted small' }, 'Write the same mathematics as in your homework.'), moduleNavList(m, 'matlab', m.matlab || [])),
-    h('section', { class: 'mod-col' }, h('h3', {}, '3 · Assignments'), h('p', { class: 'muted small' }, 'Only problem types you have already practised, with hints and walkthroughs.'),
+    // courses without MATLAB pages (e.g. Power Electronics) skip the Live Editor column
+    hasMatlab ? h('section', { class: 'mod-col' }, h('h3', {}, '2 · MATLAB Live Editor'), h('p', { class: 'muted small' }, 'Write the same mathematics as in your homework.'), moduleNavList(m, 'matlab', m.matlab || [])) : null,
+    h('section', { class: 'mod-col' }, h('h3', {}, `${hasMatlab ? 3 : 2} · Assignments`), h('p', { class: 'muted small' }, 'Only problem types you have already practised, with hints and walkthroughs.'),
       h('ol', { class: 'lesson-list' }, ...(m.assignments || []).map((a) => h('li', { class: progress.isDone(`${m.id}/assign/${a.id}`) ? 'done' : '' }, h('a', { href: `#/module/${m.id}/assign#${a.id}` }, a.title), progress.isDone(`${m.id}/assign/${a.id}`) ? h('span', { class: 'check' }, '✓') : null))),
       h('a', { class: 'btn btn-small', href: `#/module/${m.id}/assign` }, 'Open assignments')));
   const aiRow = h('div', { class: 'row' },

@@ -1,0 +1,1776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PE1 Mini Exam 1 Prep</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+/* Layout: sticky lecture index left, one reading column right. Derivations are step ledgers: an operation chip says WHAT is done, colour tracks WHICH term moves, a note says WHY. */
+:root{
+  --paper:#f5f6f4; --panel:#ffffff; --ink:#18202b; --muted:#5a6472; --rule:#d8dce1;
+  --accent:#2a57c0; --accent-soft:#e6ecfa; --trace:#c2306f; --amber:#b87d00;
+  --ok:#1d7f47; --ok-soft:#e3f3e9; --bad:#b4372b; --bad-soft:#f8e5e2;
+  --c-a:#2a57c0; --c-b:#c2306f; --c-c:#b06f00; --c-g:#1d7f47;
+  --f-display:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --f-body:"IBM Plex Sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#11151b; --panel:#181d25; --ink:#e4e7eb; --muted:#9ba5b2; --rule:#2b323c;
+    --accent:#86a8ff; --accent-soft:#1f2a44; --trace:#f070a4; --amber:#e3b13c;
+    --ok:#5fcf8c; --ok-soft:#173326; --bad:#ff8a7a; --bad-soft:#3a1d1a;
+    --c-a:#86a8ff; --c-b:#f070a4; --c-c:#e3b13c; --c-g:#5fcf8c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#11151b; --panel:#181d25; --ink:#e4e7eb; --muted:#9ba5b2; --rule:#2b323c;
+  --accent:#86a8ff; --accent-soft:#1f2a44; --trace:#f070a4; --amber:#e3b13c;
+  --ok:#5fcf8c; --ok-soft:#173326; --bad:#ff8a7a; --bad-soft:#3a1d1a;
+  --c-a:#86a8ff; --c-b:#f070a4; --c-c:#e3b13c; --c-g:#5fcf8c;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16.5px;line-height:1.6}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.shell{display:grid;grid-template-columns:230px minmax(0,1fr);gap:40px;max-width:1140px;margin:0 auto;padding:32px 20px 80px}
+nav.toc{position:sticky;top:20px;align-self:start;font-size:14px;max-height:calc(100vh - 40px);overflow:auto}
+nav.toc .course{font-family:var(--f-mono);font-size:12px;color:var(--muted);letter-spacing:.04em}
+nav.toc ol{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:2px}
+nav.toc a{display:block;padding:5px 10px;border-left:2px solid var(--rule);color:var(--ink);text-decoration:none}
+nav.toc a:hover{border-left-color:var(--accent);background:var(--accent-soft)}
+nav.toc .lec{font-family:var(--f-mono);font-size:11px;color:var(--muted);margin-right:6px}
+main{max-width:800px;min-width:0}
+header.top h1{font-family:var(--f-display);font-size:38px;line-height:1.15;margin:0 0 8px;text-wrap:balance}
+header.top p{margin:0 0 6px;color:var(--muted);max-width:68ch}
+section{padding-top:28px;margin-top:28px;border-top:1px solid var(--rule)}
+h2{font-family:var(--f-display);font-size:28px;line-height:1.2;margin:0 0 4px;text-wrap:balance}
+h2 .tag{font-family:var(--f-mono);font-size:13px;font-weight:400;color:var(--muted);display:block;margin-bottom:4px;letter-spacing:.04em}
+h3{font-family:var(--f-body);font-size:18px;margin:30px 0 8px;font-weight:600}
+h4{font-size:15px;margin:18px 0 6px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-family:var(--f-mono)}
+p,li{max-width:70ch}
+.mono,.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.note{border-left:3px solid var(--amber);padding:8px 14px;background:var(--panel);margin:14px 0;font-size:15px}
+.note strong{color:var(--amber)}
+.key{border:1px solid var(--accent);background:var(--accent-soft);padding:10px 16px;margin:14px 0;border-radius:4px}
+.extra{border-left:3px dashed var(--muted);padding:6px 14px;margin:14px 0;font-size:15px}
+.extra .lbl{font-family:var(--f-mono);font-size:12px;color:var(--muted);display:block}
+table{border-collapse:collapse;width:100%;font-size:15px;margin:12px 0}
+.tw{overflow-x:auto}
+th,td{border-bottom:1px solid var(--rule);padding:7px 10px;text-align:left;vertical-align:top}
+th{font-weight:600;background:var(--panel)}
+td.num,th.num{text-align:right}
+
+/* colour tracking: same colour = same quantity, followed from line to line */
+.ca{color:var(--c-a);fill:var(--c-a)} .cb{color:var(--c-b);fill:var(--c-b)}
+.cc{color:var(--c-c);fill:var(--c-c)} .cg{color:var(--c-g);fill:var(--c-g)}
+.cx{color:var(--c-b);fill:var(--c-b)}
+.sa{stroke:var(--c-a)} .sb{stroke:var(--c-b)} .sc{stroke:var(--c-c)} .sg{stroke:var(--c-g)}
+.fa{fill:var(--c-a)} .fb{fill:var(--c-b)} .fc{fill:var(--c-c)} .fg{fill:var(--c-g)}
+
+/* derivation ledger */
+ol.deriv{list-style:none;counter-reset:st;margin:14px 0;padding:0;border:1px solid var(--rule);background:var(--panel);border-radius:4px}
+ol.deriv>li{counter-increment:st;display:grid;grid-template-columns:30px minmax(0,1fr);gap:2px 10px;padding:10px 14px 12px 8px;border-bottom:1px solid var(--rule);max-width:none}
+ol.deriv>li:last-child{border-bottom:none}
+ol.deriv>li::before{content:counter(st);font-family:var(--f-mono);font-size:12px;color:var(--muted);text-align:right;padding-top:3px;grid-row:1 / span 3}
+ol.deriv .op{grid-column:2;font-size:14px;color:var(--ink);display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline}
+ol.deriv .eq{grid-column:2;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+ol.deriv .why{grid-column:2;font-size:14.5px;color:var(--muted)}
+ol.deriv>li.result{background:var(--accent-soft)}
+.eq mjx-container[display="true"]{margin:6px 0 !important}
+.chip{font-family:var(--f-mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;padding:1px 7px;border-radius:3px;border:1px solid currentColor;white-space:nowrap}
+.k-start{color:var(--muted)} .k-sub{color:var(--c-a)} .k-move{color:var(--c-c)} .k-exp{color:var(--c-g)}
+.k-can{color:var(--c-b)} .k-calc{color:var(--ink)} .k-res{color:var(--accent);background:var(--panel)}
+
+/* legend + twin columns */
+.legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin:12px 0}
+.legend div{background:var(--panel);border:1px solid var(--rule);border-radius:4px;padding:8px 10px;font-size:14px}
+.legend .chip{display:inline-block;margin-bottom:4px}
+.twin{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--rule);border-radius:4px;background:var(--panel);margin:12px 0;overflow:hidden}
+.twin>div{padding:8px 12px;border-bottom:1px solid var(--rule);min-width:0;overflow-x:auto}
+.twin>div:nth-child(odd){border-right:1px solid var(--rule)}
+.twin>.th{font-family:var(--f-mono);font-size:12px;color:var(--muted);background:var(--paper)}
+.twin .lbl{font-size:13px;color:var(--muted)}
+.twin>div:nth-last-child(-n+2){border-bottom:none}
+
+/* swap card for substitution */
+.swap{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1.4fr);gap:10px;align-items:center;background:var(--panel);border:1px solid var(--rule);border-radius:4px;padding:10px 14px;margin:12px 0}
+.swap .hd{font-family:var(--f-mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.swap .arrow{font-family:var(--f-mono);font-size:22px;color:var(--c-a)}
+.swap>div{min-width:0;overflow-x:auto}
+
+/* formula sheet */
+.sheet{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin:14px 0}
+.sheet div{background:var(--panel);border:1px solid var(--rule);padding:10px 12px;border-radius:4px;font-size:14.5px}
+.sheet b{display:block;font-size:12px;font-family:var(--f-mono);color:var(--muted);font-weight:400;letter-spacing:.03em}
+figure{margin:16px 0}
+figure>svg{width:100%;max-width:560px;height:auto;display:block}
+.figrow figure>svg{max-width:100%}
+figcaption{font-size:13.5px;color:var(--muted);margin-top:4px}
+.figrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin:14px 0}
+.figrow figure{margin:0;background:var(--panel);border:1px solid var(--rule);border-radius:4px;padding:10px}
+.sch{stroke:var(--ink);fill:none;stroke-width:2}
+.dim{stroke:var(--rule);fill:none;stroke-width:2}
+.hot{stroke:var(--c-a);fill:none;stroke-width:3.2}
+.hot2{stroke:var(--c-b);fill:none;stroke-width:3.2}
+.sch-t{fill:var(--ink);font-family:var(--f-mono);font-size:13px}
+.sch-m{fill:var(--muted);font-family:var(--f-mono);font-size:12px}
+.sch-c{fill:var(--accent);font-family:var(--f-mono);font-size:13px}
+.ax{stroke:var(--muted);stroke-width:1.2;fill:none}
+.grid{stroke:var(--rule);stroke-width:1;fill:none;stroke-dasharray:3 4}
+.svgtxt{font-family:var(--f-mono);font-size:12px;fill:var(--muted)}
+.svgtxt-i{font-family:var(--f-mono);font-size:12px;fill:var(--ink)}
+.dot{fill:var(--ink)}
+/* timeline */
+.tl{display:grid;gap:0;margin:12px 0;border-left:2px solid var(--rule);padding-left:0}
+.tl div{display:grid;grid-template-columns:76px 1fr;gap:12px;padding:6px 0 6px 14px;position:relative;font-size:15px}
+.tl div::before{content:"";position:absolute;left:-6px;top:13px;width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.tl .yr{font-family:var(--f-mono);font-weight:600}
+/* explorer */
+.explorer{background:var(--panel);border:1px solid var(--rule);border-radius:4px;padding:16px;margin:14px 0}
+.controls{display:flex;flex-wrap:wrap;gap:14px 24px;align-items:center;margin-bottom:10px}
+.controls label{font-size:14px;display:flex;gap:8px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.seg button{font:inherit;font-size:14px;padding:6px 14px;border:0;background:transparent;color:var(--ink);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--panel)}
+input[type=range]{accent-color:var(--accent);width:150px}
+.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:10px}
+.readout div{border:1px solid var(--rule);padding:6px 10px;border-radius:4px;font-size:13px;color:var(--muted)}
+.readout b{display:block;font-family:var(--f-mono);font-size:17px;color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+#wave text{font-family:var(--f-mono);font-size:11px;fill:var(--muted)}
+/* practice */
+details.prob{background:var(--panel);border:1px solid var(--rule);border-radius:4px;margin:12px 0;padding:0}
+details.prob>summary{cursor:pointer;padding:12px 16px;list-style:none}
+details.prob>summary::-webkit-details-marker{display:none}
+details.prob>summary .pn{font-family:var(--f-mono);font-size:12px;color:var(--accent);display:block}
+details.prob>summary .show{font-size:13px;color:var(--accent);display:block;margin-top:4px}
+details.prob[open]>summary .show{display:none}
+details.prob .sol{padding:0 16px 14px}
+details.prob ol.deriv{background:var(--paper)}
+/* quiz */
+.qbar{position:sticky;top:0;z-index:2;background:var(--paper);padding:8px 0;display:flex;gap:16px;align-items:center;border-bottom:1px solid var(--rule);font-size:14px}
+.qbar b{font-family:var(--f-mono);font-size:16px}
+.qbar button{font:inherit;font-size:13px;padding:4px 12px;border:1px solid var(--rule);background:var(--panel);color:var(--ink);border-radius:4px;cursor:pointer}
+.q{background:var(--panel);border:1px solid var(--rule);border-radius:4px;padding:12px 16px;margin:12px 0}
+.q .qt{font-weight:500;margin:0 0 8px}
+.q .qt .qn{font-family:var(--f-mono);font-size:12px;color:var(--muted);margin-right:8px}
+.q .opts{display:grid;gap:6px}
+.q .opts button{font:inherit;font-size:15px;text-align:left;padding:7px 12px;border:1px solid var(--rule);border-radius:4px;background:var(--paper);color:var(--ink);cursor:pointer}
+.q .opts button:hover:not(:disabled){border-color:var(--accent)}
+.q .opts button:disabled{cursor:default}
+.q .opts button.right{border-color:var(--ok);background:var(--ok-soft)}
+.q .opts button.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.q .ex{margin-top:8px;font-size:14.5px;border-left:3px solid var(--ok);padding:4px 12px}
+.fb{background:var(--panel);border:1px solid var(--rule);border-radius:4px;padding:9px 14px;margin:8px 0;line-height:2}
+.fb input{font:inherit;font-size:15px;width:11em;max-width:60vw;padding:2px 8px;border:1px solid var(--muted);border-radius:3px;background:var(--paper);color:var(--ink)}
+.fb[data-st="r"] input{border-color:var(--ok);background:var(--ok-soft)}
+.fb[data-st="w"] input{border-color:var(--bad);background:var(--bad-soft)}
+.fb button,.skipb{font:inherit;font-size:13px;padding:3px 10px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);border-radius:4px;cursor:pointer}
+.skipb{margin-top:8px;color:var(--muted)}
+.fbres{font-size:14px;font-family:var(--f-mono)}
+.fbres.ok{color:var(--ok)} .fbres.bad{color:var(--bad)}
+.qbar{flex-wrap:wrap}
+.qbar select{font:inherit;font-size:13px;padding:2px 6px;border:1px solid var(--rule);border-radius:4px;background:var(--panel);color:var(--ink)}
+footer{margin-top:48px;font-size:13px;color:var(--muted)}
+@media (max-width:860px){
+  .shell{grid-template-columns:1fr;gap:12px;padding:20px 16px 60px}
+  nav.toc{position:static;max-height:none}
+  nav.toc ol{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+  header.top h1{font-size:30px}
+}
+@media (max-width:560px){
+  .twin{grid-template-columns:1fr}
+  .twin>div:nth-child(odd){border-right:none}
+  .swap{grid-template-columns:1fr}
+  .swap .arrow{transform:rotate(90deg);justify-self:start}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+<nav class="toc" aria-label="Contents">
+  <div class="course">EE.PEE.210 · POWER ELECTRONICS I</div>
+  <ol>
+    <li><a href="#exam"><span class="lec">00</span>Exam format &amp; strategy</a></li>
+    <li><a href="#read"><span class="lec">00</span>How to read the math</a></li>
+    <li><a href="#sheet"><span class="lec">00</span>Formula sheet</a></li>
+    <li><a href="#math"><span class="lec">00</span>Math toolkit</a></li>
+    <li><a href="#l1"><span class="lec">L1</span>Fundamentals</a></li>
+    <li><a href="#l2"><span class="lec">L2</span>Laws &amp; components</a></li>
+    <li><a href="#rc"><span class="lec">L2</span>RC &amp; RL transients</a></li>
+    <li><a href="#l2b"><span class="lec">L2</span>KCL/KVL analysis</a></li>
+    <li><a href="#bridge"><span class="lec">L2</span>Bridge circuits</a></li>
+    <li><a href="#l3"><span class="lec">L3</span>Semiconductors</a></li>
+    <li><a href="#l4"><span class="lec">L4</span>DC-DC converters</a></li>
+    <li><a href="#explorer"><span class="lec">L4</span>Converter explorer</a></li>
+    <li><a href="#practice"><span class="lec">EX</span>Worked problems</a></li>
+    <li><a href="#fill"><span class="lec">EX</span>Fill in the blanks</a></li>
+    <li><a href="#draw"><span class="lec">EX</span>Drawing practice</a></li>
+    <li><a href="#theory"><span class="lec">EX</span>Theory questions</a></li>
+    <li><a href="#quiz"><span class="lec">EX</span>Self-check quiz</a></li>
+  </ol>
+</nav>
+
+<main>
+<header class="top">
+  <h1>Mini Exam 1: Lectures 1–4</h1>
+  <p>Study guide built from the L1–L4 slides (Basnet, autumn 2026). Every formula is built up in small steps. Each step says what was done, colours show where each term went, and a note explains why the move is allowed.</p>
+  <p>Exam format (course info): fill in the blanks and multiple choice with negative marking, drawing circuits and waveforms, some theory and calculation; formula sheet provided. Each part has its own practice section.</p>
+  <p>Blocks marked <span class="mono">BEYOND SLIDES</span> are standard results the slides use but do not derive.</p>
+</header>
+
+<!-- ============ EXAM FORMAT ============ -->
+<section id="exam">
+<h2><span class="tag">00 / EXAM FORMAT</span>What is in the exam, and how to play it</h2>
+<div class="tw"><table>
+<tr><th>Part (course info)</th><th>What it means for preparation</th><th>Practise here</th></tr>
+<tr><td>Fill in the blanks <strong>(negative marking)</strong></td><td>Exact terms matter: rectifier, depletion layer, threshold voltage, volt-second balance. Know the numbers: 0.7 V, 63.2 %, 2–3× bandgap.</td><td><a href="#fill">Fill in the blanks</a></td></tr>
+<tr><td>Multiple choice <strong>(negative marking)</strong></td><td>Comparison tables (Schottky vs PIN, BJT vs MOSFET vs IGBT), SCR modes, conversion types, history.</td><td><a href="#quiz">Quiz</a> (with penalty setting)</td></tr>
+<tr><td>Drawing circuit diagrams and waveforms</td><td>Buck and boost circuits, their on/off equivalent circuits, and the \(v_L\), \(i_L\), \(i_C\) waveforms. Also RC/RL curves, diode IV curve, half-wave rectifier, half-bridge inverter, device symbols.</td><td><a href="#draw">Drawing practice</a></td></tr>
+<tr><td>Some theory and calculation</td><td>Explain mechanisms in 2–4 sentences. Calculations: buck/boost ratios, \(D\), currents, power check, \(T_s\), \(\tau\), KCL/KVL.</td><td><a href="#theory">Theory questions</a>, <a href="#practice">Worked problems</a></td></tr>
+<tr><td>Formula sheet provided</td><td>You do not need to memorise formulas. You need to know <em>which</em> one applies, how to rearrange it (toolkit M1–M5), and the conditions behind it (steady state, small ripple, ideal components).</td><td><a href="#math">Math toolkit</a></td></tr>
+</table></div>
+
+<h3>Negative marking: when to guess</h3>
+<p>The penalty per wrong answer is not stated on the slide; check Moodle or ask. Here is the expected gain from guessing on a 4-option question, in units of one correct answer, when you guess at random among the options you could not rule out:</p>
+<div class="tw"><table>
+<tr><th>Options left after ruling some out</th><th class="num">Chance right</th><th class="num">Penalty −0.25</th><th class="num">Penalty −0.33</th><th class="num">Penalty −0.5</th><th class="num">Penalty −1</th></tr>
+<tr><td>4 (no idea)</td><td class="num">25 %</td><td class="num">+0.06</td><td class="num">0.00</td><td class="num">−0.13</td><td class="num">−0.50</td></tr>
+<tr><td>3 (one ruled out)</td><td class="num">33 %</td><td class="num">+0.17</td><td class="num">+0.11</td><td class="num">0.00</td><td class="num">−0.33</td></tr>
+<tr><td>2 (two ruled out)</td><td class="num">50 %</td><td class="num">+0.38</td><td class="num">+0.33</td><td class="num">+0.25</td><td class="num">0.00</td></tr>
+</table></div>
+<p>How it is calculated: expected gain = P(right) × 1 − P(wrong) × penalty. Example, 3 options left at −0.5: \(\frac13\cdot1-\frac23\cdot0.5=0.33-0.33=0\).</p>
+<div class="key"><strong>Rule of thumb.</strong> Leave it blank if you truly have no idea. Guess once you can rule out at least one option, unless the penalty is −1 (then only with two ruled out, and even that only breaks even). For fill-in blanks there is no option list, so leave it blank unless you are fairly sure of the term.</div>
+
+<h3>Using the formula sheet well</h3>
+<ul>
+<li>Before the exam, go through the <a href="#sheet">formula sheet below</a> and say for each line when it applies and what each symbol is. Your real sheet will look different but contain the same physics.</li>
+<li>In a calculation, write the formula in symbols, rearrange in symbols, then insert numbers with units. Partial credit usually follows the written steps.</li>
+<li>Convert prefixes first: k = \(10^3\), m = \(10^{-3}\), µ = \(10^{-6}\), n = \(10^{-9}\).</li>
+<li>Finish with a check: power in = power out for ideal converters; \(V_o&lt;V_s\) for buck, \(V_o&gt;V_s\) for boost; \(0\le D\le1\).</li>
+</ul>
+</section>
+
+<!-- ============ HOW TO READ ============ -->
+<section id="read">
+<h2><span class="tag">00 / START HERE</span>How to read the math on this page</h2>
+<p>Every derivation is a list of small steps. Each step changes <em>one</em> thing. Three aids tell you what changed:</p>
+
+<h4>1. The chip says what kind of move it is</h4>
+<div class="legend">
+  <div><span class="chip k-start">Start</span><br>An equation we take from a law or a picture. Nothing is changed yet.</div>
+  <div><span class="chip k-sub">Substitute</span><br>Swap a symbol for something it equals. Like replacing a word with its definition.</div>
+  <div><span class="chip k-move">Both sides</span><br>Do the same operation to the left and right side (add, subtract, multiply, divide). The equation stays true.</div>
+  <div><span class="chip k-exp">Expand / factor</span><br>Multiply out a bracket, or pull a common piece back into a bracket. Same value, different shape.</div>
+  <div><span class="chip k-can">Cancel</span><br>Remove things that add up to zero (\(+x-x\)) or divide to one (\(\frac{x}{x}\)).</div>
+  <div><span class="chip k-calc">Calculus</span><br>Take a derivative (slope) or an integral (area). The toolkit below explains both with drawings.</div>
+</div>
+
+<h4>2. Colour follows a term from line to line</h4>
+<p>If a term is coloured, look for the same colour in the next line: that is where it went or what it became. Crossed-out terms are cancelled. Example:</p>
+<ol class="deriv">
+<li><div class="op"><span class="chip k-start">Start</span></div><div class="eq">\[V_s=\A{v_R}+v_C\qquad\text{and we know}\qquad \A{v_R}=\A{R\,i}\]</div><div class="why">Blue marks the piece that is about to be swapped.</div></li>
+<li><div class="op"><span class="chip k-sub">Substitute</span> put \(\A{R\,i}\) where \(\A{v_R}\) was</div><div class="eq">\[V_s=\A{R\,i}+v_C\]</div><div class="why">The blue piece is the replacement. Everything else is copied unchanged.</div></li>
+</ol>
+
+<h4>3. Symbols and what they mean</h4>
+<div class="tw"><table>
+<tr><th>Symbol</th><th>Meaning</th><th>Read it as</th></tr>
+<tr><td>\(v,\ i\) (lowercase)</td><td>A value that changes with time, \(v(t)\)</td><td>"v at time t"</td></tr>
+<tr><td>\(V,\ I\) (uppercase)</td><td>A constant or average value</td><td>"the DC value"</td></tr>
+<tr><td>\(V_s,\ V_o\)</td><td>Source (input) voltage, output voltage</td><td>"V source", "V out"</td></tr>
+<tr><td>\(v_L,\ i_L\)</td><td>Voltage across / current through the inductor</td><td>subscript names the component</td></tr>
+<tr><td>\(v_C,\ i_C\)</td><td>Voltage across / current through the capacitor</td><td></td></tr>
+<tr><td>\(v_{L,on},\ v_{L,off}\)</td><td>Inductor voltage while the switch is on / off</td><td></td></tr>
+<tr><td>\(D\)</td><td>Duty cycle, fraction of time the switch is on (0 to 1)</td><td>\(D=0.4\) means on 40 % of the time</td></tr>
+<tr><td>\(T_s,\ f_s\)</td><td>Switching period and frequency, \(f_s=1/T_s\)</td><td></td></tr>
+<tr><td>\(\tau\)</td><td>Time constant (tau)</td><td>"how slow the circuit is"</td></tr>
+<tr><td>\(\Delta x\)</td><td>A change in \(x\): end value minus start value</td><td>"delta x"</td></tr>
+<tr><td>\(\dfrac{dx}{dt}\)</td><td>Rate of change of \(x\): slope of the \(x\)-vs-time graph</td><td>"dx by dt"</td></tr>
+<tr><td>\(\displaystyle\int_a^b x\,dt\)</td><td>Area under the \(x\)-vs-time graph from \(a\) to \(b\)</td><td>"integral from a to b"</td></tr>
+<tr><td>\(\approx,\ \Rightarrow\)</td><td>Approximately equal; "therefore / which gives"</td><td></td></tr>
+</table></div>
+</section>
+<!-- ============ FORMULA SHEET ============ -->
+<section id="sheet">
+<h2><span class="tag">00 / SUMMARY</span>Formula sheet</h2>
+<div class="sheet">
+  <div><b>CURRENT, VOLTAGE, POWER</b>\(i=\dfrac{dq}{dt}\), \(v=v_1-v_2\), \(P=VI\)</div>
+  <div><b>OHM / RESISTOR POWER</b>\(V=IR\), \(P=I^2R=\dfrac{V^2}{R}\)</div>
+  <div><b>SERIES / PARALLEL R</b>\(R_s=R_1+R_2\), \(R_p=\dfrac{R_1R_2}{R_1+R_2}\)</div>
+  <div><b>VOLTAGE DIVIDER</b>\(V_{out}=\dfrac{R_2}{R_1+R_2}V_{in}\)</div>
+  <div><b>FARADAY + LENZ</b>\(e=-N\dfrac{d\Phi}{dt}\) (minus sign = Lenz: opposes the change)</div>
+  <div><b>KCL / KVL</b>\(\sum i_k=0\) at a node, \(\sum v_k=0\) around a loop</div>
+  <div><b>CAPACITOR</b>\(q=Cv\), \(i=C\dfrac{dv}{dt}\), \(v=\dfrac1C\int i\,dt\)</div>
+  <div><b>INDUCTOR</b>\(\varphi=Li\), \(v=L\dfrac{di}{dt}\)</div>
+  <div><b>RC CHARGING</b>\(i=\dfrac{V_s}{R}e^{-t/\tau}\), \(v_C=V_s(1-e^{-t/\tau})\), \(\tau=RC\)</div>
+  <div><b>RL CHARGING</b>\(i=\dfrac{V_s}{R}(1-e^{-t/\tau})\), \(v_L=V_se^{-t/\tau}\), \(\tau=\dfrac LR\)</div>
+  <div><b>SWITCHING</b>\(f_s=\dfrac1{T_s}\), \(t_{on}=DT_s\), \(t_{off}=(1-D)T_s\), \(0\le D\le1\)</div>
+  <div><b>AVERAGE VALUE</b>\(V_o=\dfrac1{T_s}\int_0^{T_s}v_o(t)\,dt\)</div>
+  <div><b>VOLT-SECOND BALANCE</b>\(\int_0^{T_s}v_L\,dt=0\) in steady state</div>
+  <div><b>AMP-SECOND BALANCE</b>\(\int_0^{T_s}i_C\,dt=0\) in steady state</div>
+  <div><b>BUCK</b>\(V_o=DV_s\), \(I_o=I_L\)</div>
+  <div><b>BOOST</b>\(V_o=\dfrac{V_s}{1-D}\), \(I_o=I_L(1-D)\)</div>
+</div>
+<p>Numbers to memorise: Si knee 0.7 V, Ge knee 0.3 V; reverse leakage Si &lt; 20 µA, Ge &lt; 50 µA; typical breakdown of common diodes 20–30 V; mains 230 V 50 Hz (EU), 110–120 V 60 Hz (US); practical converter ripple 1–3 %; WBG bandgap 2–3× silicon.</p>
+</section>
+
+
+<!-- ============ MATH TOOLKIT ============ -->
+<section id="math">
+<h2><span class="tag">00 / PREREQUISITES</span>Math toolkit</h2>
+<p>All derivations in L1–L4 use only the moves on this page. Each move is shown first with plain numbers (left), then with the circuit symbols the course uses (right). If a step in a derivation confuses you, find its chip here.</p>
+
+<h3>M1. An equation is a balance</h3>
+<figure>
+<svg viewBox="0 0 520 170" role="img" aria-label="A balance scale with 2x + 3 on the left pan and 11 on the right. Removing 3 from both pans keeps it level.">
+  <path class="sch" d="M130 150 H230 M180 150 V40 M70 40 H290"/>
+  <path class="sch" d="M70 40 L45 95 M70 40 L95 95 M290 40 L265 95 M290 40 L315 95"/>
+  <path class="sch" d="M35 95 H105 a35 12 0 0 1 -70 0 M255 95 H325 a35 12 0 0 1 -70 0"/>
+  <text class="svgtxt-i" x="44" y="88" style="font-size:15px">2x + 3</text>
+  <text class="svgtxt-i" x="280" y="88" style="font-size:15px">11</text>
+  <text class="svgtxt" x="20" y="130">left side</text><text class="svgtxt" x="262" y="130">right side</text>
+  <text class="svgtxt-i" x="360" y="50">Take 3 off BOTH pans:</text>
+  <text class="svgtxt-i" x="360" y="75">2x + 3 − 3 = 11 − 3</text>
+  <text class="svgtxt-i" x="360" y="100">2x = 8</text>
+  <text class="svgtxt-i" x="360" y="125">Halve BOTH pans:</text>
+  <text class="svgtxt-i" x="360" y="150">x = 4</text>
+</svg>
+<figcaption>The "=" sign is the pivot. Any operation done to both sides keeps it level. Doing it to only one side breaks the equation: that is the only rule.</figcaption>
+</figure>
+
+<div class="twin">
+  <div class="th">WITH NUMBERS</div><div class="th">WITH CIRCUIT SYMBOLS (where it is used)</div>
+  <div><span class="chip k-move">− both sides</span><br>\(2x+3=11\)<br>\(2x+3\C{-3}=11\C{-3}\)<br>\(2x=8\)</div>
+  <div><span class="chip k-move">− both sides</span> <span class="lbl">RC derivation</span><br>\(V_s=Ri+v_C\)<br>\(V_s\C{-v_C}=Ri+v_C\C{-v_C}\)<br>\(V_s-v_C=Ri\)</div>
+  <div><span class="chip k-move">÷ both sides</span><br>\(2x=8\)<br>\(\dfrac{2x}{\C{2}}=\dfrac{8}{\C{2}}\)<br>\(x=4\)</div>
+  <div><span class="chip k-move">÷ both sides</span> <span class="lbl">boost converter</span><br>\(V_o(1-D)=V_s\)<br>\(\dfrac{V_o(1-D)}{\C{(1-D)}}=\dfrac{V_s}{\C{(1-D)}}\)<br>\(V_o=\dfrac{V_s}{1-D}\)</div>
+  <div><span class="chip k-move">× both sides</span><br>\(\dfrac{x}{5}=3\)<br>\(\dfrac{x}{5}\cdot\C{5}=3\cdot\C{5}\)<br>\(x=15\)</div>
+  <div><span class="chip k-move">× both sides</span> <span class="lbl">buck converter</span><br>\(\dfrac{V_o}{V_s}=D\)<br>\(\dfrac{V_o}{V_s}\cdot\C{V_s}=D\cdot\C{V_s}\)<br>\(V_o=DV_s\)</div>
+</div>
+<p>Shortcut you will see everywhere: "move a term to the other side and flip its sign" is just subtracting (or adding) it on both sides. "Move a factor to the other side and it goes underneath" is just dividing both sides by it.</p>
+
+<h3>M2. Substitution: swap a symbol for something equal to it</h3>
+<p>If two things are equal, one can stand in for the other anywhere. You take a <em>known relation</em> from somewhere (a component law, an earlier step) and plug its right-hand side into the hole left by its left-hand side.</p>
+<div class="swap">
+  <div><div class="hd">Known</div>\(\A{a}=\A{3}\)</div>
+  <div class="arrow" aria-hidden="true">→</div>
+  <div><div class="hd">Plug into</div>\(y=2\A{a}+1\;\Rightarrow\;y=2\cdot\A{3}+1=7\)</div>
+</div>
+<div class="swap">
+  <div><div class="hd">Known (capacitor law)</div>\(\A{i}=\A{C\dfrac{dv_C}{dt}}\)</div>
+  <div class="arrow" aria-hidden="true">→</div>
+  <div><div class="hd">Plug into</div>\(V_s=R\A{i}+v_C\;\Rightarrow\;V_s=R\A{C\dfrac{dv_C}{dt}}+v_C\)</div>
+</div>
+<p>Why we do it: each substitution removes one unknown. The goal is always an equation with only one unknown left, which can then be solved.</p>
+
+<h3>M3. Expanding brackets, and the minus sign</h3>
+<figure>
+<svg viewBox="0 0 520 150" role="img" aria-label="Area model: a rectangle of height a and width b plus c splits into two rectangles of area a times b and a times c.">
+  <rect x="40" y="30" width="180" height="80" class="fa" fill-opacity="0.15" stroke="none"/>
+  <rect x="220" y="30" width="110" height="80" class="fg" fill-opacity="0.15" stroke="none"/>
+  <path class="sch" d="M40 30 H330 V110 H40 Z M220 30 V110"/>
+  <text class="svgtxt-i" x="20" y="75">a</text>
+  <text class="svgtxt-i" x="125" y="130">b</text><text class="svgtxt-i" x="270" y="130">c</text>
+  <text class="ca" x="110" y="75" style="font-family:var(--f-mono);font-size:15px">a·b</text>
+  <text class="cg" x="255" y="75" style="font-family:var(--f-mono);font-size:15px">a·c</text>
+  <text class="svgtxt-i" x="350" y="60">a·(b + c)</text>
+  <text class="svgtxt-i" x="350" y="85">= a·b + a·c</text>
+</svg>
+<figcaption>Expanding a bracket: the factor outside multiplies <em>every</em> term inside. The big rectangle's area equals the two pieces added.</figcaption>
+</figure>
+<div class="twin">
+  <div class="th">WITH NUMBERS</div><div class="th">WITH CIRCUIT SYMBOLS</div>
+  <div><span class="chip k-exp">Expand</span><br>\(3(10-2)=3\cdot10-3\cdot2=30-6=24\)<br><span class="lbl">check: \(3\cdot8=24\) ✓</span></div>
+  <div><span class="chip k-exp">Expand</span> <span class="lbl">buck</span><br>\(D(V_s-V_o)=\A{DV_s}-\G{DV_o}\)</div>
+  <div><span class="chip k-exp">Minus in front</span><br>\(-2(5-1)=(-2)\cdot5+(-2)\cdot(-1)\)<br>\(=-10+2=-8\)<br><span class="lbl">check: \(-2\cdot4=-8\) ✓</span></div>
+  <div><span class="chip k-exp">Minus in front</span> <span class="lbl">buck</span><br>\(-V_o(1-D)=(-V_o)\cdot1+(-V_o)\cdot(-D)\)<br>\(=-V_o+DV_o\)</div>
+</div>
+<div class="key"><strong>Sign rule.</strong> A minus sign in front of a bracket flips the sign of every term inside: \(-(x-y)=-x+y\). Minus times minus is plus. Most mistakes in converter derivations happen exactly here.</div>
+
+<h3>M4. Factoring: expanding in reverse</h3>
+<div class="twin">
+  <div class="th">WITH NUMBERS</div><div class="th">WITH CIRCUIT SYMBOLS</div>
+  <div><span class="chip k-exp">Factor</span><br>\(\A{4}\cdot7+\A{4}\cdot3=\A{4}(7+3)=40\)</div>
+  <div><span class="chip k-exp">Factor</span> <span class="lbl">buck current</span><br>\(\A{(I_L-I_o)}D+\A{(I_L-I_o)}(1-D)\)<br>\(=\A{(I_L-I_o)}\,[D+1-D]=\A{(I_L-I_o)}\cdot1\)</div>
+</div>
+<p>When the same piece appears in every term, pull it out in front of a bracket. Often what is left inside the bracket simplifies to something trivial like 1.</p>
+
+<h3>M5. Cancelling</h3>
+<div class="twin">
+  <div class="th">WITH NUMBERS</div><div class="th">WITH CIRCUIT SYMBOLS</div>
+  <div><span class="chip k-can">Opposites</span><br>\(5\X{+2}\X{-2}=5\)</div>
+  <div><span class="chip k-can">Opposites</span> <span class="lbl">buck</span><br>\(DV_s\X{-DV_o}-V_o\X{+DV_o}=DV_s-V_o\)</div>
+  <div><span class="chip k-can">Top and bottom</span><br>\(\dfrac{3\cdot\X{7}}{\X{7}\cdot2}=\dfrac32\)</div>
+  <div><span class="chip k-can">Top and bottom</span> <span class="lbl">RC current</span><br>\(\dfrac{\X{C}\,V_s}{R\,\X{C}}=\dfrac{V_s}{R}\)</div>
+  <div><span class="chip k-move">÷ every term</span><br>\(\dfrac{6+9}{3}=\dfrac63+\dfrac93=2+3\)</div>
+  <div><span class="chip k-move">÷ every term</span> <span class="lbl">all converters</span><br>\(\dfrac{a\,\X{T_s}+b\,\X{T_s}}{\X{T_s}}=a+b\)</div>
+</div>
+<p>You may only cancel a <em>factor</em> (something multiplied) from top and bottom, never a term that is added: \(\frac{3+7}{7}\neq3\).</p>
+
+<h3>M6. Derivative = slope = rate of change</h3>
+<div class="figrow">
+<figure>
+<svg viewBox="0 0 320 190" role="img" aria-label="A straight rising line of current versus time with a right triangle under it: horizontal side delta t, vertical side delta i.">
+  <path class="ax" d="M40 165 H300 M40 165 V15"/>
+  <text class="svgtxt" x="296" y="182">t</text><text class="svgtxt" x="24" y="22">i</text>
+  <path class="sch" d="M50 140 L290 40"/>
+  <path class="sa" style="stroke-width:2;fill:none" d="M110 115 H230"/>
+  <path class="sb" style="stroke-width:2;fill:none" d="M230 115 V65"/>
+  <text class="ca" x="150" y="133" style="font-family:var(--f-mono);font-size:13px">Δt (run)</text>
+  <text class="cb" x="238" y="95" style="font-family:var(--f-mono);font-size:13px">Δi (rise)</text>
+  <text class="svgtxt-i" x="60" y="40">slope = Δi / Δt</text>
+</svg>
+<figcaption>For a straight line the derivative is exactly rise ÷ run. Example: current rises 2 A in 20 µs, so \(\frac{di}{dt}=\frac{2}{20\cdot10^{-6}}=10^5\) A/s.</figcaption>
+</figure>
+<figure>
+<svg viewBox="0 0 320 190" role="img" aria-label="A curve flattening out; steep tangent at the start, flat tangent later.">
+  <path class="ax" d="M40 165 H300 M40 165 V15"/>
+  <text class="svgtxt" x="296" y="182">t</text><text class="svgtxt" x="24" y="22">v</text>
+  <path class="sch" d="M40 165 C 90 60, 150 45, 300 40"/>
+  <path class="sa" style="stroke-width:2;fill:none" d="M40 165 L95 60"/>
+  <path class="sb" style="stroke-width:2;fill:none" d="M200 42 L300 38"/>
+  <text class="ca" x="60" y="120" style="font-family:var(--f-mono);font-size:12px">steep: big dv/dt</text>
+  <text class="cb" x="180" y="66" style="font-family:var(--f-mono);font-size:12px">flat: dv/dt ≈ 0</text>
+</svg>
+<figcaption>For a curve, the derivative at each instant is the slope of the line touching it there. A flat graph (constant value) has derivative 0.</figcaption>
+</figure>
+</div>
+<div class="tw"><table>
+<tr><th>Rule</th><th>Formula</th><th>In words</th></tr>
+<tr><td>Constant</td><td>\(\dfrac{d}{dt}(12)=0\)</td><td>Something that never changes has zero rate of change.</td></tr>
+<tr><td>Constant factor</td><td>\(\dfrac{d}{dt}(\A{C}\,v)=\A{C}\dfrac{dv}{dt}\)</td><td>A fixed multiplier just comes along for the ride.</td></tr>
+<tr><td>Sum</td><td>\(\dfrac{d}{dt}(f+g)=\dfrac{df}{dt}+\dfrac{dg}{dt}\)</td><td>Differentiate each term separately.</td></tr>
+<tr><td>Exponential</td><td>\(\dfrac{d}{dt}e^{\A{a}t}=\A{a}\,e^{\A{a}t}\)</td><td>Bring the number in front of \(t\) down as a multiplier. With \(a=-\frac1\tau\): \(\dfrac{d}{dt}e^{-t/\tau}=-\dfrac1\tau e^{-t/\tau}\).</td></tr>
+</table></div>
+<p>Where it appears: \(i=C\frac{dv}{dt}\) says "capacitor current is proportional to how fast its voltage changes". \(v=L\frac{di}{dt}\) says "inductor voltage is proportional to how fast its current changes". Constant voltage on a capacitor → no current. Constant current in an inductor → no voltage.</p>
+
+<h3>M7. Integral = area under the graph</h3>
+<div class="figrow">
+<figure>
+<svg viewBox="0 0 320 170" role="img" aria-label="A constant value K from time a to time b forms a rectangle; its area is K times b minus a.">
+  <path class="ax" d="M40 140 H300 M40 140 V15"/>
+  <rect x="90" y="60" width="160" height="80" class="fa" fill-opacity="0.18"/>
+  <path class="sch" d="M90 60 H250"/>
+  <path class="grid" d="M90 60 V140 M250 60 V140"/>
+  <text class="svgtxt" x="86" y="156">a</text><text class="svgtxt" x="246" y="156">b</text><text class="svgtxt" x="296" y="156">t</text>
+  <text class="svgtxt-i" x="256" y="64">K</text>
+  <text class="ca" x="112" y="104" style="font-family:var(--f-mono);font-size:13px">area = K·(b−a)</text>
+</svg>
+<figcaption>\(\displaystyle\int_a^b K\,dt=K\,(b-a)\): a constant over an interval is a rectangle, height × width. This one rule does all the integrals in L4.</figcaption>
+</figure>
+<figure>
+<svg viewBox="0 0 320 170" role="img" aria-label="A waveform positive for the first part of the period and negative for the rest: area above the axis counts positive, below counts negative.">
+  <path class="ax" d="M30 85 H305 M30 160 V12"/>
+  <rect x="40" y="45" width="100" height="40" class="fa" fill-opacity="0.2"/>
+  <rect x="140" y="85" width="150" height="27" class="fb" fill-opacity="0.2"/>
+  <path class="sch" d="M40 45 H140 V112 H290"/>
+  <text class="ca" x="62" y="70" style="font-family:var(--f-mono);font-size:13px">+ area</text>
+  <text class="cb" x="190" y="104" style="font-family:var(--f-mono);font-size:13px">− area</text>
+  <text class="svgtxt" x="36" y="135">0</text><text class="svgtxt" x="126" y="135">DTs</text><text class="svgtxt" x="280" y="135">Ts</text>
+</svg>
+<figcaption>Area above the axis counts plus, below counts minus. We can cut the interval where the shape changes and add the pieces: \(\int_0^{T_s}=\int_0^{DT_s}+\int_{DT_s}^{T_s}\).</figcaption>
+</figure>
+</div>
+<p>Widths of the two pieces (you need these in every converter derivation):</p>
+<ol class="deriv">
+<li><div class="op"><span class="chip k-calc">Width 1</span></div><div class="eq">\[DT_s-0=DT_s\]</div><div class="why">On-time: from 0 to the moment the switch opens.</div></li>
+<li><div class="op"><span class="chip k-calc">Width 2</span> then <span class="chip k-exp">Factor</span> out \(\A{T_s}\)</div><div class="eq">\[T_s-DT_s=\A{T_s}\cdot1-\A{T_s}\cdot D=\A{T_s}(1-D)\]</div><div class="why">Off-time: the rest of the period. The two widths add to \(DT_s+(1-D)T_s=T_s\) ✓.</div></li>
+</ol>
+<p>One more fact, used to prove volt-second balance: adding up all the small changes of a quantity gives its total change,</p>
+<p>\[\int_0^{T}\frac{dx}{dt}\,dt=x(T)-x(0)\qquad\text{(end value minus start value)}\]</p>
+
+<h3>M8. Average value</h3>
+<figure>
+<svg viewBox="0 0 440 160" role="img" aria-label="A pulse train switching between Vs and 0, with a dashed horizontal line at the average D times Vs.">
+  <path class="ax" d="M30 130 H420 M30 130 V15"/>
+  <g class="fa" fill-opacity="0.18"><rect x="40" y="40" width="40" height="90"/><rect x="160" y="40" width="40" height="90"/><rect x="280" y="40" width="40" height="90"/></g>
+  <path class="sch" d="M40 130 V40 H80 V130 H160 V40 H200 V130 H280 V40 H320 V130 H400"/>
+  <path class="sa" style="stroke-width:2;stroke-dasharray:6 4;fill:none" d="M40 103 H400"/>
+  <text class="svgtxt-i" x="6" y="44">Vs</text><text class="svgtxt" x="16" y="134">0</text>
+  <text class="ca" x="325" y="98" style="font-family:var(--f-mono);font-size:13px">average = D·Vs</text>
+  <text class="svgtxt" x="45" y="150">DTs</text><text class="svgtxt" x="140" y="150">Ts</text>
+</svg>
+<figcaption>Average = total area ÷ width. Imagine pouring the shaded blocks out flat across the whole period: they fill up to the dashed line. Here \(D=1/3\), so the average is one third of \(V_s\).</figcaption>
+</figure>
+<p>\[\langle f\rangle=\frac{1}{T}\int_0^{T}f(t)\,dt=\frac{\text{area in one period}}{\text{period}}\]</p>
+
+<h3>M9. Exponentials and logarithms</h3>
+<figure>
+<svg id="expToolkit" viewBox="0 0 520 230" role="img" aria-label="Plot of e to the minus x falling from 1 toward 0, and 1 minus e to the minus x rising from 0 toward 1, over x from 0 to 5."></svg>
+<figcaption>\(e^{-x}\) starts at 1 and falls toward 0; \(1-e^{-x}\) is its mirror, rising from 0 toward 1. At \(x=1\) they are at 0.368 and 0.632; by \(x=5\) the change is 99.3 % complete.</figcaption>
+</figure>
+<div class="tw"><table>
+<tr><th>Fact</th><th>Used for</th></tr>
+<tr><td>\(e^0=1\)</td><td>Value at \(t=0\)</td></tr>
+<tr><td>\(e^{-x}\to0\) as \(x\) grows</td><td>Final value as \(t\to\infty\)</td></tr>
+<tr><td>\(e^{-1}=0.368,\ e^{-2}=0.135,\ e^{-3}=0.050,\ e^{-5}=0.007\)</td><td>Values at \(t=\tau,2\tau,3\tau,5\tau\)</td></tr>
+<tr><td>\(\ln\) undoes \(e\): \(\ln(e^{x})=x\), and \(e^{\ln y}=y\)</td><td>Getting \(t\) out of the exponent, or getting rid of a \(\ln\)</td></tr>
+<tr><td>\(\ln a-\ln b=\ln\dfrac ab\), \(\ \ln\dfrac1a=-\ln a\)</td><td>Tidying logarithms</td></tr>
+<tr><td>\(\displaystyle\int\frac{1}{u}\,du=\ln u\)</td><td>The integral that creates a logarithm in RC/RL derivations</td></tr>
+</table></div>
+<p>Numbers first: \(e^{x}=5\Rightarrow x=\ln5=1.61\). Check: \(e^{1.61}=5.0\) ✓. Apply \(\ln\) to both sides (M1: same operation on both sides) and the \(e\) disappears.</p>
+</section>
+<!-- ============ L1 ============ -->
+<section id="l1">
+<h2><span class="tag">LECTURE 1</span>Fundamentals of power electronics</h2>
+<div class="key"><strong>Definition.</strong> Power electronics is the application of electronic circuits to convert, control and manage the flow of electrical power from one form or level to another. Power converters do the conversion. Heat losses are unavoidable but can be reduced.</div>
+<p>A converter can change three things: the <strong>system</strong> (AC ↔ DC), the <strong>voltage level</strong> (LV ↔ HV) and the <strong>frequency</strong> (LF ↔ HF).</p>
+
+<h3>Sources and loads</h3>
+<ul>
+<li><strong>DC sources</strong>: one current direction, constant voltage. PV, fuel cells, batteries.</li>
+<li><strong>AC sources</strong>: current periodically reverses. Synchronous generators, constant 50 Hz or 60 Hz.</li>
+<li><strong>DC loads</strong>: most consumer electronics (phone charger 3–6 V DC, laptop charger 12 V DC).</li>
+<li><strong>AC loads</strong>: electric motors, which require AC of <em>variable frequency</em> (fan, refrigerator: 220–240 V 50 Hz EU, 110–120 V 60 Hz US).</li>
+</ul>
+<p>The motivating problems: run a DC load from AC, and rotate an AC motor from DC. Both are solved by power electronic converters.</p>
+
+<h3>The four conversion schemes</h3>
+<div class="tw"><table>
+<tr><th>Conversion</th><th>Converter name</th><th>Example in L1</th></tr>
+<tr><td>AC → DC</td><td>Rectifier</td><td>Laptop charger</td></tr>
+<tr><td>DC → AC</td><td>Inverter</td><td>PV system, active power filter, STATCOM</td></tr>
+<tr><td>DC → DC</td><td>DC-DC converter (buck, boost, buck-boost)</td><td>Computer power supply</td></tr>
+<tr><td>AC → AC</td><td>Cycloconverter (or rectifier + inverter)</td><td>Industrial motor drive</td></tr>
+</table></div>
+
+<h3>Converter components</h3>
+<p><strong>Active</strong>: transistor (controlled switch). <strong>Passive</strong>: diode, resistor, capacitor, inductor, transformer. Transistor and diode are the <em>semiconductor devices</em>. Note the diode is a semiconductor yet counted as passive, because it cannot be commanded on or off.</p>
+
+<h3>History</h3>
+<p>Driving forces: defence and military (major influence), industrial electrification and grids, semiconductor revolution (critical breakthrough), transportation electrification, renewables and efficiency, consumer electronics (growing importance).</p>
+<div class="tl">
+<div><span class="yr">1880s</span><span>War of currents. Edison: DC distribution and lighting, high losses over distance. Tesla and Westinghouse: polyphase AC, transformers, efficient long-distance transmission.</span></div>
+<div><span class="yr">1902</span><span>Mercury arc rectifier, Peter Cooper Hewitt (NY). First high-power AC→DC converter; electrolysis, traction, manufacturing.</span></div>
+<div><span class="yr">1926</span><span>Thyratron vacuum tube, Irving Langmuir (GE). AC↔DC; traction and lighting control; radio, TV, first computers.</span></div>
+<div><span class="yr">1947</span><span>Point-contact transistor, Bardeen, Brattain, Shockley (Bell Labs). Germanium: poor thermal stability, slow, expensive.</span></div>
+<div><span class="yr">1957</span><span>SCR, Gordon Hall (GE). Beginning of modern power electronics; AC motors displace DC motors in traction. (L3 says 1956.)</span></div>
+<div><span class="yr">1960</span><span>MOSFET, Atalla and Kahng (Bell Labs). Rise of SMPS and microcontrollers. (L3 says 1959.)</span></div>
+<div><span class="yr">1982</span><span>IGBT, B. Jayant Baliga. (L3 says 1977, GE.)</span></div>
+<div><span class="yr">2010–</span><span>Wide bandgap (WBG): GaN and SiC. Better thermal stability, speed, efficiency; miniaturisation; DSP and renewable interfaces.</span></div>
+</div>
+<div class="note"><strong>Date conflicts between L1 and L3.</strong> SCR 1957 vs 1956, MOSFET 1960 vs 1959, IGBT 1982 vs 1977. If an exam question asks a year, check whether the options contain only one of the two; if both appear, the question is probably from the lecture on that topic (L3 for devices).</div>
+
+<h3>Power range and applications</h3>
+<p>Converters span µW to MW: µW–mW (small electronics), 20–150 W (chargers, PCs), 1–500 kW (drives, EV), above 1000 MW (HVDC transmission).</p>
+<div class="tw"><table>
+<tr><th>Application</th><th>Conversion</th></tr>
+<tr><td>Laptop charger</td><td>AC → DC</td></tr>
+<tr><td>Computer power supply (internal rails)</td><td>DC → DC</td></tr>
+<tr><td>Industrial motor drive</td><td>AC → AC</td></tr>
+<tr><td>EV drivetrain</td><td>DC → AC / DC</td></tr>
+<tr><td>EV charger / charging station</td><td>AC / DC → DC</td></tr>
+<tr><td>Wind power system</td><td>AC → AC / DC</td></tr>
+<tr><td>PV power system</td><td>DC → AC / DC</td></tr>
+<tr><td>FACTS: SVC, STATCOM, active power filter</td><td>DC → AC; dynamic reactive power compensation, harmonic filtering</td></tr>
+</table></div>
+</section>
+
+
+<!-- ============ L2 part 1 ============ -->
+<section id="l2">
+<h2><span class="tag">LECTURE 2 · PART 1</span>Laws and circuit components</h2>
+<p>Circuit components control, convert or condition energy. Circuit analysis examines voltage, current and power. Tools: Ohm, Kirchhoff, (Fourier). Purpose: modelling and performance evaluation (losses, dynamics, resonance).</p>
+
+<h3>Quantities</h3>
+<ul>
+<li><strong>Current</strong> \(i=\dfrac{dq}{dt}\) [A]: how much charge passes per second (a rate, M6). 1 A = 1 C/s.</li>
+<li><strong>Voltage</strong> \(v=v_1-v_2\) [V]: potential difference between two points, how hard charges are pushed.</li>
+<li><strong>Power</strong> \(P=VI\) [W]: rate of energy transfer. 1 W = 1 J/s.</li>
+</ul>
+
+<h3>Laws</h3>
+<div class="tw"><table>
+<tr><th>Law</th><th>Who / when</th><th>Statement</th></tr>
+<tr><td>Ohm</td><td>Georg Simon Ohm, 1827</td><td>Current in a conductor is proportional to the voltage across it: \(V=IR\)</td></tr>
+<tr><td>Faraday</td><td>Michael Faraday, 1831</td><td>1st: an EMF is induced in an \(N\)-turn coil when the linked flux changes. 2nd: its magnitude is proportional to the rate of change of flux. \(e=-N\,d\Phi/dt\)</td></tr>
+<tr><td>Lenz</td><td>Heinrich Lenz, 1834</td><td>The induced EMF opposes the change in flux. Lenz gives the <em>direction</em> (the minus sign)</td></tr>
+<tr><td>Kirchhoff</td><td>Gustav Robert Kirchhoff, 1845</td><td>KCL: algebraic sum of currents at a junction is zero. KVL: around any closed loop, sum of EMFs = sum of voltage drops</td></tr>
+</table></div>
+
+<h3>Resistor power</h3>
+<ol class="deriv">
+<li><div class="op"><span class="chip k-start">Start</span> two known relations</div><div class="eq">\[P=\A{V}\,I\qquad\qquad \A{V}=\A{IR}\]</div><div class="why">Definition of power, and Ohm's law. Blue marks \(V\), which we will swap out.</div></li>
+<li><div class="op"><span class="chip k-sub">Substitute</span> \(\A{IR}\) in place of \(\A{V}\)</div><div class="eq">\[P=\A{(IR)}\,I=I\cdot I\cdot R=I^2R\]</div><div class="why">\(I\cdot I\) is written \(I^2\). Order of multiplication does not matter.</div></li>
+<li class="result"><div class="op"><span class="chip k-res">Result</span> or swap \(I\) instead, using \(I=V/R\)</div><div class="eq">\[P=I^2R=\frac{V^2}{R}\]</div><div class="why">\(P=V\cdot\frac VR=\frac{V^2}{R}\). All of this power becomes heat in the resistor.</div></li>
+</ol>
+
+<h3>Series and parallel resistors</h3>
+<div class="figrow">
+<figure>
+<svg viewBox="0 0 300 120" role="img" aria-label="Two resistors in series: the same current I flows through both; their voltages add.">
+  <path class="sch" d="M20 50 H60 l5 -10 l10 20 l10 -20 l10 20 l10 -20 l5 10 H160 l5 -10 l10 20 l10 -20 l10 20 l10 -20 l5 10 H280"/>
+  <text class="svgtxt-i" x="80" y="30">R1</text><text class="svgtxt-i" x="180" y="30">R2</text>
+  <path class="sg" style="stroke-width:2;fill:none" d="M28 62 H52"/><polygon class="fg" points="52,58 60,62 52,66"/><text class="cg" x="30" y="80" style="font-family:var(--f-mono);font-size:13px">I</text>
+  <text class="ca" x="60" y="95" style="font-family:var(--f-mono);font-size:13px">+ I·R1 −</text>
+  <text class="cb" x="160" y="95" style="font-family:var(--f-mono);font-size:13px">+ I·R2 −</text>
+</svg>
+<figcaption>Series: one path, so the <strong>same current</strong> in both. Voltages add.</figcaption>
+</figure>
+<figure>
+<svg viewBox="0 0 300 140" role="img" aria-label="Two resistors in parallel: the same voltage V across both; their currents add.">
+  <path class="sch" d="M20 70 H70 M70 30 V110 M70 30 H110 l5 -10 l10 20 l10 -20 l10 20 l10 -20 l5 10 H230 M70 110 H110 l5 -10 l10 20 l10 -20 l10 20 l10 -20 l5 10 H230 M230 30 V110 M230 70 H280"/>
+  <text class="svgtxt-i" x="128" y="14">R1</text><text class="svgtxt-i" x="128" y="136">R2</text>
+  <text class="ca" x="88" y="52" style="font-family:var(--f-mono);font-size:12px">I1 = V/R1</text>
+  <text class="cb" x="88" y="96" style="font-family:var(--f-mono);font-size:12px">I2 = V/R2</text>
+  <text class="cg" x="22" y="62" style="font-family:var(--f-mono);font-size:12px">I</text>
+</svg>
+<figcaption>Parallel: both connect between the same two nodes, so the <strong>same voltage</strong> across both. Currents add.</figcaption>
+</figure>
+</div>
+<ol class="deriv">
+<li><div class="op"><span class="chip k-start">Start</span> series: KVL adds the two drops</div><div class="eq">\[V=\A{IR_1}+\B{IR_2}\]</div><div class="why">Same \(I\) through both resistors (picture, left).</div></li>
+<li><div class="op"><span class="chip k-exp">Factor</span> out the common \(I\)</div><div class="eq">\[V=I\,(R_1+R_2)\]</div><div class="why">Compare with Ohm's law \(V=I\cdot R\): the bracket plays the role of \(R\).</div></li>
+<li class="result"><div class="op"><span class="chip k-res">Result</span></div><div class="eq">\[R_s=R_1+R_2\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-start">Start</span> parallel: KCL adds the two branch currents</div><div class="eq">\[\G{I}=\A{\frac{V}{R_1}}+\B{\frac{V}{R_2}}\]</div><div class="why">Same \(V\) across both (picture, right); each branch obeys Ohm's law.</div></li>
+<li><div class="op"><span class="chip k-exp">Factor</span> out the common \(V\)</div><div class="eq">\[\G{I}=V\left(\frac1{R_1}+\frac1{R_2}\right)\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-exp">Common denominator</span> make both fractions have \(R_1R_2\) underneath</div><div class="eq">\[\frac1{R_1}\cdot\C{\frac{R_2}{R_2}}+\frac1{R_2}\cdot\C{\frac{R_1}{R_1}}=\frac{R_2}{R_1R_2}+\frac{R_1}{R_1R_2}=\frac{R_1+R_2}{R_1R_2}\]</div><div class="why">Multiplying by \(\frac{R_2}{R_2}\) is multiplying by 1, so the value is unchanged. Numbers: \(\frac12+\frac13=\frac36+\frac26=\frac56\).</div></li>
+<li><div class="op"><span class="chip k-move">÷ both sides</span> Ohm's law says \(R=V/I\)</div><div class="eq">\[R_p=\frac{V}{\G{I}}=\frac{V}{V\cdot\frac{R_1+R_2}{R_1R_2}}=\frac{\X{V}}{\X{V}\cdot\frac{R_1+R_2}{R_1R_2}}\]</div><div class="why">\(V\) cancels top and bottom.</div></li>
+<li class="result"><div class="op"><span class="chip k-res">Result</span> 1 divided by a fraction = the fraction flipped</div><div class="eq">\[R_p=\frac{1}{\;\frac{R_1+R_2}{R_1R_2}\;}=\frac{R_1R_2}{R_1+R_2}\]</div><div class="why">"Product over sum". Always smaller than the smaller resistor. Numbers: \(\frac{1}{5/6}=\frac65\).</div></li>
+</ol>
+
+<h3>Voltage divider (slide example: 24 V → 5 V?)</h3>
+<ol class="deriv">
+<li><div class="op"><span class="chip k-start">Start</span> series current from Ohm's law on the total</div><div class="eq">\[\G{I}=\frac{V_{in}}{R_1+R_2}\]</div><div class="why">No load connected, so \(R_1\) and \(R_2\) are in series.</div></li>
+<li><div class="op"><span class="chip k-sub">Substitute</span> into \(V_{out}=\G{I}R_2\)</div><div class="eq">\[V_{out}=\G{\frac{V_{in}}{R_1+R_2}}\cdot R_2=\frac{R_2}{R_1+R_2}\,V_{in}\]</div><div class="why">The output is the voltage across \(R_2\). Each resistor takes a share proportional to its size.</div></li>
+<li class="result"><div class="op"><span class="chip k-res">Numbers</span> \(R_1=4.7\ \Omega,\ R_2=1.2\ \Omega\)</div><div class="eq">\[V_{out}=\frac{1.2}{4.7+1.2}\cdot24=\frac{1.2}{5.9}\cdot24=0.2034\cdot24=4.88\ \text{V}\]</div><div class="why">Slide rounds to 4.9 V.</div></li>
+<li><div class="op"><span class="chip k-calc">Check the cost</span></div><div class="eq">\[I=\frac{24}{5.9}=4.07\ \text{A},\qquad P=24\cdot4.07=97.6\ \text{W}\]</div><div class="why">The divider burns about 98 W as heat with nothing connected, and \(V_{out}\) sags when a load is attached. That is why power electronics uses switching converters instead.</div></li>
+</ol>
+
+<h3>Capacitor</h3>
+<p>Stores energy in an <strong>electric field</strong> between two plates separated by a dielectric (insulator full of dipoles that align with the field). Unit farad [F]. Blocks DC, passes AC.</p>
+<ol class="deriv">
+<li><div class="op"><span class="chip k-start">Start</span> definition of capacitance</div><div class="eq">\[\A{q}=C\,v\]</div><div class="why">Charge stored is proportional to voltage; \(C\) is the fixed constant of proportionality.</div></li>
+<li><div class="op"><span class="chip k-calc">Differentiate both sides</span> (M1: same operation on both sides)</div><div class="eq">\[\frac{d\A{q}}{dt}=\frac{d}{dt}(C\,v)\]</div><div class="why">We want current, and current is the rate of change of charge.</div></li>
+<li><div class="op"><span class="chip k-sub">Substitute</span> \(\frac{d\A{q}}{dt}=\G{i}\) (definition of current)</div><div class="eq">\[\G{i}=\frac{d}{dt}(C\,v)\]</div><div class="why"></div></li>
+<li class="result"><div class="op"><span class="chip k-res">Result</span> constant factor rule (M6): \(C\) comes out</div><div class="eq">\[\G{i}=C\,\frac{dv}{dt}\]</div><div class="why">Capacitor current is proportional to how fast its voltage changes. Steady DC voltage → slope 0 → \(i=0\): <strong>capacitor blocks DC</strong>. A sudden jump in voltage would need infinite current, so <strong>capacitor voltage cannot jump</strong>.</div></li>
+</ol>
+<p>Same law solved for \(v\) (÷ \(C\), then integrate both sides): \(v=\frac1C\int i\,dt\), the form on the L4 recap slide.</p>
+
+<h3>Inductor</h3>
+<p>Stores energy in a <strong>magnetic field</strong>. Unit henry [H]. Blocks AC, passes DC.</p>
+<ol class="deriv">
+<li><div class="op"><span class="chip k-start">Start</span> definition of inductance</div><div class="eq">\[\A{\varphi_B}=L\,i\]</div><div class="why">Flux (linkage) is proportional to current.</div></li>
+<li><div class="op"><span class="chip k-sub">Substitute</span> into Faraday's law \(v=\frac{d\A{\varphi_B}}{dt}\)</div><div class="eq">\[v=\frac{d}{dt}(\A{L\,i})\]</div><div class="why">The Lenz minus sign is absorbed by drawing \(v\) as a drop in the direction of \(i\): physically the voltage opposes the change in current.</div></li>
+<li class="result"><div class="op"><span class="chip k-res">Result</span> \(L\) is constant, so it comes out</div><div class="eq">\[v=L\,\frac{di}{dt}\]</div><div class="why">Steady DC current → \(v=0\): <strong>inductor is a short to DC</strong>. A sudden jump in current would need infinite voltage, so <strong>inductor current cannot jump</strong>. That is why a buck converter needs a diode to carry the inductor current when the switch opens.</div></li>
+</ol>
+<div class="key"><strong>Mirror image.</strong> Capacitor: \(i=C\,\frac{dv}{dt}\), voltage cannot jump, blocks DC. Inductor: \(v=L\,\frac{di}{dt}\), current cannot jump, blocks AC. Swap \(v\leftrightarrow i\) and \(C\leftrightarrow L\) to go from one to the other.</div>
+<div class="extra"><span class="lbl">BEYOND SLIDES · why "blocks AC / DC"</span>Reactances: \(X_C=\dfrac{1}{2\pi fC}\) (infinite at \(f=0\), so DC is blocked) and \(X_L=2\pi fL\) (zero at \(f=0\), large at high \(f\)). Stored energy: \(W_C=\tfrac12CV^2\), \(W_L=\tfrac12LI^2\).</div>
+
+<h3>Diode</h3>
+<p>Two terminals: anode (A) and cathode (K). Conducts A → K only. <strong>Forward bias</strong> \(V_A&gt;V_K\): conducts. <strong>Reverse bias</strong> \(V_A&lt;V_K\): blocks. Ideal diode: zero drop when on, zero current when off (full reverse voltage across it). Practical diode: needs about 0.7 V (Si) before conducting and leaks a little in reverse. Example: half-wave rectifier, which passes only the positive half-cycles of an AC input to the load.</p>
+
+<h3>Transistor (MOSFET as switch)</h3>
+<p>Terminals gate (G), drain (D), source (S). Switching signal applied <em>between gate and source</em>. \(V_{GS}&gt;V_{th}\) (threshold): on, current flows D → S. \(V_{GS}=0\): off. Unlike a diode, the switching command is independent of the circuit voltages, so the transistor is <em>active</em>. Often drawn as a generic switch.</p>
+<p><strong>Half-bridge (half-wave) inverter:</strong> two switches in series across a DC supply. S1 on / S2 off connects the output to one rail, S1 off / S2 on to the other, producing a square-wave AC output. Never turn both on at once: that shorts the supply.</p>
+<p><strong>Power rating vs switching frequency</strong> (slide 26): thyristors/GTOs cover the highest power at low frequency (HVDC, traction), IGBTs the middle (kVA to MVA, around 1–20 kHz: drives, UPS, welding), MOSFETs the highest frequency at lower power (SMPS, 100 kHz and up).</p>
+</section>
+
+<!-- ============ RC / RL ============ -->
+<section id="rc">
+<h2><span class="tag">LECTURE 2 · PART 2</span>RC and RL charging</h2>
+
+<h3>The shortcut first</h3>
+<p>Every RC or RL switching transient has the same shape. You need three numbers: where the quantity <strong>starts</strong>, where it <strong>ends</strong>, and the <strong>time constant</strong>.</p>
+<div class="key">\[x(t)=x_{\text{end}}+\big(x_{\text{start}}-x_{\text{end}}\big)\,e^{-t/\tau}\qquad\tau=RC\ \text{ or }\ \tau=\frac LR\]</div>
+<div class="tw"><table>
+<tr><th>Quantity</th><th>Start (t = 0)</th><th>End (t → ∞)</th><th>Plug in</th></tr>
+<tr><td>RC: capacitor voltage \(v_C\)</td><td>0 (empty)</td><td>\(V_s\) (full)</td><td>\(V_s+(0-V_s)e^{-t/\tau}=V_s(1-e^{-t/\tau})\)</td></tr>
+<tr><td>RC: current \(i\)</td><td>\(V_s/R\) (empty C acts like a wire)</td><td>0 (full C blocks)</td><td>\(0+(\frac{V_s}{R}-0)e^{-t/\tau}=\frac{V_s}{R}e^{-t/\tau}\)</td></tr>
+<tr><td>RL: current \(i\)</td><td>0 (L current cannot jump)</td><td>\(V_s/R\) (L acts like a wire)</td><td>\(\frac{V_s}{R}(1-e^{-t/\tau})\)</td></tr>
+<tr><td>RL: inductor voltage \(v_L\)</td><td>\(V_s\) (all of it, since \(i=0\))</td><td>0</td><td>\(V_se^{-t/\tau}\)</td></tr>
+</table></div>
+<p>The start and end values come from the two component facts: at \(t=0\) a capacitor's voltage and an inductor's current keep their old values; at \(t\to\infty\) (DC steady state) a capacitor is an open circuit and an inductor is a wire. The derivations below show where the formula itself comes from.</p>
+
+<div class="figrow">
+<figure>
+<svg id="rcPlot" viewBox="0 0 520 230" role="img" aria-label="RC charging: capacitor voltage rising to Vs and current falling to zero, with markers at one to five time constants."></svg>
+<figcaption>RC: \(v_C/V_s\) rises, \(i\cdot R/V_s\) falls. Dots at \(t=\tau\): 63.2 % and 36.8 %.</figcaption>
+</figure>
+</div>
+
+<h3>RC charging: full derivation</h3>
+<figure>
+<svg viewBox="0 0 380 175" role="img" aria-label="RC circuit: source Vs, series resistor R with voltage vR, capacitor C with voltage vC, current i clockwise.">
+  <path class="sch" d="M50 30 H120 l5 -10 l10 20 l10 -20 l10 20 l10 -20 l5 10 H290 V78 M290 92 V150 H50 V112 M50 68 V30"/>
+  <path class="sch" d="M272 78 H308 M272 92 H308"/>
+  <circle class="sch" cx="50" cy="90" r="22"/><text class="sch-t" x="45" y="84">+</text><text class="sch-t" x="46" y="106">−</text>
+  <text class="sch-t" x="6" y="95">Vs</text><text class="sch-t" x="140" y="62">R</text><text class="sch-t" x="316" y="122">C</text>
+  <text class="ca" x="118" y="14" style="font-family:var(--f-mono);font-size:13px">+  vR = R·i  −</text>
+  <text class="cb" x="316" y="74" style="font-family:var(--f-mono);font-size:13px">+</text><text class="cb" x="316" y="90" style="font-family:var(--f-mono);font-size:13px">vC</text><text class="cb" x="316" y="106" style="font-family:var(--f-mono);font-size:13px">−</text>
+  <path class="sg" style="stroke-width:2;fill:none" d="M215 42 H250"/><polygon class="fg" points="250,37 260,42 250,47"/><text class="cg" x="228" y="60" style="font-family:var(--f-mono);font-size:13px">i</text>
+  <path class="ax" d="M140 120 a 30 22 0 1 1 50 0"/><polygon class="dot" points="186,114 192,124 196,113"/><text class="svgtxt" x="132" y="142">walk the loop (KVL)</text>
+</svg>
+<figcaption>Switch closes at \(t=0\) with the capacitor empty. Colours match the equations: \(\A{v_R}\) blue, \(\B{v_C}\) magenta, \(\G{i}\) green.</figcaption>
+</figure>
+<h4>Part A: build the equation</h4>
+<ol class="deriv">
+<li><div class="op"><span class="chip k-start">Start</span> KVL around the loop</div><div class="eq">\[V_s=\A{v_R}+\B{v_C}\]</div><div class="why">Walking once round the loop, the source lifts the potential by \(V_s\); the resistor and capacitor together drop the same amount.</div></li>
+<li><div class="op"><span class="chip k-sub">Substitute</span> Ohm's law \(\A{v_R}=\A{R\,\G{i}}\)</div><div class="eq">\[V_s=\A{R}\,\G{i}+\B{v_C}\]</div><div class="why">Two unknowns remain: \(\G{i}\) and \(\B{v_C}\). Next swap removes \(\G{i}\).</div></li>
+<li><div class="op"><span class="chip k-sub">Substitute</span> capacitor law \(\G{i}=\G{C\frac{dv_C}{dt}}\)</div><div class="eq">\[V_s=R\,\G{C\frac{dv_C}{dt}}+\B{v_C}\]</div><div class="why">Now only one unknown, \(v_C(t)\), appears (together with its own slope). An equation linking a quantity to its rate of change is a <em>differential equation</em>.</div></li>
+<li><div class="op"><span class="chip k-move">− both sides</span> subtract \(\B{v_C}\)</div><div class="eq">\[\begin{aligned}V_s\C{-v_C}&amp;=RC\frac{dv_C}{dt}+v_C\C{-v_C}\\V_s-v_C&amp;=RC\frac{dv_C}{dt}\end{aligned}\]</div><div class="why">Collect the slope on one side.</div></li>
+<li><div class="op"><span class="chip k-move">÷ both sides</span> divide by \(\C{RC}\), then read right-to-left</div><div class="eq">\[\frac{dv_C}{dt}=\frac{V_s-v_C}{\C{RC}}\]</div><div class="why"><strong>Meaning:</strong> the charging speed (slope) is proportional to the gap \(V_s-v_C\) still left. Big gap at the start → steep. Gap shrinking → slope shrinking. That is why the curve flattens out and never quite reaches \(V_s\).</div></li>
+</ol>
+<h4>Part B: solve it</h4>
+<ol class="deriv">
+<li><div class="op"><span class="chip k-move">Separate</span> × both sides by \(\C{dt}\), ÷ both sides by \(\A{(V_s-v_C)}\)</div><div class="eq">\[\frac{dv_C}{\A{V_s-v_C}}=\frac{\C{dt}}{RC}\]</div><div class="why">\(dv_C\) and \(dt\) are tiny changes; treat them like ordinary numbers. Goal: everything about \(v_C\) on the left, everything about \(t\) on the right, so each side can be summed (integrated) on its own.</div></li>
+<li><div class="op"><span class="chip k-calc">Integrate both sides</span> from the start to "now"</div><div class="eq">\[\int_{0}^{\,v_C}\frac{dv}{V_s-v}=\int_0^{\,t}\frac{dt'}{RC}\]</div><div class="why">Add up all tiny changes from the start state (time 0, voltage 0) to the present (time \(t\), voltage \(v_C\)). Inside the integrals the running variables are renamed \(v\) and \(t'\) so they do not get confused with the end values \(v_C\) and \(t\).</div></li>
+<li><div class="op"><span class="chip k-sub">Substitute</span> left side only: let \(\A{u}=V_s-v\)</div><div class="eq">\[\A{u}=V_s-v\quad\Rightarrow\quad d\A{u}=-dv\quad\Rightarrow\quad dv=-d\A{u}\]</div><div class="why">If \(v\) goes up by a tiny amount, \(u\) goes down by the same amount. The limits change too: when \(v=0\), \(u=V_s\); when \(v=v_C\), \(u=V_s-v_C\).</div></li>
+<li><div class="op"><span class="chip k-calc">Integrate</span> using \(\int\frac{du}{u}=\ln u\) (M9)</div><div class="eq">\[\int_{V_s}^{V_s-v_C}\frac{-d\A{u}}{\A{u}}=-\Big[\ln \A{u}\Big]_{V_s}^{V_s-v_C}=-\Big(\ln(V_s-v_C)-\ln V_s\Big)\]</div><div class="why">\([\,F\,]_a^b\) means "\(F\) at the top limit minus \(F\) at the bottom limit".</div></li>
+<li><div class="op"><span class="chip k-exp">Tidy</span> \(\ln a-\ln b=\ln\frac ab\)</div><div class="eq">\[\text{left side}=-\ln\frac{V_s-v_C}{V_s}\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-calc">Integrate</span> right side: \(\frac1{RC}\) is a constant (rectangle, M7)</div><div class="eq">\[\int_0^{\,t}\frac{dt'}{RC}=\frac{1}{RC}\,(t-0)=\frac{t}{RC}\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-move">× both sides by −1</span> after setting left = right</div><div class="eq">\[\begin{aligned}-\ln\frac{V_s-v_C}{V_s}&amp;=\frac{t}{RC}\\ \ln\frac{V_s-v_C}{V_s}&amp;=-\frac{t}{RC}\end{aligned}\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-move">Undo the ln</span> raise \(e\) to each side: \(e^{\ln y}=y\)</div><div class="eq">\[\frac{V_s-v_C}{V_s}=e^{-t/RC}\]</div><div class="why">\(\ln\) and \(e\) cancel each other, like \(\sqrt{x}\) and \(x^2\).</div></li>
+<li><div class="op"><span class="chip k-move">× both sides</span> by \(\C{V_s}\); name \(\tau=RC\)</div><div class="eq">\[V_s-v_C=\C{V_s}\,e^{-t/\tau}\]</div><div class="why">\(\tau=RC\) has units of seconds (Ω·F = s).</div></li>
+<li><div class="op"><span class="chip k-move">Rearrange</span> + \(v_C\) both sides, − \(V_se^{-t/\tau}\) both sides</div><div class="eq">\[v_C=V_s-\A{V_s}\,e^{-t/\tau}\]</div><div class="why"></div></li>
+<li class="result"><div class="op"><span class="chip k-res">Result</span> <span class="chip k-exp">Factor</span> out \(\A{V_s}\)</div><div class="eq">\[\B{v_C(t)}=\A{V_s}\left(1-e^{-t/\tau}\right),\qquad\tau=RC\]</div><div class="why">Check: \(t=0\): \(V_s(1-1)=0\) ✓ (empty). \(t\to\infty\): \(V_s(1-0)=V_s\) ✓ (full).</div></li>
+</ol>
+<h4>Part C: the current</h4>
+<ol class="deriv">
+<li><div class="op"><span class="chip k-sub">Substitute</span> the result into \(\G{i}=C\frac{d\B{v_C}}{dt}\)</div><div class="eq">\[\G{i}=C\,\frac{d}{dt}\Big[\B{V_s\left(1-e^{-t/\tau}\right)}\Big]\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-calc">Constant factor</span> \(V_s\) comes out (M6)</div><div class="eq">\[\G{i}=C\,V_s\,\frac{d}{dt}\Big[1-e^{-t/\tau}\Big]\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-calc">Differentiate each term</span> (M6 sum and exponential rules)</div><div class="eq">\[\frac{d}{dt}\big[\,1\,\big]=0,\qquad\frac{d}{dt}\big[e^{-t/\tau}\big]=-\frac1\tau e^{-t/\tau}\]\[\Rightarrow\quad\frac{d}{dt}\Big[1-e^{-t/\tau}\Big]=0-\Big(-\frac1\tau e^{-t/\tau}\Big)=+\frac1\tau e^{-t/\tau}\]</div><div class="why">Minus times minus is plus (M3).</div></li>
+<li><div class="op"><span class="chip k-sub">Substitute</span> and \(\frac1\tau=\frac1{RC}\)</div><div class="eq">\[\G{i}=C\,V_s\cdot\frac{1}{RC}\,e^{-t/\tau}=\frac{\X{C}\,V_s}{R\,\X{C}}\,e^{-t/\tau}\]</div><div class="why">\(C\) is a factor top and bottom, so it cancels (M5).</div></li>
+<li class="result"><div class="op"><span class="chip k-res">Result</span></div><div class="eq">\[\G{i(t)}=\frac{V_s}{R}\,e^{-t/\tau}\]</div><div class="why">Slide formula. Starts at \(V_s/R\) (empty capacitor acts like a wire), decays to 0 (full capacitor blocks DC). Uses: 555 timers, converter supplies, low/high-pass filters.</div></li>
+</ol>
+
+<h3>RL charging: full derivation</h3>
+<figure>
+<svg viewBox="0 0 380 175" role="img" aria-label="RL circuit: source Vs, series resistor R with voltage vR, inductor L with voltage vL, current i clockwise.">
+  <path class="sch" d="M50 30 H120 l5 -10 l10 20 l10 -20 l10 20 l10 -20 l5 10 H290 V50 M290 114 V150 H50 V112 M50 68 V30"/>
+  <path class="sch" d="M290 50 a8 8 0 0 1 0 16 a8 8 0 0 1 0 16 a8 8 0 0 1 0 16 a8 8 0 0 1 0 16"/>
+  <circle class="sch" cx="50" cy="90" r="22"/><text class="sch-t" x="45" y="84">+</text><text class="sch-t" x="46" y="106">−</text>
+  <text class="sch-t" x="6" y="95">Vs</text><text class="sch-t" x="140" y="62">R</text><text class="sch-t" x="262" y="86">L</text>
+  <text class="ca" x="118" y="14" style="font-family:var(--f-mono);font-size:13px">+  vR = R·i  −</text>
+  <text class="cb" x="312" y="62" style="font-family:var(--f-mono);font-size:13px">+</text><text class="cb" x="312" y="86" style="font-family:var(--f-mono);font-size:13px">vL</text><text class="cb" x="312" y="110" style="font-family:var(--f-mono);font-size:13px">−</text>
+  <path class="sg" style="stroke-width:2;fill:none" d="M215 42 H250"/><polygon class="fg" points="250,37 260,42 250,47"/><text class="cg" x="228" y="60" style="font-family:var(--f-mono);font-size:13px">i</text>
+</svg>
+<figcaption>Same loop as RC with an inductor in place of the capacitor. Now the unknown is the current \(\G{i}\).</figcaption>
+</figure>
+<div class="figrow">
+<figure>
+<svg id="rlPlot" viewBox="0 0 520 230" role="img" aria-label="RL: current rising to Vs over R and inductor voltage falling to zero, with markers at one to five time constants."></svg>
+<figcaption>RL is the mirror of RC: the <em>current</em> rises, the inductor <em>voltage</em> decays.</figcaption>
+</figure>
+</div>
+<ol class="deriv">
+<li><div class="op"><span class="chip k-start">Start</span> KVL</div><div class="eq">\[V_s=\A{v_R}+\B{v_L}\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-sub">Substitute</span> \(\A{v_R}=\A{R\,i}\) and \(\B{v_L}=\B{L\frac{di}{dt}}\)</div><div class="eq">\[V_s=\A{R\,\G{i}}+\B{L\frac{d\G{i}}{dt}}\]</div><div class="why">Only one unknown: \(\G{i}(t)\).</div></li>
+<li><div class="op"><span class="chip k-move">− both sides</span> \(\C{Ri}\), then <span class="chip k-move">÷ both sides</span> \(\C{L}\)</div><div class="eq">\[\begin{aligned}V_s-\C{Ri}&amp;=L\frac{di}{dt}\\ \frac{di}{dt}&amp;=\frac{V_s-Ri}{\C{L}}\end{aligned}\]</div><div class="why">Same meaning as RC: the current rises fast while the gap \(V_s-Ri\) is large, and slows as it closes.</div></li>
+<li><div class="op"><span class="chip k-move">Separate</span> \(i\)-things left, \(t\)-things right</div><div class="eq">\[\frac{di}{\A{V_s-Ri}}=\frac{dt}{L}\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-calc">Integrate both sides</span> from (0, 0) to (\(t\), \(i\))</div><div class="eq">\[\int_0^{\,i}\frac{di'}{V_s-Ri'}=\int_0^{\,t}\frac{dt'}{L}=\frac tL\]</div><div class="why">Right side: rectangle rule, \(\frac1L\) is constant.</div></li>
+<li><div class="op"><span class="chip k-sub">Substitute</span> \(\A{u}=V_s-Ri'\)</div><div class="eq">\[d\A{u}=-R\,di'\;\Rightarrow\;di'=-\frac{d\A{u}}{R};\qquad\text{limits: }V_s\to V_s-Ri\]</div><div class="why">Now \(u\) changes \(R\) times faster than \(i'\) (and in the opposite direction), hence the factor \(-\frac1R\).</div></li>
+<li><div class="op"><span class="chip k-calc">Integrate</span> left side</div><div class="eq">\[\int_{V_s}^{V_s-Ri}-\frac1R\frac{d\A{u}}{\A{u}}=-\frac1R\Big[\ln \A{u}\Big]_{V_s}^{V_s-Ri}=-\frac1R\ln\frac{V_s-Ri}{V_s}\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-move">× both sides by \(-R\)</span> after setting left = right</div><div class="eq">\[\ln\frac{V_s-Ri}{V_s}=-\frac{R}{L}\,t=-\frac{t}{\tau},\qquad\tau=\frac LR\]</div><div class="why">\(\frac RL\,t=\frac{t}{L/R}\): dividing by \(\frac LR\) is multiplying by \(\frac RL\).</div></li>
+<li><div class="op"><span class="chip k-move">Undo ln</span> then <span class="chip k-move">× both sides</span> by \(V_s\)</div><div class="eq">\[V_s-Ri=V_s\,e^{-t/\tau}\]</div><div class="why"></div></li>
+<li class="result"><div class="op"><span class="chip k-res">Result</span> rearrange, then ÷ both sides by \(R\)</div><div class="eq">\[R\,i=V_s-V_se^{-t/\tau}\quad\Rightarrow\quad\G{i(t)}=\frac{V_s}{R}\left(1-e^{-t/\tau}\right)\]</div><div class="why">Check: \(t=0\): 0 ✓. \(t\to\infty\): \(V_s/R\) ✓.</div></li>
+<li class="result"><div class="op"><span class="chip k-res">Result</span> inductor voltage: substitute into \(\B{v_L}=L\frac{di}{dt}\)</div><div class="eq">\[\B{v_L}=L\cdot\frac{V_s}{R}\cdot\frac1\tau e^{-t/\tau}=\X{L}\cdot\frac{V_s}{\X{R}}\cdot\frac{\X{R}}{\X{L}}\,e^{-t/\tau}=V_s\,e^{-t/\tau}\]</div><div class="why">Differentiate exactly as in RC Part C; \(\frac1\tau=\frac RL\), and \(L\), \(R\) cancel. RL uses: relays, motor starting-current limiting, filters.</div></li>
+</ol>
+</section>
+
+<!-- ============ L2 part 3: KCL/KVL ============ -->
+<section id="l2b">
+<h2><span class="tag">LECTURE 2 · PART 3</span>KCL/KVL circuit analysis</h2>
+<p>Method: (1) identify nodes, assume branch currents and loops; (2) KCL at each node; (3) KVL for each independent loop; (4) substitute currents into loop equations; (5) solve. You never need to guess directions correctly: if a current comes out negative, the real current flows opposite to your arrow.</p>
+
+<div class="tw"><table>
+<tr><th>Writing KVL: walk the loop and add</th><th>Sign</th></tr>
+<tr><td>Through a source from − to +</td><td>\(+V\) (lifted up)</td></tr>
+<tr><td>Through a source from + to −</td><td>\(-V\)</td></tr>
+<tr><td>Through a resistor in the same direction as its assumed current</td><td>\(-IR\) (dropped)</td></tr>
+<tr><td>Through a resistor against its assumed current</td><td>\(+IR\)</td></tr>
+<tr><td>Back at the start</td><td>total \(=0\)</td></tr>
+</table></div>
+
+<figure>
+<svg viewBox="0 0 460 215" role="img" aria-label="Example circuit: V1 20 V on the left between nodes A and D; R1 10 ohm vertical between B and D; R2 5 ohm and R3 20 ohm in series along the top from B to C; V2 100 V on the right between C and D.">
+  <path class="sch" d="M60 40 H230 M262 40 H300 M332 40 H400 M60 40 V88 M60 132 V180 H400 V132 M400 88 V40"/>
+  <path class="sch" d="M230 40 l4 -8 l4 16 l4 -16 l4 16 l4 -16 l4 16 l4 -8 M300 40 l4 -8 l4 16 l4 -16 l4 16 l4 -16 l4 16 l4 -8"/>
+  <circle class="sch" cx="60" cy="110" r="22"/><text class="sch-t" x="54" y="104">+</text><text class="sch-t" x="55" y="126">−</text>
+  <circle class="sch" cx="400" cy="110" r="22"/><text class="sch-t" x="394" y="104">+</text><text class="sch-t" x="395" y="126">−</text>
+  <text class="sch-t" x="0" y="114">V1 20V</text><text class="sch-t" x="428" y="108">V2</text><text class="sch-t" x="424" y="124">100V</text>
+  <path class="sch" d="M180 40 V80 l-8 4 l16 8 l-16 8 l16 8 l-16 8 l16 8 l-8 4 V180"/>
+  <text class="sch-t" x="194" y="115">R1 10Ω</text>
+  <text class="sch-t" x="226" y="22">R2 5Ω</text><text class="sch-t" x="296" y="22">R3 20Ω</text>
+  <text class="sch-t" x="52" y="30">A</text><text class="sch-t" x="176" y="30">B</text><text class="sch-t" x="396" y="30">C</text><text class="sch-t" x="176" y="200">D</text>
+  <path class="sa" style="stroke-width:2.2;fill:none" d="M110 54 H150"/><polygon class="fa" points="150,49 160,54 150,59"/><text class="ca" x="118" y="72" style="font-family:var(--f-mono);font-size:14px">I1</text>
+  <path class="sb" style="stroke-width:2.2;fill:none" d="M260 54 H210"/><polygon class="fb" points="210,49 200,54 210,59"/><text class="cb" x="226" y="72" style="font-family:var(--f-mono);font-size:14px">I2</text>
+  <path class="sg" style="stroke-width:2.2;fill:none" d="M162 70 V100"/><polygon class="fg" points="157,100 162,110 167,100"/><text class="cg" x="138" y="92" style="font-family:var(--f-mono);font-size:14px">I3</text>
+  <path class="ax" d="M100 140 a 22 18 0 1 1 30 10"/><text class="svgtxt" x="104" y="170">loop 1</text>
+  <path class="ax" d="M280 140 a 28 20 0 1 0 -36 10"/><text class="svgtxt" x="268" y="170">loop 2</text>
+</svg>
+<figcaption>Slide 31. At node B: \(\A{I_1}\) and \(\B{I_2}\) flow in, \(\G{I_3}\) flows out down through R1.</figcaption>
+</figure>
+
+<ol class="deriv">
+<li><div class="op"><span class="chip k-start">Start</span> KCL at node B: in = out, written as a sum equal to zero</div><div class="eq">\[\A{I_1}+\B{I_2}-\G{I_3}=0\qquad(1)\]</div><div class="why">Currents into B counted +, out of B counted −.</div></li>
+<li><div class="op"><span class="chip k-start">Start</span> KVL loop 1 (A → B → D → A)</div><div class="eq">\[V_1-R_1\G{I_3}=0\qquad(2)\]</div><div class="why">Up through V1 (− to +): \(+V_1\). Down through R1 along \(\G{I_3}\): \(-R_1I_3\). Three unknowns need three equations, hence two loops plus one node.</div></li>
+<li><div class="op"><span class="chip k-start">Start</span> KVL loop 2 (C → B → D → C)</div><div class="eq">\[V_2-R_3\B{I_2}-R_2\B{I_2}-R_1\G{I_3}=0\qquad(3)\]</div><div class="why">Up through V2: \(+V_2\). R3 and R2 along \(\B{I_2}\): two drops. R1 along \(\G{I_3}\): drop.</div></li>
+<li><div class="op"><span class="chip k-move">Solve (2)</span> it has only one unknown: + \(R_1I_3\) both sides, ÷ \(R_1\)</div><div class="eq">\[\G{I_3}=\frac{V_1}{R_1}=\frac{20}{10}=\G{2\ \text{A}}\]</div><div class="why">Always start with the equation that has the fewest unknowns.</div></li>
+<li><div class="op"><span class="chip k-sub">Substitute</span> numbers and \(\G{I_3=2}\) into (3)</div><div class="eq">\[100-20\B{I_2}-5\B{I_2}-10\cdot\G{2}=0\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-exp">Collect</span> like terms</div><div class="eq">\[\underbrace{100-20}_{80}\;\underbrace{-20\B{I_2}-5\B{I_2}}_{-25\B{I_2}}=0\quad\Rightarrow\quad80-25\B{I_2}=0\]</div><div class="why">Numbers with numbers, \(I_2\)-terms with \(I_2\)-terms.</div></li>
+<li><div class="op"><span class="chip k-move">+ both sides</span> \(25I_2\), then <span class="chip k-move">÷ both sides</span> 25</div><div class="eq">\[80=25\B{I_2}\quad\Rightarrow\quad\B{I_2}=\frac{80}{25}=\B{3.2\ \text{A}}\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-sub">Substitute</span> into (1), rearranged as \(\A{I_1}=\G{I_3}-\B{I_2}\)</div><div class="eq">\[\A{I_1}=\G{2}-\B{3.2}=\A{-1.2\ \text{A}}\]</div><div class="why">Negative: the real current flows B → A, into the + terminal of V1. V1 is being charged by V2.</div></li>
+<li class="result"><div class="op"><span class="chip k-res">Result</span> Ohm's law on each resistor</div><div class="eq">\[V_{R1}=10\cdot2=20\ \text{V},\quad V_{R2}=5\cdot3.2=16\ \text{V},\quad V_{R3}=20\cdot3.2=64\ \text{V}\]</div><div class="why">Check loop 2: \(64+16+20=100\) V ✓.</div></li>
+</ol>
+
+<h3 id="bridge">Bridge circuits (Mini Exam 1 question)</h3>
+<p>A circuit from Mini Exam 1: five resistors in a bridge. Part (a) asked for the KCL and KVL equations. Part (b) gave two currents and asked for \(I_5\) and the meaning of its sign. The value of the middle resistor is not given in the sketch, so it is called \(R_5\) here.</p>
+<figure>
+<svg viewBox="0 0 460 300" role="img" aria-label="Bridge circuit: 12 V source; left node L, top node T, bottom node B, right node R. 10 ohm from L to T, 20 ohm from L to B, 30 ohm from T to R, 40 ohm from B to R, R5 from T down to B. Currents I1 to I5 and source current I marked.">
+  <path class="sch" d="M90 130 H40 V270 H196 M206 270 H410 V130 H330"/>
+  <path class="sch" d="M196 254 V286 M206 262 V278"/>
+  <text class="sch-t" x="180" y="252">+</text><text class="sch-t" x="222" y="262">12 V</text>
+  <g transform="translate(150,85) rotate(-36.87)"><path class="sch" d="M-75 0 H-24 l4 -7 l8 14 l8 -14 l8 14 l8 -14 l8 14 l4 -7 H75"/></g>
+  <g transform="translate(270,85) rotate(36.87)"><path class="sch" d="M-75 0 H-24 l4 -7 l8 14 l8 -14 l8 14 l8 -14 l8 14 l4 -7 H75"/></g>
+  <g transform="translate(150,175) rotate(36.87)"><path class="sch" d="M-75 0 H-24 l4 -7 l8 14 l8 -14 l8 14 l8 -14 l8 14 l4 -7 H75"/></g>
+  <g transform="translate(270,175) rotate(-36.87)"><path class="sch" d="M-75 0 H-24 l4 -7 l8 14 l8 -14 l8 14 l8 -14 l8 14 l4 -7 H75"/></g>
+  <path class="sch" d="M210 40 V106 l-7 4 l14 8 l-14 8 l14 8 l-14 8 l14 8 l-7 4 V220"/>
+  <circle class="dot" cx="90" cy="130" r="3.5"/><circle class="dot" cx="210" cy="40" r="3.5"/><circle class="dot" cx="210" cy="220" r="3.5"/><circle class="dot" cx="330" cy="130" r="3.5"/>
+  <text class="sch-t" x="82" y="120" text-anchor="end">L</text><text class="sch-t" x="210" y="28" text-anchor="middle">T</text><text class="sch-t" x="210" y="242" text-anchor="middle">B</text><text class="sch-t" x="338" y="120">R</text>
+  <text class="sch-t" x="142" y="62" text-anchor="end">10 Ω</text><text class="sch-t" x="288" y="66">30 Ω</text>
+  <text class="sch-t" x="140" y="204" text-anchor="end">20 Ω</text><text class="sch-t" x="292" y="200">40 Ω</text>
+  <text class="sch-t" x="198" y="134" text-anchor="end">R5</text>
+  <path class="sa" style="stroke-width:2;fill:none" d="M97 105 L117 90"/><polygon class="fa" points="114,85 123,86 120,94"/><text class="ca" x="98" y="88" text-anchor="end" style="font-family:var(--f-mono);font-size:13px">I1</text>
+  <path class="sb" style="stroke-width:2;fill:none" d="M236 39 L256 54"/><polygon class="fb" points="252,58 262,58 258,50"/><text class="cb" x="262" y="44" style="font-family:var(--f-mono);font-size:13px">I3</text>
+  <path class="sc" style="stroke-width:2;fill:none" d="M96 155 L116 170"/><polygon class="fc" points="112,174 122,174 118,166"/><text class="cc" x="94" y="178" text-anchor="end" style="font-family:var(--f-mono);font-size:13px">I2</text>
+  <path class="sc" style="stroke-width:2;fill:none" d="M236 221 L256 206"/><polygon class="fc" points="253,201 262,202 259,210"/><text class="cc" x="260" y="228" style="font-family:var(--f-mono);font-size:13px">I4</text>
+  <path class="sg" style="stroke-width:2;fill:none" d="M228 108 V140"/><polygon class="fg" points="223,140 228,150 233,140"/><text class="cg" x="236" y="134" style="font-family:var(--f-mono);font-size:13px">I5</text>
+  <path class="ax" style="stroke-width:2" d="M26 222 V188"/><polygon class="dot" points="21,190 26,180 31,190"/><text class="sch-t" x="18" y="210" text-anchor="end">I</text>
+</svg>
+<figcaption>Arrows as drawn in the exam. The long plate of the battery is +, so the current I leaves the + terminal, goes up the left wire into node L, through the bridge, and returns from node R. Exam labels may differ; here \(\A{I_1}\) = 10 Ω, \(\C{I_2}\) = 20 Ω, \(\B{I_3}\) = 30 Ω, \(\C{I_4}\) = 40 Ω, \(\G{I_5}\) = middle.</figcaption>
+</figure>
+
+<h4>Part (a), step 1: count before you write</h4>
+<div class="twin">
+  <div class="th">KCL EQUATIONS</div><div class="th">KVL EQUATIONS</div>
+  <div>Nodes \(n=4\) (L, T, B, R).<br>Independent KCL equations \(=n-1=\mathbf{3}\).<br><span class="lbl">The 4th node's equation is the sum of the other three, so it adds nothing new.</span></div>
+  <div>Branches \(b=6\) (5 resistors + source).<br>Independent KVL equations \(=b-n+1=\mathbf{3}\).<br><span class="lbl">Choose the three "windows" of the circuit: they are always independent.</span></div>
+</div>
+<p>6 unknown currents (\(I, I_1\ldots I_5\)) and 3 + 3 = 6 equations. Writing this count down earns marks on its own.</p>
+
+<h4>Part (a), step 2: KCL at three nodes (in = out, written as sum = 0)</h4>
+<ol class="deriv">
+<li><div class="op"><span class="chip k-start">Node L</span> \(I\) in; \(\A{I_1}\), \(\C{I_2}\) out</div><div class="eq">\[I-\A{I_1}-\C{I_2}=0\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-start">Node T</span> \(\A{I_1}\) in; \(\B{I_3}\), \(\G{I_5}\) out</div><div class="eq">\[\A{I_1}-\B{I_3}-\G{I_5}=0\]</div><div class="why">This is the equation that answers part (b).</div></li>
+<li><div class="op"><span class="chip k-start">Node B</span> \(\C{I_2}\), \(\G{I_5}\) in; \(\C{I_4}\) out</div><div class="eq">\[\C{I_2}+\G{I_5}-\C{I_4}=0\]</div><div class="why">Node R (\(I_3+I_4=I\)) would follow from these three, so it is not written.</div></li>
+</ol>
+
+<h4>Part (a), step 3: KVL around the three windows (walk clockwise)</h4>
+<p>Sign rule from the table above: resistor walked <em>with</em> its arrow → \(-IR\); <em>against</em> → \(+IR\); source from − to + → \(+V\).</p>
+<ol class="deriv">
+<li><div class="op"><span class="chip k-start">Loop 1</span> upper-left window L → T → B → L</div><div class="eq">\[-10\,\A{I_1}-R_5\,\G{I_5}+20\,\C{I_2}=0\]</div><div class="why">L→T with \(I_1\): drop. T→B with \(I_5\): drop. B→L against \(I_2\): \(+20I_2\).</div></li>
+<li><div class="op"><span class="chip k-start">Loop 2</span> right window T → R → B → T</div><div class="eq">\[-30\,\B{I_3}+40\,\C{I_4}+R_5\,\G{I_5}=0\]</div><div class="why">T→R with \(I_3\): drop. R→B against \(I_4\): \(+40I_4\). B→T against \(I_5\): \(+R_5I_5\).</div></li>
+<li class="result"><div class="op"><span class="chip k-start">Loop 3</span> bottom window: source → L → B → R → source</div><div class="eq">\[12-20\,\C{I_2}-40\,\C{I_4}=0\]</div><div class="why">Through the battery from − to +: \(+12\). L→B with \(I_2\), B→R with \(I_4\): two drops. This completes part (a): 3 KCL + 3 KVL.</div></li>
+</ol>
+
+<h4>Part (b): given \(I=0.5\) A and \(I_3=0.2\) A, find \(I_5\). What does its sign tell you?</h4>
+<p>Look for a node where only known currents and \(I_5\) meet. Node T has \(I_1\), \(I_3\) and \(I_5\). So the 0.5 A must be the current entering T through the 10 Ω resistor (\(I_1\) in our labels). If the exam's \(I\) really was the total source current, KCL alone cannot give \(I_5\); see the note at the end.</p>
+<ol class="deriv">
+<li><div class="op"><span class="chip k-start">Start</span> KCL at node T</div><div class="eq">\[\A{I_1}-\B{I_3}-\G{I_5}=0\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-move">+ \(I_5\) both sides</span></div><div class="eq">\[\G{I_5}=\A{I_1}-\B{I_3}\]</div><div class="why">In words: what flows in through 10 Ω, minus what leaves through 30 Ω, must go down through the middle.</div></li>
+<li class="result"><div class="op"><span class="chip k-res">Result</span> <span class="chip k-sub">numbers</span></div><div class="eq">\[\G{I_5}=\A{0.5}-\B{0.2}=\G{+0.3\ \text{A}}\]</div><div class="why"><strong>Sign:</strong> positive, so the current flows in the direction of the arrow, downward from T to B. Node T is at a higher potential than node B. \(I_5\neq0\), so the bridge is <strong>unbalanced</strong>. Had the result been negative, the current would flow upward (opposite to the arrow) with the same size.</div></li>
+</ol>
+
+<h4>Check the direction without solving anything</h4>
+<ol class="deriv">
+<li><div class="op"><span class="chip k-start">Remove R5</span> each side becomes a voltage divider (bottom of battery = 0 V)</div><div class="eq">\[V_T=12\cdot\frac{30}{10+30}=12\cdot0.75=9\ \text{V}\qquad V_B=12\cdot\frac{40}{20+40}=12\cdot0.667=8\ \text{V}\]</div><div class="why">The voltage at T is the drop across the 30 Ω resistor; at B, the drop across the 40 Ω resistor.</div></li>
+<li class="result"><div class="op"><span class="chip k-res">Conclusion</span></div><div class="eq">\[V_T&gt;V_B\;\Rightarrow\;I_5\ \text{flows from T to B (downward)}\]</div><div class="why">Current flows from higher to lower potential. Positive \(I_5\) with a downward arrow is physically consistent. (Solving the full circuit with, for example, \(R_5=5\ \Omega\) gives \(I\approx0.50\) A and \(I_5\approx+0.04\) A downward. The exam's numbers are simplified, but the direction agrees.)</div></li>
+</ol>
+
+<h4>When is a bridge balanced (\(I_5=0\))?</h4>
+<p>Generic labels: \(R_1\) = L–T, \(R_2\) = L–B, \(R_3\) = T–R, \(R_4\) = B–R.</p>
+<ol class="deriv">
+<li><div class="op"><span class="chip k-start">Start</span> \(I_5=0\) means T and B are at the same potential</div><div class="eq">\[V_s\frac{R_3}{R_1+R_3}=V_s\frac{R_4}{R_2+R_4}\]</div><div class="why">With no current in \(R_5\) each side is an independent voltage divider (as above).</div></li>
+<li><div class="op"><span class="chip k-move">÷ both sides</span> by \(V_s\), then <span class="chip k-move">× both sides</span> by both denominators</div><div class="eq">\[R_3\,(R_2+R_4)=R_4\,(R_1+R_3)\]</div><div class="why">"Cross-multiplying" is just multiplying both sides by \((R_1+R_3)(R_2+R_4)\).</div></li>
+<li><div class="op"><span class="chip k-exp">Expand</span> both sides</div><div class="eq">\[R_2R_3+\A{R_3R_4}=R_1R_4+\A{R_3R_4}\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-can">Cancel</span> \(R_3R_4\) from both sides (− \(R_3R_4\) both sides)</div><div class="eq">\[R_2R_3+\X{R_3R_4}=R_1R_4+\X{R_3R_4}\quad\Rightarrow\quad R_2R_3=R_1R_4\]</div><div class="why"></div></li>
+<li class="result"><div class="op"><span class="chip k-res">Balance condition</span> ÷ both sides by \(R_3R_4\)</div><div class="eq">\[\frac{R_1}{R_3}=\frac{R_2}{R_4}\]</div><div class="why">Exam bridge: \(\frac{10}{30}=0.33\) and \(\frac{20}{40}=0.5\). Not equal, so unbalanced, which agrees with \(I_5\neq0\). Always check this ratio first: if it holds, \(I_5=0\) and the middle resistor can be ignored.</div></li>
+</ol>
+<div class="note"><strong>If the given \(I\) was the total source current.</strong> \(I\) only appears at nodes L and R, and \(I_5\) only at T and B, so no single node links them. You would first need \(I_1\): for example from Loop 3 and node R (\(I_4=I-I_3=0.3\) A, then \(I_2=(12-40\cdot0.3)/20=0\)). That gives \(I_1=0.5\) and the same \(I_5=0.3\) A. Write down which node or loop you use; examiners give credit for a correct method even if the labels were read differently.</div>
+
+<p>The slide's "food for thought" (\(V_1=100\) V, \(V_2=20\) V) is worked in problem P5.</p>
+</section>
+<!-- ============ L3 ============ -->
+<section id="l3">
+<h2><span class="tag">LECTURE 3</span>Power semiconductors</h2>
+<p>A switch can be mechanical (button), electromechanical (relay) or electrical (MOSFET). In power electronics, switches make rectifiers, active rectifiers, DC supplies and variable-frequency drives.</p>
+
+<h3>Silicon and doping</h3>
+<ul>
+<li>A semiconductor conducts between a conductor and an insulator. Its conductivity changes with doping, applied voltage or temperature. Examples: Si, Ge, GaAs.</li>
+<li>Silicon: most used; second most abundant element after oxygen; 4 valence electrons forming covalent bonds in a diamond-like crystal.</li>
+<li><strong>Group-3 dopant</strong> (B, Ga, In, Al) → adds <strong>holes</strong> → <strong>P-type</strong>.</li>
+<li><strong>Group-5 dopant</strong> (P, As, Sb) → adds <strong>free electrons</strong> → <strong>N-type</strong>.</li>
+<li>Holes (P) and free electrons (N) are the <em>mobile charge carriers</em>.</li>
+</ul>
+<p>Memory aid: silicon has 4. Group 3 brings one too few (a hole, Positive gap); group 5 one too many (an extra electron, Negative).</p>
+<p><strong>Conventional current</strong> flows + → − (Franklin, positive carriers). <strong>Electron flow</strong> is − → + (J.J. Thomson, 1897). Circuit diagrams use conventional current. In semiconductors both holes (+) and electrons (−) carry current.</p>
+
+<h3>PN junction diode (Russell Ohl, Bell Labs, 1939; commercial ~1947)</h3>
+<div class="tw"><table>
+<tr><th>Bias</th><th>What happens</th></tr>
+<tr><td>Zero</td><td>Holes diffuse P → N, electrons N → P. This leaves negative charge on the P side and positive on the N side: the <strong>depletion layer</strong>. Its electric field stops further diffusion and forms the <strong>potential barrier</strong>. Width depends on doping levels.</td></tr>
+<tr><td>Forward (+ to P)</td><td>No current until the applied voltage exceeds the barrier (the <strong>knee voltage</strong>: Si 0.7 V, Ge 0.3 V). Then the depletion layer shrinks to nearly zero and current flows A → K.</td></tr>
+<tr><td>Reverse (+ to N)</td><td>Barrier grows; diode insulates. A small <strong>reverse leakage</strong> current flows from minority carriers (Si &lt; 20 µA, Ge &lt; 50 µA). At the <strong>breakdown voltage</strong> (around 20–30 V for common diodes) <strong>avalanche breakdown</strong> lets large reverse current flow.</td></tr>
+</table></div>
+
+<h3>Schottky and PIN diodes</h3>
+<p><strong>Schottky</strong> (theory: Walter Schottky 1938; commercial 1960s): P-type replaced by a metal (Al, W, Mo, Pt, Cr) forming a metal–semiconductor junction. The <strong>Schottky barrier</strong> is much smaller, because there is no P-type: only electrons are majority carriers.</p>
+<p><strong>PIN</strong> (Jun-ichi Nishizawa 1950; commercial ~1952): p+ (heavy), n− (lightly doped "intrinsic", wide), n+ (heavy). Zero bias: two depletion layers. Forward: carriers injected into the intrinsic layer, low-resistance switch. Reverse: depletion regions widen and merge into one large layer, high-resistance switch. The intrinsic layer acts as a voltage-controlled resistor.</p>
+<div class="tw"><table>
+<tr><th>Property (vs PN)</th><th>Schottky</th><th>PIN</th></tr>
+<tr><td>Switching speed</td><td>Faster</td><td>—</td></tr>
+<tr><td>Forward voltage drop</td><td>Lower</td><td>Higher</td></tr>
+<tr><td>On-state resistance</td><td>Lower</td><td>Higher</td></tr>
+<tr><td>Reverse breakdown voltage</td><td>Lower</td><td>Higher</td></tr>
+<tr><td>Reverse leakage current</td><td>Higher</td><td>Lower</td></tr>
+</table></div>
+<p>Pattern: Schottky and PIN are mirror images. Schottky trades blocking capability for speed and low loss (low-voltage, high-frequency). PIN trades conduction loss for blocking capability (high voltage).</p>
+
+<h3>Transistors</h3>
+<div class="tw"><table>
+<tr><th>Device</th><th>Origin</th><th>Structure / terminals</th><th>Control</th></tr>
+<tr><td>BJT</td><td>Shockley, Bell Labs, 1948</td><td>NPN or PNP; emitter, base, collector. NPN: electrons majority; PNP: holes. Arrow shows current direction.</td><td>Small base current controls large C–E current (current-controlled)</td></tr>
+<tr><td>SCR (thyristor)</td><td>GE, 1956</td><td>PNPN, 3 junctions J1–J3; anode (heavily doped P), cathode, gate (on the P layer near the cathode)</td><td>Gate current pulse turns on; latches; turned off only by reverse-biasing A–K</td></tr>
+<tr><td>MOSFET</td><td>Atalla &amp; Kahng, Bell Labs, 1959</td><td>Gate, drain, source, body (body tied to source → 3 terminals). Gate insulated by SiO₂. N-channel: n+ D/S in p substrate. P-channel: the reverse.</td><td>Gate–source voltage (voltage-controlled)</td></tr>
+<tr><td>IGBT</td><td>Baliga, GE, 1977</td><td>Four layers (NPNP) with MOS gate; gate, emitter, collector. Combines MOSFET, BJT and SCR.</td><td>Gate–emitter voltage</td></tr>
+</table></div>
+
+<h3>How each switch works</h3>
+<p><strong>BJT on</strong>: base–emitter junction forward biased, collector–base reverse biased. Carriers are injected from emitter into the base; the base is thin, so they cross into the collector. <strong>Off</strong>: base–emitter reverse biased, no current.</p>
+<p><strong>SCR modes</strong>:</p>
+<ul>
+<li><em>Forward blocking</em> (anode +): outer junctions J1, J3 forward biased, <strong>middle J2 reverse biased</strong> → blocks. No gate current, stays off.</li>
+<li><em>Reverse blocking</em> (anode −): J1, J3 reverse biased, J2 forward → blocks. Gate signal does not help; stays off.</li>
+<li><em>Forward conduction</em>: a sufficient gate–cathode current pulse injects holes, the middle depletion layer breaks down, device conducts. The outer layers then keep supplying carriers regardless of the gate: <strong>latched on</strong>. Turn-off requires reverse bias across A–K.</li>
+</ul>
+<p><strong>MOSFET</strong>: gate–oxide–body forms a capacitor. Off: non-positive \(V_{GS}\), junctions blocked by depletion layers. On: positive \(V_{GS}\) repels holes under the oxide and draws electrons in from n+ regions, creating an <strong>inversion n layer</strong> (the channel). Drain–source voltage then drives electrons through all-n path; majority carriers only, no diffusion current. Modes: <em>enhancement</em> = normally open (off at \(V_{GS}=0\)); <em>depletion</em> = normally closed.</p>
+<p><strong>IGBT</strong>: positive \(V_{GE}\) creates the N channel (MOSFET mechanism). That electron current drives hole injection from the outer p+ layer into the n− drift layer, which removes the inner depletion layer (BJT mechanism) and gives a hole current path too. Result: MOS-easy gate drive with bipolar-low conduction loss at high current.</p>
+
+<h3>MOSFET vs BJT (slide 29)</h3>
+<p>MOSFET advantages: faster switching; higher input impedance (less switching/drive loss); no built-in forward voltage drop (no potential barrier in the channel); smaller (higher power density). Disadvantages: higher on-state resistance (conduction loss), lower current rating, more expensive. Uses: SMPS, consumer and automotive electronics, high-efficiency fast switching.</p>
+
+<div class="tw"><table>
+<tr><th>Parameter</th><th>BJT</th><th>MOSFET</th><th>IGBT</th></tr>
+<tr><td>Switching speed</td><td>Slow (µs)</td><td>Fast (ns)</td><td>Medium-fast</td></tr>
+<tr><td>On-state resistance</td><td>Low</td><td>Medium</td><td>Low</td></tr>
+<tr><td>Switching loss</td><td>High</td><td>Low</td><td>Low</td></tr>
+<tr><td>Breakdown voltage</td><td>High (&lt; 1 kV)</td><td>High (&lt; 1 kV)</td><td>Very high (&gt; 1 kV)</td></tr>
+<tr><td>Current rating</td><td>High (&lt; 500 A)</td><td>Low (&lt; 200 A)</td><td>Very high (&gt; 500 A)</td></tr>
+<tr><td>Unit cost</td><td>Low</td><td>Medium</td><td>High</td></tr>
+</table></div>
+<p>IGBT uses: high-power SMPS, high-power consumer and automotive electronics, EV charging, motor control.</p>
+
+<h3>Wide bandgap (WBG)</h3>
+<ul>
+<li>Bandgap 2–3× that of silicon. Materials: GaN, SiC. Benefits: higher temperature and voltage tolerance, higher efficiency, more compact.</li>
+<li><strong>SiC MOSFET</strong>: same MOS structure as Si-MOSFET on a SiC substrate; the drift layer is much thinner and more heavily doped → lower on-resistance.</li>
+<li><strong>GaN</strong>: no doped regions. A heterojunction of AlGaN and GaN; because the bandgaps differ, electrons accumulate at the interface forming a <strong>2DEG</strong> (two-dimensional electron gas), a nanometre-thin channel with very high electron mobility. Usually GaN-on-Si or GaN-on-SiC substrates for cost and thermal reasons.</li>
+<li>Trend: SiC MOSFETs and GaN devices are replacing Si transistors; MOSFET and IGBT remain the most used so far.</li>
+</ul>
+</section>
+
+
+<!-- ============ L4 ============ -->
+<section id="l4">
+<h2><span class="tag">LECTURE 4</span>DC-DC converters</h2>
+<p>A DC-DC converter steps a DC voltage down or up. It needs a switching device; the output level is set by the <strong>duty cycle</strong> \(D\) (fraction of the period the switch is on, \(0\le D\le1\)) at <strong>switching frequency</strong> \(f_s=1/T_s\) (how fast it toggles).</p>
+
+<h3>Average output of a chopped voltage</h3>
+<p>A switch alone between source and load gives the pulse train in figure M8: \(v_o=V_s\) while on (\(0\) to \(DT_s\)), \(v_o=0\) while off (\(DT_s\) to \(T_s\)).</p>
+<ol class="deriv">
+<li><div class="op"><span class="chip k-start">Start</span> definition of average (M8)</div><div class="eq">\[V_o=\frac1{T_s}\int_0^{T_s}v_o(t)\,dt\]</div><div class="why">Area of one period, divided by the period.</div></li>
+<li><div class="op"><span class="chip k-calc">Split the area</span> where the switch changes state (M7)</div><div class="eq">\[V_o=\frac1{T_s}\Big[\A{\int_0^{DT_s}V_s\,dt}+\B{\int_{DT_s}^{T_s}0\,dt}\Big]\]</div><div class="why">On-piece has height \(V_s\); off-piece has height 0.</div></li>
+<li><div class="op"><span class="chip k-calc">Rectangle rule</span> height × width</div><div class="eq">\[V_o=\frac1{T_s}\Big[\A{V_s\cdot DT_s}+\B{0}\Big]\]</div><div class="why"></div></li>
+<li class="result"><div class="op"><span class="chip k-res">Result</span> <span class="chip k-can">Cancel</span> \(T_s\)</div><div class="eq">\[V_o=\frac{V_s\,D\,\X{T_s}}{\X{T_s}}=DV_s\]</div><div class="why">Example: 24 V at \(D=0.5\) → 12 V average.</div></li>
+</ol>
+<p>Problem: the real output is a pulse train, \(v_o(t)=V_o+\Delta v\) (ripple). Fix: add an <strong>LC low-pass filter</strong> (smoothing). It blocks the AC components and leaves the DC average. Practical ripple remains around 1–3 %.</p>
+
+<h3>Classification</h3>
+<div class="tw"><table>
+<tr><th>Basis</th><th>Types</th></tr>
+<tr><td>Hardware</td><td>Linear regulator; switch-mode regulator</td></tr>
+<tr><td>Power flow</td><td>Unidirectional; bidirectional</td></tr>
+<tr><td>Isolation</td><td>Isolated (with transformer); non-isolated</td></tr>
+<tr><td>Topology</td><td>Hard switching; soft switching; resonant</td></tr>
+<tr><td>Voltage level</td><td>Buck (step-down); boost (step-up); buck-boost (either)</td></tr>
+</table></div>
+<p>Applications. Buck: microprocessor voltage regulation, battery charging, vehicle onboard electronics, phone charger. Boost: laptops, power banks, EV battery management, PV grid integration. Buck-boost: energy storage (charging = buck, discharging = boost), portable devices, UPS.</p>
+
+<h3>Steady state and small-ripple approximation</h3>
+<p><strong>Steady state</strong>: after all transients have settled. Waveforms still ripple, but every waveform <em>repeats exactly each period</em>. <strong>Small-ripple approximation</strong>: ripple in capacitor voltage and inductor current is small compared with the average, so treat \(v_o\approx V_o\) and \(i_L\approx I_L\) as constants during each on/off interval. That turns every integral into a rectangle.</p>
+
+<h3>Why volt-second and amp-second balance hold</h3>
+<ol class="deriv">
+<li><div class="op"><span class="chip k-start">Start</span> inductor law, then <span class="chip k-move">÷ both sides</span> by \(L\)</div><div class="eq">\[v_L=L\frac{di_L}{dt}\quad\Rightarrow\quad\frac{di_L}{dt}=\frac{v_L}{L}\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-calc">Integrate both sides</span> over one period</div><div class="eq">\[\int_0^{T_s}\frac{di_L}{dt}\,dt=\frac1L\int_0^{T_s}v_L\,dt\]</div><div class="why">\(\frac1L\) is a constant, so it sits outside the integral.</div></li>
+<li><div class="op"><span class="chip k-calc">Left side</span> sum of all small changes = total change (M7)</div><div class="eq">\[\A{i_L(T_s)-i_L(0)}=\frac1L\int_0^{T_s}v_L\,dt\]</div><div class="why">Left side: current at the end of the period minus current at the start.</div></li>
+<li class="result"><div class="op"><span class="chip k-res">Volt-second balance</span> steady state: the waveform repeats</div><div class="eq">\[\A{i_L(T_s)=i_L(0)}\;\Rightarrow\;\A{0}=\frac1L\int_0^{T_s}v_L\,dt\;\Rightarrow\;\int_0^{T_s}v_L\,dt=0\]</div><div class="why">Multiply both sides by \(L\). In words: the area under \(v_L\) over one period is zero, so the average inductor voltage is zero. If it were not, the current would creep up (or down) every cycle, which is not steady state.</div></li>
+<li class="result"><div class="op"><span class="chip k-res">Amp-second balance</span> same three steps with \(i_C=C\frac{dv_C}{dt}\)</div><div class="eq">\[v_C(T_s)-v_C(0)=\frac1C\int_0^{T_s}i_C\,dt=0\;\Rightarrow\;\int_0^{T_s}i_C\,dt=0\]</div><div class="why">Average capacitor current over one period is zero.</div></li>
+</ol>
+<div class="key"><strong>4-step recipe (L4 summary).</strong> 1) Draw on-time and off-time circuits, label currents and drops. 2) KVL and KCL for each. 3) Volt-second balance → \(V_o/V_s\). 4) Amp-second balance → \(I_o/I_L\). The buck and boost below follow exactly these four steps.</div>
+
+<!-- BUCK -->
+<h3>Buck converter (step-down)</h3>
+<h4>Step 1: draw the two circuits</h4>
+<div class="figrow">
+<figure><svg id="buckOn" viewBox="0 0 430 160" role="img" aria-label="Buck on-state: switch closed, current path from source through switch, inductor, to output and back. Diode off."></svg>
+<figcaption><strong>On</strong> (0 → \(DT_s\)): S closed, diode reverse biased (off). Current flows Vs → S → L → output. L and C charge.</figcaption></figure>
+<figure><svg id="buckOff" viewBox="0 0 430 160" role="img" aria-label="Buck off-state: switch open, inductor current freewheels through the diode and output."></svg>
+<figcaption><strong>Off</strong> (\(DT_s\) → \(T_s\)): S open. The inductor current cannot stop, so it pushes the diode on and circulates D → L → output. L and C discharge.</figcaption></figure>
+</div>
+<h4>Step 2: KVL and KCL in each state</h4>
+<div class="twin">
+  <div class="th">ON-STATE</div><div class="th">OFF-STATE</div>
+  <div><span class="chip k-start">KVL</span> walk the blue loop<br>\(+V_s-\A{v_L}-V_o=0\)<br><span class="chip k-move">+ \(v_L\) both sides</span><br>\(\A{v_{L,on}}=V_s-V_o\)</div>
+  <div><span class="chip k-start">KVL</span> walk the blue loop (diode ≈ 0 V)<br>\(0-\B{v_L}-V_o=0\)<br><span class="chip k-move">+ \(v_L\) both sides</span><br>\(\B{v_{L,off}}=-V_o\)</div>
+  <div><span class="chip k-start">KCL</span> output node: in = out<br>\(i_L=i_C+i_o\)<br><span class="chip k-move">− \(i_o\) both sides</span><br>\(\A{i_{C,on}}=I_L-I_o\)</div>
+  <div><span class="chip k-start">KCL</span> output node: same node, same split<br>\(i_L=i_C+i_o\)<br>\(\B{i_{C,off}}=I_L-I_o\)</div>
+</div>
+<p>Uppercase \(V_o, I_L, I_o\) because of the small-ripple approximation: inside one interval they are treated as constants.</p>
+
+<h4>Step 3: volt-second balance → output voltage</h4>
+<figure>
+<svg id="vsBuck" viewBox="0 0 520 230" role="img" aria-label="Buck inductor voltage over one period for Vs 24 V and D 0.4: positive 14.4 V for 0.4 Ts, negative 9.6 V for 0.6 Ts; both areas equal 5.76."></svg>
+<figcaption>Numbers: \(V_s=24\) V, \(D=0.4\), so \(V_o=9.6\) V. Blue area \(=14.4\times0.4=5.76\). Magenta area \(=9.6\times0.6=5.76\). Equal and opposite: the sum is zero. A tall thin rectangle balances a short wide one.</figcaption>
+</figure>
+<ol class="deriv">
+<li><div class="op"><span class="chip k-start">Start</span> blue area + magenta area = 0</div><div class="eq">\[\A{\underbrace{v_{L,on}}_{\text{height}}\cdot\underbrace{DT_s}_{\text{width}}}+\B{\underbrace{v_{L,off}}_{\text{height}}\cdot\underbrace{(1-D)T_s}_{\text{width}}}=0\]</div><div class="why">Volt-second balance, with each integral written as a rectangle (M7).</div></li>
+<li><div class="op"><span class="chip k-sub">Substitute</span> the heights from Step 2</div><div class="eq">\[\A{(V_s-V_o)}\,DT_s+\B{(-V_o)}\,(1-D)T_s=0\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-move">÷ every term</span> by \(\C{T_s}\) (M5)</div><div class="eq">\[\frac{\A{(V_s-V_o)}D\,\X{T_s}}{\X{T_s}}+\frac{\B{(-V_o)}(1-D)\,\X{T_s}}{\X{T_s}}=\frac{0}{T_s}\]\[\A{(V_s-V_o)}D\;\B{-\,V_o(1-D)}=0\]</div><div class="why">\(0\) divided by anything is 0. \(T_s\) is never zero, so dividing is allowed.</div></li>
+<li><div class="op"><span class="chip k-exp">Expand</span> both brackets (M3, watch the minus)</div><div class="eq">\[\A{D V_s - D V_o}\;\B{-\,V_o + D V_o}=0\]</div><div class="why">Blue: \(D\) times each term. Magenta: \(-V_o\) times each term: \((-V_o)\cdot1=-V_o\) and \((-V_o)\cdot(-D)=+DV_o\).</div></li>
+<li><div class="op"><span class="chip k-can">Cancel</span> the opposites \(-DV_o\) and \(+DV_o\)</div><div class="eq">\[DV_s\X{-DV_o}-V_o\X{+DV_o}=0\quad\Rightarrow\quad DV_s-V_o=0\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-move">+ \(V_o\) both sides</span></div><div class="eq">\[DV_s=V_o\]</div><div class="why"></div></li>
+<li class="result"><div class="op"><span class="chip k-res">Result</span> also as a ratio: ÷ both sides by \(V_s\)</div><div class="eq">\[V_o=DV_s\qquad\frac{V_o}{V_s}=D\]</div><div class="why">Since \(D\le1\), \(V_o\le V_s\): step-down. Check with the figure: \(0.4\cdot24=9.6\) V ✓.</div></li>
+</ol>
+
+<h4>Step 4: amp-second balance → output current</h4>
+<ol class="deriv">
+<li><div class="op"><span class="chip k-start">Start</span> capacitor areas sum to zero</div><div class="eq">\[\A{i_{C,on}}\cdot DT_s+\B{i_{C,off}}\cdot(1-D)T_s=0\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-sub">Substitute</span> from Step 2</div><div class="eq">\[\A{(I_L-I_o)}DT_s+\B{(I_L-I_o)}(1-D)T_s=0\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-move">÷ every term</span> by \(T_s\)</div><div class="eq">\[(I_L-I_o)\,D+(I_L-I_o)\,(1-D)=0\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-exp">Factor</span> the common bracket \(\G{(I_L-I_o)}\) (M4)</div><div class="eq">\[\G{(I_L-I_o)}\,\big[D+1-D\big]=0\quad\Rightarrow\quad\G{(I_L-I_o)}\cdot1=0\]</div><div class="why">\(D-D=0\), so the square bracket is just 1.</div></li>
+<li class="result"><div class="op"><span class="chip k-res">Result</span> + \(I_o\) both sides</div><div class="eq">\[I_o=I_L\]</div><div class="why">The average inductor current equals the load current; the capacitor only carries the ripple.</div></li>
+</ol>
+<div class="extra"><span class="lbl">BEYOND SLIDES · power check and ripple</span>Input current flows only while S is on, so \(I_s=DI_L\). Then \(P_{in}=V_s\cdot DI_L\) and \(P_{out}=V_oI_o=DV_s\cdot I_L\): equal, as an ideal lossless converter must be. Inductor ripple (peak-to-peak): during on-time the current slope is \(\frac{V_s-V_o}{L}\) (from \(v=L\frac{di}{dt}\)) for \(DT_s\) seconds, so \(\Delta i_L=\frac{(V_s-V_o)DT_s}{L}\). Larger \(L\) or higher \(f_s\) gives smaller ripple.</div>
+
+<!-- BOOST -->
+<h3>Boost converter (step-up)</h3>
+<h4>Step 1: draw the two circuits</h4>
+<div class="figrow">
+<figure><svg id="boostOn" viewBox="0 0 430 160" role="img" aria-label="Boost on-state: switch closed shorts the inductor to ground; source charges inductor; capacitor alone feeds the load."></svg>
+<figcaption><strong>On</strong>: S closed. Blue loop: Vs charges L through S. Magenta loop: diode blocks, so C alone feeds the load (C discharges).</figcaption></figure>
+<figure><svg id="boostOff" viewBox="0 0 430 160" role="img" aria-label="Boost off-state: switch open; source and inductor in series push current through the diode into capacitor and load."></svg>
+<figcaption><strong>Off</strong>: S open. Vs and L in series push current through D, charging C and feeding the load. Their voltages add: that is where the step-up comes from.</figcaption></figure>
+</div>
+<h4>Step 2: KVL and KCL in each state</h4>
+<div class="twin">
+  <div class="th">ON-STATE</div><div class="th">OFF-STATE</div>
+  <div><span class="chip k-start">KVL</span> blue loop Vs → L → S<br>\(+V_s-\A{v_L}=0\)<br>\(\A{v_{L,on}}=V_s\)</div>
+  <div><span class="chip k-start">KVL</span> loop Vs → L → D → output<br>\(+V_s-\B{v_L}-V_o=0\)<br>\(\B{v_{L,off}}=V_s-V_o\)</div>
+  <div><span class="chip k-start">KCL</span> output node; diode off, nothing flows in<br>\(0=i_C+i_o\)<br>\(\A{i_{C,on}}=-I_o\)</div>
+  <div><span class="chip k-start">KCL</span> output node; \(i_L\) flows in<br>\(i_L=i_C+i_o\)<br>\(\B{i_{C,off}}=I_L-I_o\)</div>
+</div>
+<p>\(v_{L,off}=V_s-V_o\) is negative because \(V_o&gt;V_s\). The inductor gives back the energy it stored during the on-time.</p>
+
+<h4>Step 3: volt-second balance → output voltage</h4>
+<figure>
+<svg id="vsBoost" viewBox="0 0 520 230" role="img" aria-label="Boost inductor voltage over one period for Vs 24 V and D 0.6: positive 24 V for 0.6 Ts, negative 36 V for 0.4 Ts; both areas equal 14.4."></svg>
+<figcaption>Numbers: \(V_s=24\) V, \(D=0.6\), so \(V_o=60\) V. Blue \(=24\times0.6=14.4\). Magenta \(=(24-60)\times0.4=-14.4\). Balanced.</figcaption>
+</figure>
+<ol class="deriv">
+<li><div class="op"><span class="chip k-start">Start</span> + <span class="chip k-sub">Substitute</span> the heights</div><div class="eq">\[\A{V_s}\cdot DT_s+\B{(V_s-V_o)}\cdot(1-D)T_s=0\]</div><div class="why">The slides write \(D'=1-D\).</div></li>
+<li><div class="op"><span class="chip k-move">÷ every term</span> by \(T_s\)</div><div class="eq">\[\A{V_sD}+\B{(V_s-V_o)(1-D)}=0\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-exp">Expand</span> only the \(V_s\) part of the magenta bracket</div><div class="eq">\[\A{V_sD}+\B{V_s(1-D)}-\G{V_o(1-D)}=0\quad\Rightarrow\quad\A{V_sD}+\B{V_s-V_sD}-\G{V_o(1-D)}=0\]</div><div class="why">First split \((V_s-V_o)(1-D)\) into \(V_s(1-D)-V_o(1-D)\). Then expand \(V_s(1-D)=V_s-V_sD\). Keep \(\G{V_o(1-D)}\) together: that is the piece we want to isolate.</div></li>
+<li><div class="op"><span class="chip k-can">Cancel</span> \(+V_sD\) and \(-V_sD\)</div><div class="eq">\[\X{V_sD}+V_s\X{-V_sD}-\G{V_o(1-D)}=0\quad\Rightarrow\quad V_s-\G{V_o(1-D)}=0\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-move">+ both sides</span> \(\G{V_o(1-D)}\)</div><div class="eq">\[V_s=\G{V_o(1-D)}\]</div><div class="why"></div></li>
+<li class="result"><div class="op"><span class="chip k-res">Result</span> ÷ both sides by \(\C{(1-D)}\)</div><div class="eq">\[V_o=\frac{V_s}{\C{1-D}}\qquad\frac{V_o}{V_s}=\frac1{1-D}\]</div><div class="why">Valid for \(D&lt;1\). Since \(1-D\le1\), dividing by it makes the result bigger: step-up. Check: \(24/0.4=60\) V ✓.</div></li>
+</ol>
+
+<h4>Step 4: amp-second balance → output current</h4>
+<ol class="deriv">
+<li><div class="op"><span class="chip k-start">Start</span> + <span class="chip k-sub">Substitute</span> from Step 2</div><div class="eq">\[\A{(-I_o)}\cdot DT_s+\B{(I_L-I_o)}\cdot(1-D)T_s=0\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-move">÷ every term</span> by \(T_s\), then <span class="chip k-exp">Expand</span> the magenta bracket</div><div class="eq">\[\A{-I_oD}+\B{I_L(1-D)-I_o(1-D)}=0\]\[\A{-I_oD}+\B{I_L(1-D)-I_o+I_oD}=0\]</div><div class="why">\(-I_o(1-D)=-I_o+I_oD\) (minus rule, M3).</div></li>
+<li><div class="op"><span class="chip k-can">Cancel</span> \(-I_oD\) and \(+I_oD\)</div><div class="eq">\[\X{-I_oD}+I_L(1-D)-I_o\X{+I_oD}=0\quad\Rightarrow\quad I_L(1-D)-I_o=0\]</div><div class="why"></div></li>
+<li class="result"><div class="op"><span class="chip k-res">Result</span> + \(I_o\) both sides</div><div class="eq">\[I_o=I_L(1-D)\qquad\frac{I_L}{I_o}=\frac1{1-D}\]</div><div class="why">The inductor (= input) current is larger than the load current by the same factor that the voltage is boosted.</div></li>
+</ol>
+<div class="extra"><span class="lbl">BEYOND SLIDES · power check, limits, buck-boost</span>In a boost, input current = inductor current, \(I_s=I_L\). \(P_{in}=V_sI_L\); \(P_{out}=\frac{V_s}{\X{1-D}}\cdot I_L\X{(1-D)}=V_sI_L\) ✓. As \(D\to1\) the ideal gain goes to infinity; real losses limit it, so practical boosts stay well below \(D=0.9\). Inductor ripple: \(\Delta i_L=\frac{V_sDT_s}{L}\).<br>Buck-boost (named in L4, analysed later): on \(v_L=V_s\), off \(v_L=V_o\) (output polarity inverted), so \(V_sD+V_o(1-D)=0\Rightarrow V_o=-\frac{D}{1-D}V_s\): \(|V_o|&lt;V_s\) for \(D&lt;0.5\), \(&gt;V_s\) for \(D&gt;0.5\).</div>
+
+<div class="tw"><table>
+<tr><th class="num">D</th><th class="num">Buck \(V_o/V_s=D\)</th><th class="num">Boost \(V_o/V_s=1/(1-D)\)</th><th class="num">Boost \(I_L/I_o\)</th></tr>
+<tr><td class="num">0.20</td><td class="num">0.20</td><td class="num">1.25</td><td class="num">1.25</td></tr>
+<tr><td class="num">0.25</td><td class="num">0.25</td><td class="num">1.33</td><td class="num">1.33</td></tr>
+<tr><td class="num">0.50</td><td class="num">0.50</td><td class="num">2.00</td><td class="num">2.00</td></tr>
+<tr><td class="num">0.75</td><td class="num">0.75</td><td class="num">4.00</td><td class="num">4.00</td></tr>
+<tr><td class="num">0.80</td><td class="num">0.80</td><td class="num">5.00</td><td class="num">5.00</td></tr>
+</table></div>
+</section>
+<!-- ============ EXPLORER ============ -->
+<section id="explorer">
+<h2><span class="tag">LECTURE 4 · INTERACTIVE</span>Converter explorer</h2>
+<p>Move the duty cycle and watch the inductor voltage. The shaded area above zero (on-time) always equals the area below zero (off-time): that equality is volt-second balance, and the output voltage is whatever value makes it true.</p>
+<div class="explorer">
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Topology">
+      <button type="button" id="mBuck" aria-pressed="true">Buck</button>
+      <button type="button" id="mBoost" aria-pressed="false">Boost</button>
+    </div>
+    <label for="dS">D <input type="range" id="dS" min="0.05" max="0.9" step="0.01" value="0.4"> <span class="num" id="dV">0.40</span></label>
+    <label for="vS">V<sub>s</sub> <input type="range" id="vS" min="5" max="48" step="1" value="24"> <span class="num" id="vV">24 V</span></label>
+  </div>
+  <div class="tw"><svg id="wave" viewBox="0 0 680 330" role="img" aria-label="Switch state, inductor voltage and inductor current over two switching periods"></svg></div>
+  <div class="readout">
+    <div>Output V<sub>o</sub><b id="rVo">–</b></div>
+    <div>v<sub>L,on</sub> × D<b id="rA">–</b></div>
+    <div>v<sub>L,off</sub> × (1−D)<b id="rB">–</b></div>
+    <div>Sum (must be 0)<b id="rS">–</b></div>
+  </div>
+</div>
+</section>
+
+
+<!-- ============ PRACTICE ============ -->
+<section id="practice">
+<h2><span class="tag">EXAM PRACTICE</span>Worked problems</h2>
+<p>Try each before opening the solution. Every solution follows the same habit: write the formula in symbols first, rearrange it in symbols, and only then put numbers in.</p>
+
+<details class="prob"><summary><span class="pn">P1 · BUCK, FULL</span>A buck converter has \(V_s=48\) V, \(D=0.25\), load \(R=6\ \Omega\). Find \(V_o\), \(I_o\), \(I_L\), the average input current and check the power balance.<span class="show">Show solution</span></summary><div class="sol"><ol class="deriv">
+<li><div class="op"><span class="chip k-start">Formula</span> buck ratio, then <span class="chip k-sub">numbers</span></div><div class="eq">\[V_o=DV_s=0.25\cdot48=\A{12\ \text{V}}\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-start">Formula</span> Ohm's law on the load</div><div class="eq">\[I_o=\frac{\A{V_o}}{R}=\frac{\A{12}}{6}=\B{2\ \text{A}}\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-start">Formula</span> buck amp-second result</div><div class="eq">\[I_L=I_o=\B{2\ \text{A}}\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-start">Formula</span> source only delivers during the on-fraction \(D\)</div><div class="eq">\[I_s=D\,I_L=0.25\cdot\B{2}=0.5\ \text{A}\]</div><div class="why"></div></li>
+<li class="result"><div class="op"><span class="chip k-res">Check</span> power in = power out</div><div class="eq">\[P_{in}=48\cdot0.5=24\ \text{W}\qquad P_{out}=\A{12}\cdot\B{2}=24\ \text{W}\]</div><div class="why">Ideal converter: no loss. Voltage down ×4, current up ×4.</div></li>
+</ol></div></details>
+
+<details class="prob"><summary><span class="pn">P2 · BOOST, FIND D</span>A boost converter must make 48 V from a 12 V battery. What duty cycle is needed?<span class="show">Show solution</span></summary><div class="sol"><ol class="deriv">
+<li><div class="op"><span class="chip k-start">Formula</span> boost ratio</div><div class="eq">\[V_o=\frac{V_s}{\C{1-D}}\]</div><div class="why">\(D\) is stuck inside the bottom of a fraction. Plan: get the bracket out from underneath, then isolate \(D\).</div></li>
+<li><div class="op"><span class="chip k-move">× both sides</span> by \(\C{(1-D)}\)</div><div class="eq">\[V_o\,\C{(1-D)}=V_s\]</div><div class="why">Multiplying by the bottom of a fraction removes the fraction.</div></li>
+<li><div class="op"><span class="chip k-move">÷ both sides</span> by \(V_o\)</div><div class="eq">\[\C{1-D}=\frac{V_s}{V_o}\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-move">Rearrange</span> + \(D\) both sides, − \(\frac{V_s}{V_o}\) both sides</div><div class="eq">\[D=1-\frac{V_s}{V_o}\]</div><div class="why">Symbol form done. Now numbers.</div></li>
+<li class="result"><div class="op"><span class="chip k-res">Numbers</span></div><div class="eq">\[D=1-\frac{12}{48}=1-0.25=0.75\]</div><div class="why">Check: \(12/(1-0.75)=12/0.25=48\) V ✓.</div></li>
+</ol></div></details>
+
+<details class="prob"><summary><span class="pn">P3 · BOOST CURRENTS</span>Boost converter, \(V_s=24\) V, \(D=0.6\), \(I_o=3\) A. Find \(V_o\), \(I_L\) and verify power.<span class="show">Show solution</span></summary><div class="sol"><ol class="deriv">
+<li><div class="op"><span class="chip k-start">Formula</span> boost ratio</div><div class="eq">\[V_o=\frac{24}{1-0.6}=\frac{24}{0.4}=60\ \text{V}\]</div><div class="why">Dividing by 0.4 is the same as multiplying by 2.5.</div></li>
+<li><div class="op"><span class="chip k-start">Formula</span> \(I_o=I_L(1-D)\), then <span class="chip k-move">÷ both sides</span> by \(\C{(1-D)}\)</div><div class="eq">\[I_L=\frac{I_o}{\C{1-D}}=\frac{3}{0.4}=7.5\ \text{A}\]</div><div class="why"></div></li>
+<li class="result"><div class="op"><span class="chip k-res">Check</span> in a boost the input current is the inductor current</div><div class="eq">\[P_{in}=24\cdot7.5=180\ \text{W}\qquad P_{out}=60\cdot3=180\ \text{W}\]</div><div class="why">Balanced ✓.</div></li>
+</ol></div></details>
+
+<details class="prob"><summary><span class="pn">P4 · TIMING</span>A converter switches at \(f_s=100\) kHz with \(D=0.4\). Find \(T_s\), \(t_{on}\), \(t_{off}\).<span class="show">Show solution</span></summary><div class="sol"><ol class="deriv">
+<li><div class="op"><span class="chip k-start">Formula</span> period = 1 / frequency</div><div class="eq">\[T_s=\frac1{f_s}=\frac{1}{100\,000\ \text{Hz}}=10^{-5}\ \text{s}=10\ \mu\text{s}\]</div><div class="why">100 kHz = \(10^5\) Hz, and \(\frac1{10^5}=10^{-5}\). 1 µs = \(10^{-6}\) s, so \(10^{-5}\) s = 10 µs.</div></li>
+<li><div class="op"><span class="chip k-start">Formula</span> on-time = \(D\) × period</div><div class="eq">\[t_{on}=DT_s=0.4\cdot10=4\ \mu\text{s}\]</div><div class="why"></div></li>
+<li class="result"><div class="op"><span class="chip k-res">Result</span> off-time = the rest</div><div class="eq">\[t_{off}=(1-D)T_s=0.6\cdot10=6\ \mu\text{s}\]</div><div class="why">Check: \(4+6=10\) µs ✓.</div></li>
+</ol></div></details>
+
+<details class="prob"><summary><span class="pn">P5 · KCL/KVL "FOOD FOR THOUGHT"</span>Same circuit as slide 31 but \(V_1=100\) V and \(V_2=20\) V. Solve all currents and resistor voltages.<span class="show">Show solution</span></summary><div class="sol"><ol class="deriv">
+<li><div class="op"><span class="chip k-start">Same equations</span> (1)–(3) from the L2 example; only the source values change</div><div class="eq">\[\G{I_3}=\frac{V_1}{R_1}=\frac{100}{10}=\G{10\ \text{A}}\]</div><div class="why">Loop 1 has one unknown, so solve it first.</div></li>
+<li><div class="op"><span class="chip k-sub">Substitute</span> into loop 2</div><div class="eq">\[20-20\B{I_2}-5\B{I_2}-10\cdot\G{10}=0\quad\Rightarrow\quad\underbrace{20-100}_{-80}-25\B{I_2}=0\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-move">+ 80 both sides</span>, then <span class="chip k-move">÷ both sides</span> by −25</div><div class="eq">\[-25\B{I_2}=80\quad\Rightarrow\quad\B{I_2}=\frac{80}{-25}=\B{-3.2\ \text{A}}\]</div><div class="why">Negative: the real current flows B → C, into the + terminal of V2. V2 is now being charged.</div></li>
+<li><div class="op"><span class="chip k-sub">Substitute</span> into KCL \(\A{I_1}=\G{I_3}-\B{I_2}\)</div><div class="eq">\[\A{I_1}=\G{10}-(\B{-3.2})=10+3.2=\A{13.2\ \text{A}}\]</div><div class="why">Subtracting a negative number adds it.</div></li>
+<li class="result"><div class="op"><span class="chip k-res">Result</span> Ohm's law</div><div class="eq">\[V_{R1}=100\ \text{V},\quad V_{R2}=5\cdot(-3.2)=-16\ \text{V},\quad V_{R3}=20\cdot(-3.2)=-64\ \text{V}\]</div><div class="why">Same 16 V and 64 V magnitudes as the original, but with reversed polarity. Check loop 2: \(20-(-64)-(-16)-100=0\) ✓.</div></li>
+</ol></div></details>
+
+<details class="prob"><summary><span class="pn">P6 · RC TRANSIENT</span>\(R=10\ \text{k}\Omega\), \(C=100\ \mu\text{F}\), \(V_s=12\) V, capacitor initially empty. Find \(\tau\), \(i(0)\), \(v_C\) at 2 s, and the time to reach 9 V.<span class="show">Show solution</span></summary><div class="sol"><ol class="deriv">
+<li><div class="op"><span class="chip k-start">Formula</span> \(\tau=RC\) with prefixes as powers of ten</div><div class="eq">\[\tau=\underbrace{10\cdot10^{3}}_{10\ \text{k}\Omega}\cdot\underbrace{100\cdot10^{-6}}_{100\ \mu\text{F}}=10^4\cdot10^{-4}=10^{0}=1\ \text{s}\]</div><div class="why">Multiply powers of ten by adding exponents: \(4+(-4)=0\).</div></li>
+<li><div class="op"><span class="chip k-sub">Substitute</span> \(t=0\) into \(i=\frac{V_s}{R}e^{-t/\tau}\)</div><div class="eq">\[i(0)=\frac{12}{10\,000}\,e^{0}=0.0012\cdot1=1.2\ \text{mA}\]</div><div class="why">\(e^0=1\). Empty capacitor acts like a wire, so only \(R\) limits.</div></li>
+<li><div class="op"><span class="chip k-sub">Substitute</span> \(t=2\) s into \(v_C=V_s(1-e^{-t/\tau})\)</div><div class="eq">\[v_C(2)=12\,(1-e^{-2})=12\,(1-0.135)=12\cdot0.865=10.38\ \text{V}\]</div><div class="why">\(t/\tau=2/1=2\).</div></li>
+<li><div class="op"><span class="chip k-start">Goal</span> find \(t\) when \(v_C=9\): <span class="chip k-move">÷ both sides</span> by 12</div><div class="eq">\[9=12\,(1-\C{e^{-t}})\quad\Rightarrow\quad\frac{9}{12}=1-\C{e^{-t}}\quad\Rightarrow\quad0.75=1-\C{e^{-t}}\]</div><div class="why">\(t\) is trapped inside the exponential. First get the exponential alone.</div></li>
+<li><div class="op"><span class="chip k-move">Rearrange</span> + \(e^{-t}\) both sides, − 0.75 both sides</div><div class="eq">\[\C{e^{-t}}=1-0.75=0.25\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-move">ln both sides</span> (M9: ln undoes e)</div><div class="eq">\[\ln\big(\C{e^{-t}}\big)=\ln0.25\quad\Rightarrow\quad-t=\ln0.25=-1.386\]</div><div class="why"></div></li>
+<li class="result"><div class="op"><span class="chip k-res">Result</span> × both sides by −1</div><div class="eq">\[t=1.39\ \text{s}\]</div><div class="why">Check: \(12(1-e^{-1.39})=12(1-0.25)=9\) V ✓.</div></li>
+</ol></div></details>
+
+<details class="prob"><summary><span class="pn">P7 · RL TRANSIENT</span>\(L=50\) mH, \(R=10\ \Omega\), \(V_s=20\) V. Find \(\tau\), the final current, and \(i\) and \(v_L\) at \(t=5\) ms.<span class="show">Show solution</span></summary><div class="sol"><ol class="deriv">
+<li><div class="op"><span class="chip k-start">Formula</span> \(\tau=L/R\)</div><div class="eq">\[\tau=\frac{0.05\ \text{H}}{10\ \Omega}=0.005\ \text{s}=5\ \text{ms}\]</div><div class="why">50 mH = 0.050 H.</div></li>
+<li><div class="op"><span class="chip k-start">End value</span> inductor = wire in DC steady state</div><div class="eq">\[i(\infty)=\frac{V_s}{R}=\frac{20}{10}=2\ \text{A}\]</div><div class="why"></div></li>
+<li class="result"><div class="op"><span class="chip k-sub">Substitute</span> \(t=5\) ms \(=\tau\), so \(t/\tau=1\)</div><div class="eq">\[i=2\,(1-e^{-1})=2\cdot0.632=1.26\ \text{A}\qquad v_L=20\,e^{-1}=7.36\ \text{V}\]</div><div class="why">Check KVL: \(Ri+v_L=10\cdot1.264+7.36=20\) V ✓.</div></li>
+</ol></div></details>
+
+<details class="prob"><summary><span class="pn">P8 · COMPONENT LAWS</span>(a) A 2 mH inductor's current ramps from 1 A to 3 A in 20 µs: inductor voltage? (b) A 10 µF capacitor's voltage rises at 5 V/ms: current? (c) A 200-turn coil's flux changes by 0.02 Wb in 10 ms: induced EMF?<span class="show">Show solution</span></summary><div class="sol"><ol class="deriv">
+<li><div class="op"><span class="chip k-calc">(a) Slope</span> straight ramp: rise ÷ run (M6)</div><div class="eq">\[\frac{di}{dt}=\frac{3-1}{20\cdot10^{-6}}=\frac{2}{2\cdot10^{-5}}=10^{5}\ \text{A/s}\]\[v=L\frac{di}{dt}=2\cdot10^{-3}\cdot10^{5}=2\cdot10^{2}=200\ \text{V}\]</div><div class="why">A small inductor still makes a large voltage when its current changes fast.</div></li>
+<li><div class="op"><span class="chip k-calc">(b) Units first</span> per millisecond → per second</div><div class="eq">\[\frac{dv}{dt}=\frac{5\ \text{V}}{10^{-3}\ \text{s}}=5000\ \text{V/s}\]\[i=C\frac{dv}{dt}=10\cdot10^{-6}\cdot5000=0.05\ \text{A}=50\ \text{mA}\]</div><div class="why"></div></li>
+<li class="result"><div class="op"><span class="chip k-calc">(c) Faraday</span></div><div class="eq">\[e=-N\frac{\Delta\Phi}{\Delta t}=-200\cdot\frac{0.02}{0.01}=-200\cdot2=-400\ \text{V}\]</div><div class="why">Magnitude 400 V; the minus sign (Lenz) means the EMF opposes the flux change.</div></li>
+</ol></div></details>
+
+<details class="prob"><summary><span class="pn">P9 · RESISTORS</span>For \(R_1=4.7\ \Omega\), \(R_2=1.2\ \Omega\): series and parallel equivalents, and the power in each when the parallel pair sits across 12 V.<span class="show">Show solution</span></summary><div class="sol"><ol class="deriv">
+<li><div class="op"><span class="chip k-start">Series</span></div><div class="eq">\[R_s=4.7+1.2=5.9\ \Omega\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-start">Parallel</span> product over sum</div><div class="eq">\[R_p=\frac{4.7\cdot1.2}{4.7+1.2}=\frac{5.64}{5.9}=0.956\ \Omega\]</div><div class="why">Smaller than 1.2 Ω ✓.</div></li>
+<li class="result"><div class="op"><span class="chip k-res">Power</span> parallel → same \(V\), so use \(P=V^2/R\)</div><div class="eq">\[P_1=\frac{12^2}{4.7}=\frac{144}{4.7}=30.6\ \text{W}\qquad P_2=\frac{144}{1.2}=120\ \text{W}\]</div><div class="why">In parallel the <em>smaller</em> resistor takes more power.</div></li>
+</ol></div></details>
+
+<details class="prob"><summary><span class="pn">P10 · CONCEPT</span>Explain why a buck converter needs the diode, and why its output can never exceed the input.<span class="show">Show solution</span></summary><div class="sol">
+<p>When S opens, the inductor current cannot change instantly (\(v=L\,di/dt\) would be infinite). The diode gives that current a freewheeling path from ground through L to the output. Without it, the voltage across the opening switch would spike and destroy it.</p>
+<p>Output limit: \(V_o=DV_s\) with \(D\le1\). In picture form (figure in L4): volt-second balance needs a positive rectangle and a negative rectangle. The negative one is \(-V_o\), fine. The positive one is \(V_s-V_o\), which is only positive if \(V_o&lt;V_s\).</p>
+</div></details>
+
+<details class="prob"><summary><span class="pn">P11 · BRIDGE, FULL SOLVE</span>Same bridge as the Mini Exam figure but with \(V_s=12\) V, \(R_1=2\ \Omega\) (L–T), \(R_2=4\ \Omega\) (L–B), \(R_3=4\ \Omega\) (T–R), \(R_4=2\ \Omega\) (B–R), \(R_5=4\ \Omega\) (T–B). Solve all six currents.<span class="show">Show solution</span></summary><div class="sol"><ol class="deriv">
+<li><div class="op"><span class="chip k-start">Equations</span> the 3 KCL + 3 KVL from the bridge section, with these values</div><div class="eq">\[\begin{aligned}&amp;I=I_1+I_2,\quad I_1=I_3+\G{I_5},\quad I_2+\G{I_5}=I_4\\&amp;-2I_1-4\G{I_5}+4I_2=0\\&amp;-4I_3+2I_4+4\G{I_5}=0\\&amp;12-4I_2-2I_4=0\end{aligned}\]</div><div class="why">Plan: use KCL to remove unknowns, leaving three loop equations in three unknowns.</div></li>
+<li><div class="op"><span class="chip k-move">Rearrange</span> node T and node B</div><div class="eq">\[\A{I_3=I_1-I_5}\qquad\B{I_4=I_2+I_5}\]</div><div class="why"></div></li>
+<li><div class="op"><span class="chip k-sub">Substitute</span> into the three loops</div><div class="eq">\[\begin{aligned}\text{L1: }&amp;-2I_1-4I_5+4I_2=0\\\text{L2: }&amp;-4\A{(I_1-I_5)}+2\B{(I_2+I_5)}+4I_5=0\\\text{L3: }&amp;12-4I_2-2\B{(I_2+I_5)}=0\end{aligned}\]</div><div class="why">Now only \(I_1\), \(I_2\), \(I_5\) remain.</div></li>
+<li><div class="op"><span class="chip k-exp">Expand and collect</span></div><div class="eq">\[\begin{aligned}\text{L1: }&amp;\C{I_1=2I_2-2I_5}\quad(\text{÷2, then move terms})\\\text{L2: }&amp;-4I_1+2I_2+10I_5=0\\\text{L3: }&amp;12-6I_2-2I_5=0\end{aligned}\]</div><div class="why">L2: \(-4I_1+4I_5+2I_2+2I_5+4I_5\). L3: \(-4I_2-2I_2-2I_5\).</div></li>
+<li><div class="op"><span class="chip k-sub">Substitute</span> \(\C{I_1}\) into L2</div><div class="eq">\[-4\C{(2I_2-2I_5)}+2I_2+10I_5=0\;\Rightarrow\;-8I_2+8I_5+2I_2+10I_5=0\;\Rightarrow\;-6I_2+18I_5=0\]</div><div class="why">+ \(6I_2\) both sides, ÷ 6: \(I_2=3I_5\).</div></li>
+<li><div class="op"><span class="chip k-sub">Substitute</span> \(I_2=3I_5\) into L3</div><div class="eq">\[12-6\cdot3I_5-2I_5=0\;\Rightarrow\;12-20I_5=0\;\Rightarrow\;\G{I_5=0.6\ \text{A}}\]</div><div class="why"></div></li>
+<li class="result"><div class="op"><span class="chip k-res">Back-substitute</span></div><div class="eq">\[I_2=1.8,\quad I_1=3.6-1.2=2.4,\quad I_3=2.4-0.6=1.8,\quad I_4=1.8+0.6=2.4,\quad I=4.2\ \text{A}\]</div><div class="why">Check L3: \(12-4\cdot1.8-2\cdot2.4=12-7.2-4.8=0\) ✓. Balance check: \(\frac{2}{4}\neq\frac{4}{2}\), so \(I_5\neq0\) as expected; positive means downward, T higher than B.</div></li>
+</ol></div></details>
+</section>
+
+<!-- ============ FILL IN THE BLANKS ============ -->
+<section id="fill">
+<h2><span class="tag">EXAM PRACTICE · NEGATIVE MARKING</span>Fill in the blanks</h2>
+<p>Type the missing word or number, press Enter or Check. Spelling is checked loosely (case and spaces are ignored). Numbers accept small rounding differences.</p>
+<div class="qbar"><span>Correct <b id="fbScore">0</b> · Wrong <b id="fbWrong">0</b> of <span id="fbTotal">0</span></span><button type="button" id="fbReveal">Show all answers</button><button type="button" id="fbReset">Reset</button></div>
+<div id="fblist">
+<div class="fb" data-ans="rectifier">A converter that turns AC into DC is called a <input aria-label="answer"> .</div>
+<div class="fb" data-ans="inverter">A converter that turns DC into AC is called an <input aria-label="answer"> .</div>
+<div class="fb" data-ans="cycloconverter|cyclo-converter">An AC → AC converter that changes frequency directly is a <input aria-label="answer"> .</div>
+<div class="fb" data-ans="manage">Power electronics is the application of electronic circuits to convert, control and <input aria-label="answer"> the flow of electrical power.</div>
+<div class="fb" data-ans="mercury arc rectifier|mercury arc|mercury-arc rectifier">The first high-power AC → DC converter (1902) was the <input aria-label="answer"> .</div>
+<div class="fb" data-ans="transistor|transistors|switch">The only active component in a power converter is the <input aria-label="answer"> .</div>
+<div class="fb" data-ans="electric">A capacitor stores energy in an <input aria-label="answer"> field.</div>
+<div class="fb" data-ans="magnetic">An inductor stores energy in a <input aria-label="answer"> field.</div>
+<div class="fb" data-ans="dc|direct current">A capacitor blocks <input aria-label="answer"> current; an inductor blocks AC.</div>
+<div class="fb" data-ans="direction">Lenz's law determines the <input aria-label="answer"> of the induced EMF.</div>
+<div class="fb" data-ans="l/r">The time constant of an RL circuit is τ = <input aria-label="answer"> .</div>
+<div class="fb" data-num="63.2" data-tol="0.01">After one time constant a charging capacitor has reached <input aria-label="answer"> % of its final voltage.</div>
+<div class="fb" data-ans="n|n-type|ntype">Doping silicon with phosphorus (group 5) gives <input aria-label="answer"> -type material.</div>
+<div class="fb" data-ans="holes|hole">In P-type silicon the majority charge carriers are <input aria-label="answer"> .</div>
+<div class="fb" data-ans="depletion layer|depletion region|depletion">Diffusion at a PN junction creates a charge-free zone called the <input aria-label="answer"> .</div>
+<div class="fb" data-num="0.7" data-tol="0.02">The knee voltage of a silicon diode is about <input aria-label="answer"> V.</div>
+<div class="fb" data-ans="avalanche|avalanche breakdown">Large reverse current at the breakdown voltage is called <input aria-label="answer"> breakdown.</div>
+<div class="fb" data-ans="metal">A Schottky diode replaces the P-type layer with a <input aria-label="answer"> .</div>
+<div class="fb" data-ans="intrinsic|lightly doped|lightly-doped|n-">The wide middle layer of a PIN diode is the <input aria-label="answer"> layer.</div>
+<div class="fb" data-ans="pnpn|p-n-p-n|four|4">The SCR has a <input aria-label="answer"> layer structure.</div>
+<div class="fb" data-ans="reverse|reverse bias|reverse-biasing|reverse biasing">A latched SCR is turned off by <input aria-label="answer"> biasing the anode–cathode.</div>
+<div class="fb" data-ans="threshold|vth|threshold voltage">An enhancement MOSFET turns on when \(V_{GS}\) exceeds the <input aria-label="answer"> voltage.</div>
+<div class="fb" data-ans="inversion|inversion layer|n channel|n-channel">A positive gate voltage on an N-channel MOSFET creates an <input aria-label="answer"> layer under the oxide.</div>
+<div class="fb" data-ans="emitter">The IGBT's three terminals are gate, collector and <input aria-label="answer"> .</div>
+<div class="fb" data-ans="sic|silicon carbide">The two main wide-bandgap materials are GaN and <input aria-label="answer"> .</div>
+<div class="fb" data-ans="gas">GaN conducts through a 2DEG: a two-dimensional electron <input aria-label="answer"> .</div>
+<div class="fb" data-ans="inductor">Volt-second balance: in steady state the average <input aria-label="answer"> voltage over one period is zero.</div>
+<div class="fb" data-ans="capacitor">Amp-second balance: in steady state the average <input aria-label="answer"> current over one period is zero.</div>
+<div class="fb" data-ans="diode">In the off-state of a buck converter, the <input aria-label="answer"> conducts the inductor current.</div>
+<div class="fb" data-num="12" data-tol="0.01">A buck converter with \(V_s=48\) V and \(D=0.25\) gives \(V_o=\) <input aria-label="answer"> V.</div>
+<div class="fb" data-num="30" data-tol="0.01">A boost converter with \(V_s=12\) V and \(D=0.6\) gives \(V_o=\) <input aria-label="answer"> V.</div>
+<div class="fb" data-num="20" data-tol="0.01">At \(f_s=50\) kHz the switching period is <input aria-label="answer"> µs.</div>
+<div class="fb" data-num="0.75" data-tol="0.01">To boost 6 V to 24 V the duty cycle must be <input aria-label="answer"> .</div>
+<div class="fb" data-num="1" data-tol="0.01">\(R=1\ \text{k}\Omega\) and \(C=1\) mF give τ = <input aria-label="answer"> s.</div>
+<div class="fb" data-num="3" data-tol="0.01">A bridge circuit with 4 nodes needs <input aria-label="answer"> independent KCL equations.</div>
+<div class="fb" data-num="3" data-tol="0.01">A circuit with 6 branches and 4 nodes needs <input aria-label="answer"> independent KVL equations.</div>
+<div class="fb" data-ans="balanced">If \(R_1/R_3=R_2/R_4\), the current in the bridge resistor is zero and the bridge is <input aria-label="answer"> .</div>
+</div>
+</section>
+
+<!-- ============ DRAWING PRACTICE ============ -->
+<section id="draw">
+<h2><span class="tag">EXAM PRACTICE · DRAWING</span>Drawing practice: circuits and waveforms</h2>
+<p>Draw each one on paper first, then open the reference and compare it with the checklist. Graders look for the items in the checklist, not artistic quality.</p>
+<div class="key"><strong>Waveform rules that earn the marks.</strong> Stack the plots vertically on the same time axis. Mark \(0\), \(DT_s\), \(T_s\) (and \(2T_s\)). Label every level with its expression (\(V_s-V_o\), \(-V_o\), \(I_L\)). Draw at least two periods. Straight ramps where the voltage across L is constant (\(v=L\frac{di}{dt}\) with constant \(v\) means constant slope).</div>
+
+<details class="prob"><summary><span class="pn">D1 · CIRCUIT</span>Draw the buck converter: source, switch, diode, inductor, capacitor, load. Then draw its on-state and off-state equivalent circuits.<span class="show">Show reference</span></summary><div class="sol">
+<p><strong>Checklist:</strong> switch in series with the source; diode from ground to the switch node, cathode at the switch node (pointing up); L in series towards the output; C and load in parallel at the output; polarity of \(V_s\) and \(V_o\). On-state: switch shorted, diode removed. Off-state: switch removed, diode shorted.</p>
+<div class="figrow">
+<figure><svg id="drBuck" viewBox="0 0 430 160" role="img" aria-label="Buck converter schematic"></svg><figcaption>Full circuit.</figcaption></figure>
+<figure><svg id="drBuckOn" viewBox="0 0 430 160" role="img" aria-label="Buck on-state"></svg><figcaption>On: current path highlighted.</figcaption></figure>
+<figure><svg id="drBuckOff" viewBox="0 0 430 160" role="img" aria-label="Buck off-state"></svg><figcaption>Off: freewheeling through the diode.</figcaption></figure>
+</div></div></details>
+
+<details class="prob"><summary><span class="pn">D2 · WAVEFORMS</span>Draw the buck converter's switch signal, \(v_L\), \(i_L\) and \(i_C\) over two periods (take \(D=0.4\)).<span class="show">Show reference</span></summary><div class="sol">
+<p><strong>Checklist:</strong> \(v_L\) is a rectangle: \(V_s-V_o\) (positive) during on, \(-V_o\) during off. \(i_L\) is a triangle around \(I_L\): rises during on, falls during off, peak at \(DT_s\), ripple \(\Delta i_L\) marked. \(i_C=i_L-I_o\): same triangle shifted down to be centred on 0. The positive and negative areas of \(v_L\) are equal.</p>
+<figure><svg id="wfBuck" viewBox="0 0 520 430" role="img" aria-label="Buck waveforms: switch, inductor voltage, inductor current, capacitor current over two periods"></svg></figure>
+</div></details>
+
+<details class="prob"><summary><span class="pn">D3 · CIRCUIT</span>Draw the boost converter and its on-state and off-state equivalent circuits.<span class="show">Show reference</span></summary><div class="sol">
+<p><strong>Checklist:</strong> L in series with the source; switch from the inductor's far end to ground; diode in series towards the output (anode at the switch node); C and load at the output. On-state: two separate loops (Vs–L–S, and C–load). Off-state: one loop Vs–L–D–output.</p>
+<div class="figrow">
+<figure><svg id="drBoost" viewBox="0 0 430 160" role="img" aria-label="Boost converter schematic"></svg><figcaption>Full circuit.</figcaption></figure>
+<figure><svg id="drBoostOn" viewBox="0 0 430 160" role="img" aria-label="Boost on-state"></svg><figcaption>On: two loops.</figcaption></figure>
+<figure><svg id="drBoostOff" viewBox="0 0 430 160" role="img" aria-label="Boost off-state"></svg><figcaption>Off: source and L push through D.</figcaption></figure>
+</div></div></details>
+
+<details class="prob"><summary><span class="pn">D4 · WAVEFORMS</span>Draw the boost converter's switch signal, \(v_L\), \(i_L\) and \(i_C\) over two periods (take \(D=0.4\)).<span class="show">Show reference</span></summary><div class="sol">
+<p><strong>Checklist:</strong> \(v_L=V_s\) during on, \(V_s-V_o\) (negative, since \(V_o&gt;V_s\)) during off. \(i_L\) triangle around \(I_L\). \(i_C\) is <em>flat</em> at \(-I_o\) during on (C alone feeds the load), then jumps up to \(I_L-I_o\) and ramps down with \(i_L\) during off. This jump is the most common thing students miss.</p>
+<figure><svg id="wfBoost" viewBox="0 0 520 440" role="img" aria-label="Boost waveforms: switch, inductor voltage, inductor current, capacitor current over two periods"></svg></figure>
+</div></details>
+
+<details class="prob"><summary><span class="pn">D5 · WAVEFORMS</span>Sketch the RC charging circuit's \(v_C(t)\) and \(i(t)\), and the RL circuit's \(i(t)\) and \(v_L(t)\). Mark τ.<span class="show">Show reference</span></summary><div class="sol">
+<p><strong>Checklist:</strong> RC: \(v_C\) rises from 0 towards \(V_s\), 63 % at τ; \(i\) starts at \(V_s/R\) and decays to 0 (37 % at τ). RL: \(i\) rises from 0 towards \(V_s/R\); \(v_L\) starts at \(V_s\) and decays. Curves are steepest at \(t=0\) and flatten; "complete" after about 5τ. Axis labels with values.</p>
+<div class="figrow">
+<figure><svg id="drRC" viewBox="0 0 520 230" role="img" aria-label="RC curves"></svg><figcaption>RC: blue \(v_C/V_s\), magenta \(iR/V_s\).</figcaption></figure>
+<figure><svg id="drRL" viewBox="0 0 520 230" role="img" aria-label="RL curves"></svg><figcaption>RL: blue \(iR/V_s\), magenta \(v_L/V_s\).</figcaption></figure>
+</div></div></details>
+
+<details class="prob"><summary><span class="pn">D6 · CURVE</span>Draw the IV characteristic of an ideal diode and of a practical silicon PN diode.<span class="show">Show reference</span></summary><div class="sol">
+<p><strong>Checklist:</strong> axes \(V\) (horizontal) and \(I\) (vertical). Ideal: zero current for all negative voltage, vertical line at \(V=0\) (zero drop when on). Practical: nearly zero current until the knee (0.7 V Si, 0.3 V Ge), then steep rise; small reverse leakage (µA) in the reverse region; sudden large reverse current at the breakdown voltage (avalanche).</p>
+<figure>
+<svg viewBox="0 0 520 240" role="img" aria-label="Diode IV curves: ideal diode as an L-shape along the negative voltage axis and up the current axis; practical diode with knee at 0.7 volts, small leakage and breakdown at negative voltage.">
+  <path class="ax" d="M20 150 H500 M260 230 V15"/>
+  <text class="svgtxt" x="488" y="168">V</text><text class="svgtxt" x="268" y="22">I</text>
+  <path class="sb" style="fill:none;stroke-width:2.5" d="M30 150 H260 V25"/>
+  <path class="sa" style="fill:none;stroke-width:2.5" d="M70 230 C 78 175, 82 156, 95 154 L 250 152 C 300 151, 310 148, 318 120 C 324 90, 328 60, 334 25"/>
+  <path class="grid" d="M318 150 V120 M70 150 V230"/>
+  <text class="svgtxt-i" x="300" y="168">0.7 V (knee)</text>
+  <text class="svgtxt-i" x="40" y="140">breakdown</text>
+  <text class="svgtxt-i" x="120" y="170">reverse leakage (µA)</text>
+  <text class="cb" x="200" y="40" style="font-family:var(--f-mono);font-size:13px">ideal</text>
+  <text class="ca" x="345" y="50" style="font-family:var(--f-mono);font-size:13px">practical Si</text>
+  <text class="svgtxt" x="350" y="200">forward bias →</text><text class="svgtxt" x="110" y="200">← reverse bias</text>
+</svg>
+</figure>
+</div></details>
+
+<details class="prob"><summary><span class="pn">D7 · WAVEFORMS</span>Draw the input and output voltage of a half-wave diode rectifier with a resistive load.<span class="show">Show reference</span></summary><div class="sol">
+<p><strong>Checklist:</strong> input: full sine. Output: positive half-cycles pass, negative half-cycles become 0 (diode reverse biased). Practical diode: output peak is 0.7 V lower and conduction starts slightly later. Output is DC (one polarity) but heavily pulsating.</p>
+<figure><svg id="wfRect" viewBox="0 0 520 260" role="img" aria-label="Half-wave rectifier input sine and output with only positive half cycles"></svg></figure>
+</div></details>
+
+<details class="prob"><summary><span class="pn">D8 · WAVEFORMS</span>Draw the switch signals and output voltage of the half-bridge (half-wave) inverter.<span class="show">Show reference</span></summary><div class="sol">
+<p><strong>Checklist:</strong> S1 and S2 are complementary: never on at the same time. S1 on → output at the positive level; S2 on → output at the negative level. Output is a square wave alternating each half-period. Use the level labels from the lecture circuit (with a split DC supply, \(\pm V_{dc}/2\)).</p>
+<figure><svg id="wfInv" viewBox="0 0 520 300" role="img" aria-label="Half-bridge inverter: complementary switch signals S1 and S2 and a square-wave output"></svg></figure>
+</div></details>
+
+<details class="prob"><summary><span class="pn">D9 · SYMBOLS</span>Draw the circuit symbols and name the terminals: diode, Schottky diode, SCR, NPN BJT, N-channel MOSFET, IGBT.<span class="show">Show reference</span></summary><div class="sol">
+<p><strong>Checklist:</strong> terminal names are often the marks: diode A/K, SCR A/K/G (gate on the cathode side), BJT B/C/E (arrow on the emitter, pointing out for NPN), MOSFET G/D/S (gate insulated: a gap between gate line and channel), IGBT G/C/E (MOS gate, BJT-like C/E with arrow on emitter). Compare with the symbols in the L3 slides; small style differences between textbooks are normal.</p>
+<figure>
+<svg viewBox="0 0 540 330" role="img" aria-label="Device symbols: diode, Schottky diode, SCR, NPN BJT, N-channel MOSFET, IGBT, with terminal labels.">
+  <!-- diode -->
+  <g transform="translate(20,20)"><path class="sch" d="M0 40 H40 M60 40 H100 M60 25 V55"/><polygon class="sch" points="40,25 40,55 60,40"/><text class="sch-t" x="0" y="30">A</text><text class="sch-t" x="90" y="30">K</text><text class="sch-m" x="20" y="90">Diode</text></g>
+  <!-- schottky -->
+  <g transform="translate(200,20)"><path class="sch" d="M0 40 H40 M60 40 H100 M66 30 V25 H60 V55 H54 V50"/><polygon class="sch" points="40,25 40,55 60,40"/><text class="sch-t" x="0" y="30">A</text><text class="sch-t" x="90" y="30">K</text><text class="sch-m" x="10" y="90">Schottky</text></g>
+  <!-- SCR -->
+  <g transform="translate(380,20)"><path class="sch" d="M0 40 H40 M60 40 H110 M60 25 V55 M58 50 L80 72 H100"/><polygon class="sch" points="40,25 40,55 60,40"/><text class="sch-t" x="0" y="30">A</text><text class="sch-t" x="100" y="30">K</text><text class="sch-t" x="104" y="76">G</text><text class="sch-m" x="20" y="100">SCR</text></g>
+  <!-- NPN BJT -->
+  <g transform="translate(20,170)"><path class="sch" d="M0 60 H40 M40 30 V90 M40 48 L80 20 V5 M40 72 L80 100 V115"/><polygon class="sch-af" points="80,100 66,99 72,89"/><text class="sch-t" x="0" y="52">B</text><text class="sch-t" x="88" y="12">C</text><text class="sch-t" x="88" y="118">E</text><text class="sch-m" x="20" y="148">NPN BJT</text></g>
+  <!-- N-MOSFET -->
+  <g transform="translate(200,170)"><path class="sch" d="M0 80 H34 M34 40 V80 M44 34 V48 M44 54 V66 M44 72 V86 M44 40 H80 V5 M44 60 H80 V115 M44 79 H80"/><polygon class="sch-af" points="46,60 58,55 58,65"/><text class="sch-t" x="0" y="72">G</text><text class="sch-t" x="88" y="12">D</text><text class="sch-t" x="88" y="118">S</text><text class="sch-m" x="0" y="148">N-ch MOSFET</text></g>
+  <!-- IGBT -->
+  <g transform="translate(380,170)"><path class="sch" d="M0 60 H32 M32 35 V85 M42 30 V90 M42 48 L80 22 V5 M42 72 L80 98 V115"/><polygon class="sch-af" points="80,98 66,98 71,87"/><text class="sch-t" x="0" y="52">G</text><text class="sch-t" x="88" y="12">C</text><text class="sch-t" x="88" y="118">E</text><text class="sch-m" x="30" y="148">IGBT</text></g>
+</svg>
+</figure>
+</div></details>
+</section>
+
+<!-- ============ THEORY ============ -->
+<section id="theory">
+<h2><span class="tag">EXAM PRACTICE · THEORY</span>Short theory questions</h2>
+<p>Answer in 2–4 sentences, out loud or on paper, then compare. A good exam answer names the mechanism and the consequence.</p>
+
+<details class="prob"><summary><span class="pn">T1</span>Why does a switch-mode converter waste far less power than a linear regulator or resistive divider?<span class="show">Show model answer</span></summary><div class="sol"><p>A resistive element drops the excess voltage while carrying the full current, so \(P=VI\) is lost as heat. An ideal switch is either fully on (current but ~0 V) or fully off (voltage but ~0 A), so \(P=VI\approx0\) in both states. Energy is moved through L and C, which store and release it without loss; only switching transitions and non-ideal resistances cause losses.</p></div></details>
+
+<details class="prob"><summary><span class="pn">T2</span>Explain how the depletion layer forms and what happens to it under forward and reverse bias.<span class="show">Show model answer</span></summary><div class="sol"><p>At the junction, holes diffuse from P to N and electrons from N to P. They leave behind fixed ions, which creates a charge-free depletion layer with an electric field that stops further diffusion (the potential barrier). Forward bias (+ on P) pushes carriers towards the junction; above the knee voltage the layer collapses and current flows. Reverse bias widens the layer; only a small leakage current flows until breakdown.</p></div></details>
+
+<details class="prob"><summary><span class="pn">T3</span>Compare a Schottky diode with a PN diode. When would you choose each?<span class="show">Show model answer</span></summary><div class="sol"><p>Schottky uses a metal–N junction with only majority carriers, so its barrier is smaller: lower forward drop, lower on-resistance, faster switching, but lower breakdown voltage and higher leakage. Choose Schottky for low-voltage, high-frequency converters where conduction and switching losses matter. Choose PN (or PIN for high voltage) where blocking voltage and low leakage matter more.</p></div></details>
+
+<details class="prob"><summary><span class="pn">T4</span>Describe the three operating modes of an SCR and why it cannot be turned off from the gate.<span class="show">Show model answer</span></summary><div class="sol"><p>Forward blocking: anode positive, outer junctions J1 and J3 forward biased, middle J2 reverse biased, so it blocks. Reverse blocking: anode negative, J1 and J3 reverse biased, so it blocks even with a gate signal. Forward conduction: a gate current pulse injects carriers, J2 breaks down and the device conducts. Once on, the outer layers keep supplying carriers to the middle layers by themselves (latching), so the gate loses control; it turns off only when the anode–cathode is reverse biased.</p></div></details>
+
+<details class="prob"><summary><span class="pn">T5</span>How does an N-channel enhancement MOSFET turn on? Why does it switch faster than a BJT?<span class="show">Show model answer</span></summary><div class="sol"><p>The gate–oxide–body forms a capacitor. A positive \(V_{GS}\) above threshold pushes holes away from under the oxide and pulls electrons in, forming an n-type inversion channel between drain and source; current then flows from D to S. Only majority carriers (electrons) conduct and the gate is insulated, so there is no stored minority charge to remove and almost no gate current: fast switching and low drive power. The cost is a higher on-resistance and lower current rating.</p></div></details>
+
+<details class="prob"><summary><span class="pn">T6</span>Why is the IGBT preferred for high-power motor drives and EV charging?<span class="show">Show model answer</span></summary><div class="sol"><p>It combines a MOSFET-style insulated gate (easy, low-power drive) with bipolar conduction: the channel current causes hole injection into the drift layer, which lowers the on-state resistance at high current. It handles very high voltage (&gt; 1 kV) and current (&gt; 500 A) with low conduction loss, at medium switching speed. MOSFETs are faster but have higher on-resistance and lower current rating.</p></div></details>
+
+<details class="prob"><summary><span class="pn">T7</span>What advantages do wide-bandgap devices (SiC, GaN) have, and how does GaN conduct?<span class="show">Show model answer</span></summary><div class="sol"><p>A bandgap 2–3× that of silicon allows higher voltage and temperature, higher efficiency and smaller converters. SiC MOSFETs have the same MOS structure but a thinner, more heavily doped drift layer, so lower on-resistance. GaN has no doped regions: at the AlGaN/GaN heterojunction electrons gather into a 2DEG, a nanometre-thin channel with very high electron mobility.</p></div></details>
+
+<details class="prob"><summary><span class="pn">T8</span>State volt-second balance and explain why it must hold in steady state.<span class="show">Show model answer</span></summary><div class="sol"><p>In steady state the integral of the inductor voltage over one switching period is zero, i.e. the average inductor voltage is zero. From \(v_L=L\,di_L/dt\), that integral equals \(L\,[i_L(T_s)-i_L(0)]\). In steady state the current waveform repeats, so the current at the end of a period equals that at the start, and the integral must be zero. Otherwise the current would grow or shrink every cycle.</p></div></details>
+
+<details class="prob"><summary><span class="pn">T9</span>What is the small-ripple approximation and why is it needed?<span class="show">Show model answer</span></summary><div class="sol"><p>It assumes the ripple in capacitor voltage and inductor current is small compared with their average values, so they are treated as constants (\(v_o\approx V_o\), \(i_L\approx I_L\)) within each switching interval. This makes the inductor voltage and capacitor current piecewise constant, so the balance integrals become simple height × width products that give \(V_o/V_s\) and \(I_o/I_L\).</p></div></details>
+
+<details class="prob"><summary><span class="pn">T10</span>Why do a capacitor and an inductor at the output of a chopper give a smooth DC output?<span class="show">Show model answer</span></summary><div class="sol"><p>The chopped voltage is a DC average plus AC components at the switching frequency and its harmonics. The LC network is a low-pass filter: the inductor opposes fast current changes (high impedance at high frequency) and the capacitor shunts fast voltage changes (low impedance at high frequency). The DC average passes through; only a small ripple (about 1–3 %) remains.</p></div></details>
+</section>
+<!-- ============ QUIZ ============ -->
+<section id="quiz">
+<h2><span class="tag">EXAM PRACTICE</span>Self-check quiz</h2>
+<p>Set the penalty to match your exam (check Moodle). Use <em>Skip</em> when you would leave the question blank in the real exam: it scores 0. The net score shows whether your guessing habits pay off.</p>
+<div class="qbar"><label for="qpen">Penalty per wrong <select id="qpen"><option value="0">0</option><option value="0.25" selected>−0.25</option><option value="0.3333">−1/3</option><option value="0.5">−0.5</option><option value="1">−1</option></select></label><span>Right <b id="qR">0</b> · Wrong <b id="qW">0</b> · Skipped <b id="qS">0</b> · Net <b id="qN">0.00</b> / <span id="qtotal">0</span></span><button type="button" id="qreset">Reset quiz</button></div>
+<div id="qlist">
+
+<div class="q" data-a="1"><p class="qt"><span class="qn">Q1</span>A converter that turns AC into DC is called</p><div class="opts"><button>Inverter</button><button>Rectifier</button><button>Cycloconverter</button><button>Chopper</button></div><div class="ex" hidden>Rectifier: AC → DC. Inverter: DC → AC. Cycloconverter: AC → AC.</div></div>
+
+<div class="q" data-a="2"><p class="qt"><span class="qn">Q2</span>An industrial variable-speed motor drive fed from the grid is classed in L1 as</p><div class="opts"><button>AC → DC</button><button>DC → DC</button><button>AC → AC</button><button>DC → AC</button></div><div class="ex" hidden>Fixed-frequency grid AC in, variable-frequency AC out to the motor.</div></div>
+
+<div class="q" data-a="0"><p class="qt"><span class="qn">Q3</span>The first high-power AC → DC converter (1902) was the</p><div class="opts"><button>Mercury arc rectifier</button><button>Thyratron</button><button>SCR</button><button>Point-contact transistor</button></div><div class="ex" hidden>Peter Cooper Hewitt, 1902. The thyratron came in 1926, the SCR in 1956/57.</div></div>
+
+<div class="q" data-a="3"><p class="qt"><span class="qn">Q4</span>Which is the active component of a power converter?</p><div class="opts"><button>Diode</button><button>Inductor</button><button>Transformer</button><button>Transistor</button></div><div class="ex" hidden>Only the transistor can be commanded on/off independently. The diode is a semiconductor but passive.</div></div>
+
+<div class="q" data-a="1"><p class="qt"><span class="qn">Q5</span>Doping silicon with phosphorus (group 5) produces</p><div class="opts"><button>P-type, majority holes</button><button>N-type, majority electrons</button><button>Intrinsic silicon</button><button>P-type, majority electrons</button></div><div class="ex" hidden>Group 5 (P, As, Sb) has one more valence electron than Si → extra free electrons → N-type. Group 3 (B, Ga, In, Al) → holes → P-type.</div></div>
+
+<div class="q" data-a="2"><p class="qt"><span class="qn">Q6</span>Knee voltage of a silicon PN diode</p><div class="opts"><button>0.3 V</button><button>0.5 V</button><button>0.7 V</button><button>1.2 V</button></div><div class="ex" hidden>Si 0.7 V, Ge 0.3 V.</div></div>
+
+<div class="q" data-a="0"><p class="qt"><span class="qn">Q7</span>The depletion layer in an unbiased PN junction forms because</p><div class="opts"><button>Carriers diffuse across the junction, leaving fixed charges whose field stops further diffusion</button><button>The metal contact repels electrons</button><button>Avalanche breakdown occurs</button><button>The gate oxide charges up</button></div><div class="ex" hidden>Holes diffuse P → N and electrons N → P; the uncovered ions create a field and potential barrier.</div></div>
+
+<div class="q" data-a="3"><p class="qt"><span class="qn">Q8</span>Compared with a PN diode, a Schottky diode has</p><div class="opts"><button>Higher forward drop and lower leakage</button><button>Higher breakdown voltage</button><button>Slower switching</button><button>Lower forward drop but higher reverse leakage</button></div><div class="ex" hidden>Schottky: faster, lower drop, lower on-resistance, lower breakdown, higher leakage. Metal–N junction, majority carriers only.</div></div>
+
+<div class="q" data-a="1"><p class="qt"><span class="qn">Q9</span>The main benefit of the lightly doped intrinsic layer in a PIN diode is</p><div class="opts"><button>Lower forward voltage drop</button><button>Higher reverse breakdown voltage</button><button>Faster switching than Schottky</button><button>Higher leakage current</button></div><div class="ex" hidden>Under reverse bias the two depletion regions merge into one wide layer: high breakdown, low leakage. Cost: higher on-resistance and forward drop.</div></div>
+
+<div class="q" data-a="2"><p class="qt"><span class="qn">Q10</span>In SCR forward blocking mode (anode positive, no gate current)</p><div class="opts"><button>All three junctions are reverse biased</button><button>J1 and J3 reverse, J2 forward</button><button>J1 and J3 forward, J2 reverse</button><button>Only J1 is reverse biased</button></div><div class="ex" hidden>The middle junction J2 blocks the forward voltage. In reverse blocking it is the other way round.</div></div>
+
+<div class="q" data-a="0"><p class="qt"><span class="qn">Q11</span>Once an SCR is latched on, it turns off when</p><div class="opts"><button>The anode–cathode voltage is reversed</button><button>The gate current is removed</button><button>A negative gate pulse is applied</button><button>V<sub>GS</sub> drops below threshold</button></div><div class="ex" hidden>After latching, the gate has lost control; the outer layers keep supplying carriers. Reverse bias across A–K is needed.</div></div>
+
+<div class="q" data-a="1"><p class="qt"><span class="qn">Q12</span>An enhancement-mode N-channel MOSFET conducts when</p><div class="opts"><button>Base current is injected</button><button>\(V_{GS}&gt;V_{th}\)</button><button>\(V_{GS}=0\)</button><button>The drain is reverse biased</button></div><div class="ex" hidden>Positive gate–source voltage above threshold forms the inversion n-channel. Enhancement mode = normally open.</div></div>
+
+<div class="q" data-a="3"><p class="qt"><span class="qn">Q13</span>Current in an N-channel MOSFET's channel is carried by</p><div class="opts"><button>Holes by diffusion</button><button>Holes and electrons equally</button><button>Ions in the oxide</button><button>Electrons in the inversion layer (majority carriers, no diffusion current)</button></div><div class="ex" hidden>That is why it has no built-in forward voltage drop and switches fast.</div></div>
+
+<div class="q" data-a="2"><p class="qt"><span class="qn">Q14</span>Per the L3 comparison table, the fastest switch is the</p><div class="opts"><button>BJT</button><button>IGBT</button><button>MOSFET</button><button>SCR</button></div><div class="ex" hidden>MOSFET: ns. BJT: µs. IGBT: medium-fast.</div></div>
+
+<div class="q" data-a="1"><p class="qt"><span class="qn">Q15</span>Per the L3 comparison table, a disadvantage of the MOSFET versus the BJT is</p><div class="opts"><button>Higher switching loss</button><button>Higher on-state resistance and lower current rating</button><button>Lower input impedance</button><button>Built-in forward voltage drop</button></div><div class="ex" hidden>MOSFET: higher conduction loss, lower current rating, more expensive. Advantages: speed, high input impedance, no built-in drop, small size.</div></div>
+
+<div class="q" data-a="0"><p class="qt"><span class="qn">Q16</span>For a 1.2 kV, 600 A motor-drive switch, the table points to</p><div class="opts"><button>IGBT</button><button>MOSFET</button><button>BJT</button><button>Schottky diode</button></div><div class="ex" hidden>IGBT: breakdown &gt; 1 kV, current &gt; 500 A, low on-resistance.</div></div>
+
+<div class="q" data-a="3"><p class="qt"><span class="qn">Q17</span>The IGBT combines the mechanisms of</p><div class="opts"><button>Diode and capacitor</button><button>BJT only</button><button>Schottky and PIN diodes</button><button>MOSFET (gate), BJT (conduction) and SCR (4-layer structure)</button></div><div class="ex" hidden>MOS gate forms the channel; resulting hole injection gives bipolar conduction; NPNP layers like an SCR.</div></div>
+
+<div class="q" data-a="2"><p class="qt"><span class="qn">Q18</span>Conduction in a GaN device happens in</p><div class="opts"><button>A heavily doped p+ region</button><button>An inversion layer under SiO₂</button><button>A 2DEG at the AlGaN/GaN heterojunction</button><button>The depletion layer</button></div><div class="ex" hidden>GaN has no doped regions; the bandgap difference accumulates electrons at the interface into a very high-mobility 2D electron gas.</div></div>
+
+<div class="q" data-a="1"><p class="qt"><span class="qn">Q19</span>SiC MOSFETs have lower on-resistance than Si MOSFETs mainly because</p><div class="opts"><button>They use a 2DEG channel</button><button>The drift layer is thinner and more heavily doped</button><button>They have no gate oxide</button><button>They are bipolar devices</button></div><div class="ex" hidden>Same MOS structure on SiC; the wide bandgap allows a thin, heavily doped drift layer for the same blocking voltage.</div></div>
+
+<div class="q" data-a="0"><p class="qt"><span class="qn">Q20</span>A capacitor in DC steady state behaves as</p><div class="opts"><button>An open circuit</button><button>A short circuit</button><button>A resistor equal to 1/C</button><button>A voltage source of zero</button></div><div class="ex" hidden>\(i=C\,dv/dt\) and \(dv/dt=0\) → \(i=0\). The inductor is the opposite: a short to DC.</div></div>
+
+<div class="q" data-a="3"><p class="qt"><span class="qn">Q21</span>The time constant of an RL circuit is</p><div class="opts"><button>\(RL\)</button><button>\(R/L\)</button><button>\(1/(RL)\)</button><button>\(L/R\)</button></div><div class="ex" hidden>From the derivation: \(\frac RL t=t/\tau\) → \(\tau=L/R\). RC circuit: \(\tau=RC\).</div></div>
+
+<div class="q" data-a="2"><p class="qt"><span class="qn">Q22</span>Lenz's law determines</p><div class="opts"><button>The magnitude of the induced EMF</button><button>The relation between charge and voltage</button><button>The direction of the induced EMF (it opposes the change in flux)</button><button>The sum of currents at a node</button></div><div class="ex" hidden>Faraday's second law gives the magnitude; Lenz gives the direction, the minus sign.</div></div>
+
+<div class="q" data-a="1"><p class="qt"><span class="qn">Q23</span>Solving KCL/KVL gives \(I_1=-1.2\) A. This means</p><div class="opts"><button>The calculation is wrong</button><button>The real current is 1.2 A opposite to the assumed arrow</button><button>The current is AC</button><button>The branch carries no power</button></div><div class="ex" hidden>Directions are assumed first; a negative result just reverses the arrow.</div></div>
+
+<div class="q" data-a="0"><p class="qt"><span class="qn">Q24</span>Volt-second balance states that in steady state</p><div class="opts"><button>The average inductor voltage over one switching period is zero</button><button>The average capacitor current is zero</button><button>Inductor voltage is always zero</button><button>Input and output voltages are equal</button></div><div class="ex" hidden>Because \(i_L(T_s)=i_L(0)\). The capacitor statement is amp-second balance.</div></div>
+
+<div class="q" data-a="2"><p class="qt"><span class="qn">Q25</span>A buck converter has \(V_s=24\) V and \(D=0.5\). V<sub>o</sub> is</p><div class="opts"><button>48 V</button><button>24 V</button><button>12 V</button><button>6 V</button></div><div class="ex" hidden>\(V_o=DV_s=0.5\cdot24=12\) V.</div></div>
+
+<div class="q" data-a="3"><p class="qt"><span class="qn">Q26</span>A boost converter has \(V_s=24\) V and \(D=0.5\). V<sub>o</sub> is</p><div class="opts"><button>12 V</button><button>24 V</button><button>36 V</button><button>48 V</button></div><div class="ex" hidden>\(V_o=V_s/(1-D)=24/0.5=48\) V.</div></div>
+
+<div class="q" data-a="1"><p class="qt"><span class="qn">Q27</span>In the buck converter's off-state</p><div class="opts"><button>The switch conducts and the diode blocks</button><button>The diode conducts and \(v_L=-V_o\)</button><button>The capacitor is disconnected</button><button>\(v_L=V_s-V_o\)</button></div><div class="ex" hidden>Inductor current freewheels through the diode; the inductor sees the output voltage reversed.</div></div>
+
+<div class="q" data-a="0"><p class="qt"><span class="qn">Q28</span>In the boost converter's on-state, the capacitor current is</p><div class="opts"><button>\(-I_o\): the capacitor alone feeds the load</button><button>\(I_L-I_o\)</button><button>Zero</button><button>\(I_L\)</button></div><div class="ex" hidden>The closed switch shorts the inductor end to ground and the diode blocks, isolating the output.</div></div>
+
+<div class="q" data-a="2"><p class="qt"><span class="qn">Q29</span>For a boost converter, \(I_o=I_L(1-D)\). With \(D=0.75\) and \(I_o=2\) A, the inductor current is</p><div class="opts"><button>0.5 A</button><button>1.5 A</button><button>8 A</button><button>2.67 A</button></div><div class="ex" hidden>\(I_L=I_o/(1-D)=2/0.25=8\) A.</div></div>
+
+<div class="q" data-a="3"><p class="qt"><span class="qn">Q30</span>The small-ripple approximation means</p><div class="opts"><button>Ripple is zero in practice</button><button>The switching frequency is low</button><button>The LC filter can be omitted</button><button>Capacitor voltage and inductor current ripples are small compared with their averages, so they are treated as constant</button></div><div class="ex" hidden>\(v=V+\Delta v\approx V\). It lets each on/off interval be integrated as a rectangle.</div></div>
+
+<div class="q" data-a="1"><p class="qt"><span class="qn">Q31</span>Why is a resistive voltage divider not used to make 5 V from 24 V for a real load?</p><div class="opts"><button>It cannot produce a voltage below the input</button><button>It dissipates large power as heat and the output changes with load</button><button>It only works with AC</button><button>Ohm's law does not apply</button></div><div class="ex" hidden>The L2 example (4.7 Ω / 1.2 Ω) burns about 98 W with no load connected.</div></div>
+
+<div class="q" data-a="0"><p class="qt"><span class="qn">Q32</span>Adding an L and C at the output of a switching converter</p><div class="opts"><button>Forms a low-pass filter that removes AC components, leaving the DC average</button><button>Raises the output above the input</button><button>Removes the need for a switch</button><button>Isolates input from output</button></div><div class="ex" hidden>LC = smoothing circuit. Ripple of about 1–3 % remains in practice.</div></div>
+
+<div class="q" data-a="2"><p class="qt"><span class="qn">Q33</span>In a bridge you assumed \(I_5\) flows downward and calculated \(I_5=-0.3\) A. This means</p><div class="opts"><button>The calculation must be wrong</button><button>The bridge is balanced</button><button>0.3 A flows upward, and the bottom middle node is at the higher potential</button><button>No current flows in R5</button></div><div class="ex" hidden>Negative = opposite to the assumed arrow, same magnitude. Current flows from higher to lower potential, so the bottom node is higher. Non-zero means unbalanced.</div></div>
+
+<div class="q" data-a="1"><p class="qt"><span class="qn">Q34</span>A bridge has 10 Ω (L–T), 30 Ω (T–R), 20 Ω (L–B), 40 Ω (B–R). Without the middle resistor, the top and bottom node voltages from a 12 V source are</p><div class="opts"><button>8 V and 9 V</button><button>9 V and 8 V</button><button>6 V and 6 V</button><button>3 V and 4 V</button></div><div class="ex" hidden>Dividers: \(12\cdot\frac{30}{40}=9\) V and \(12\cdot\frac{40}{60}=8\) V. Top is higher, so the bridge current flows top → bottom.</div></div>
+
+</div>
+</section>
+
+
+<footer>Source: EE.PEE.210 lecture slides L1 (9.10.2026), L2 (26.10.2026), L3 (28.10.2026), L4 (2.11.2026), DSc. Hikmat Basnet, Tampere University. Items marked BEYOND SLIDES are standard textbook results.</footer>
+</main>
+</div>
+<script>
+
+/* ---------- Quiz with negative marking ---------- */
+(function(){
+  const qs=[...document.querySelectorAll('#qlist .q')];
+  const pen=document.getElementById('qpen');
+  document.getElementById('qtotal').textContent=qs.length;
+  const $=id=>document.getElementById(id);
+  function upd(){
+    let r=0,w=0,s=0;
+    qs.forEach(q=>{if(q.dataset.st==='r')r++;else if(q.dataset.st==='w')w++;else if(q.dataset.st==='s')s++;});
+    $('qR').textContent=r;$('qW').textContent=w;$('qS').textContent=s;
+    $('qN').textContent=(r-w*parseFloat(pen.value)).toFixed(2);
+  }
+  qs.forEach(q=>{
+    const a=+q.dataset.a;
+    const btns=[...q.querySelectorAll('.opts button')];
+    const sk=document.createElement('button');sk.type='button';sk.className='skipb';sk.textContent='Skip (leave blank)';
+    q.querySelector('.opts').after(sk);
+    function finish(st,i){
+      if(q.dataset.st)return;
+      q.dataset.st=st;
+      if(st==='r')btns[i].classList.add('right');
+      else{if(st==='w')btns[i].classList.add('wrong');btns[a].classList.add('right');}
+      btns.forEach(x=>x.disabled=true);sk.disabled=true;
+      q.querySelector('.ex').hidden=false;upd();
+    }
+    btns.forEach((b,i)=>{b.type='button';b.addEventListener('click',()=>finish(i===a?'r':'w',i));});
+    sk.addEventListener('click',()=>finish('s'));
+  });
+  pen.addEventListener('change',upd);
+  $('qreset').addEventListener('click',()=>{
+    qs.forEach(q=>{delete q.dataset.st;q.querySelector('.ex').hidden=true;
+      q.querySelectorAll('button').forEach(b=>{b.disabled=false;b.classList.remove('right','wrong');});});
+    upd();
+  });
+  upd();
+})();
+
+/* ---------- Fill in the blanks ---------- */
+(function(){
+  const items=[...document.querySelectorAll('#fblist .fb')];
+  const $=id=>document.getElementById(id);
+  $('fbTotal').textContent=items.length;
+  const norm=s=>s.toLowerCase().replace(/[\s ]+/g,'').replace(/[−–]/g,'-').replace(/[τ]/g,'');
+  function upd(){let r=0,w=0;items.forEach(it=>{if(it.dataset.st==='r')r++;if(it.dataset.st==='w')w++;});$('fbScore').textContent=r;$('fbWrong').textContent=w;}
+  function shown(it){
+    if(it.dataset.num)return it.dataset.num;
+    return it.dataset.ans.split('|')[0];
+  }
+  items.forEach((it,idx)=>{
+    const inp=it.querySelector('input');inp.id='fb'+idx;inp.autocomplete='off';inp.spellcheck=false;
+    const b=document.createElement('button');b.type='button';b.textContent='Check';
+    const res=document.createElement('span');res.className='fbres';res.setAttribute('aria-live','polite');
+    it.append(' ',b,' ',res);
+    function check(){
+      const v=inp.value.trim(); if(!v){res.textContent='';it.dataset.st='';upd();return;}
+      let ok=false;
+      if(it.dataset.num){const x=parseFloat(v.replace(',','.'));const t=+it.dataset.num,tol=+it.dataset.tol||0.01;ok=isFinite(x)&&Math.abs(x-t)<=Math.max(Math.abs(t)*tol,1e-9);}
+      else ok=it.dataset.ans.split('|').some(a=>norm(a)===norm(v));
+      it.dataset.st=ok?'r':'w';
+      res.textContent=ok?'Correct':'Answer: '+shown(it);
+      res.className='fbres '+(ok?'ok':'bad');upd();
+    }
+    b.addEventListener('click',check);
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();check();}});
+  });
+  $('fbReveal').addEventListener('click',()=>items.forEach(it=>{const r=it.querySelector('.fbres');if(it.dataset.st!=='r'){r.textContent='Answer: '+shown(it);r.className='fbres';}}));
+  $('fbReset').addEventListener('click',()=>{items.forEach(it=>{it.dataset.st='';it.querySelector('input').value='';const r=it.querySelector('.fbres');r.textContent='';r.className='fbres';});upd();});
+  upd();
+})();
+
+/* ---------- Reference waveforms ---------- */
+(function(){
+  const NS='http://www.w3.org/2000/svg';
+  function add(svg,tag,attrs,txt){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(txt!=null)e.textContent=txt;svg.appendChild(e);return e;}
+  function lanes(id,spec){
+    const svg=document.getElementById(id); if(!svg)return;
+    const x0=80,W=410,span=spec.span||2,X=t=>x0+t/span*W;
+    let y=12; const top=y;
+    spec.lanes.forEach(L=>{L.y=y;y+=L.h+22;});
+    const bottom=y-18;
+    spec.marks.forEach(m=>{add(svg,'path',{class:'grid',d:`M${X(m.t)} ${top} V${bottom}`});add(svg,'text',{class:'svgtxt',x:X(m.t),y:bottom+14,'text-anchor':'middle'},m.label);});
+    spec.lanes.forEach(L=>{
+      const Y=v=>L.y+L.h-(v-L.lo)/(L.hi-L.lo)*L.h;
+      add(svg,'text',{class:'svgtxt-i',x:8,y:L.y+L.h/2+4},L.name);
+      add(svg,'path',{class:'ax',d:`M${x0} ${L.y} V${L.y+L.h}`});
+      const zy=(L.lo<=0&&L.hi>=0)?Y(0):L.y+L.h;
+      add(svg,'path',{class:'ax',d:`M${x0} ${zy} H${X(span)+10}`});
+      if(L.lo<0)add(svg,'text',{class:'svgtxt',x:x0-6,y:zy+4,'text-anchor':'end'},'0');
+      if(L.avg!=null){add(svg,'path',{class:'sc',style:'fill:none;stroke-width:1.5;stroke-dasharray:5 4',d:`M${x0} ${Y(L.avg)} H${X(span)}`});}
+      if(L.fill){const p=L.pts();let d=`M${X(p[0][0])} ${zy} `;p.forEach(([t,v])=>d+=`L${X(t).toFixed(1)} ${Y(v).toFixed(1)} `);d+=`L${X(p[p.length-1][0])} ${zy} Z`;add(svg,'path',{d,class:L.fill,'fill-opacity':0.15,stroke:'none'});}
+      (L.extra||[]).forEach(E=>{const p=E.pts();add(svg,'path',{d:p.map(([t,v],i)=>(i?'L':'M')+X(t).toFixed(1)+' '+Y(v).toFixed(1)).join(' '),class:E.cls,style:'fill:none;stroke-width:1.8;'+(E.dash?'stroke-dasharray:5 4':'')});});
+      const p=L.pts();
+      add(svg,'path',{d:p.map(([t,v],i)=>(i?'L':'M')+X(t).toFixed(1)+' '+Y(v).toFixed(1)).join(' '),class:L.cls||'sch',style:'fill:none;stroke-width:2.4'});
+      (L.labels||[]).forEach(([t,v,txt,cls,dy])=>add(svg,'text',{x:X(t),y:Y(v)+(dy||-6),class:cls||'svgtxt-i',style:'font-family:var(--f-mono);font-size:12px'},txt));
+    });
+  }
+  const D=0.4, per=f=>{let a=[];for(let k=0;k<2;k++)a=a.concat(f(k));return a;};
+  const mk=[{t:0,label:'0'},{t:D,label:'DTs'},{t:1,label:'Ts'},{t:1+D,label:''},{t:2,label:'2Ts'}];
+  const SW={name:'SW',lo:-0.2,hi:1.3,h:40,cls:'sc',pts:()=>per(k=>[[k,1],[k+D,1],[k+D,0],[k+1,0]]),labels:[[0.12,1,'ON','svgtxt'],[0.6,0,'OFF','svgtxt']]};
+  const IL={name:'iL',lo:0,hi:1.3,h:80,cls:'sa',avg:0.8,pts:()=>per(k=>[[k,0.6],[k+D,1.0],[k+1,0.6]]),labels:[[1.72,0.8,'IL','cc',-4],[D+0.03,1.0,'peak at DTs','svgtxt',-4]]};
+  lanes('wfBuck',{marks:mk,lanes:[SW,
+    {name:'vL',lo:-0.6,hi:0.85,h:110,cls:'sch',fill:'fa',pts:()=>per(k=>[[k,0.6],[k+D,0.6],[k+D,-0.4],[k+1,-0.4]]),labels:[[0.03,0.6,'Vs − Vo','ca'],[D+0.05,-0.4,'−Vo','cb',16]]},
+    IL,
+    {name:'iC',lo:-0.35,hi:0.35,h:80,cls:'sb',pts:()=>per(k=>[[k,-0.2],[k+D,0.2],[k+1,-0.2]]),labels:[[D+0.03,0.2,'iC = iL − Io (average 0)','svgtxt',-4]]}
+  ]});
+  lanes('wfBoost',{marks:mk,lanes:[SW,
+    {name:'vL',lo:-0.9,hi:1.25,h:110,cls:'sch',fill:'fa',pts:()=>per(k=>[[k,1],[k+D,1],[k+D,-0.667],[k+1,-0.667]]),labels:[[0.05,1,'Vs','ca'],[D+0.05,-0.667,'Vs − Vo  (negative)','cb',16]]},
+    IL,
+    {name:'iC',lo:-0.8,hi:0.8,h:90,cls:'sb',pts:()=>per(k=>[[k,-0.6],[k+D,-0.6],[k+D,0.55],[k+1,0.25]]),labels:[[0.03,-0.6,'−Io','cb',16],[D+0.05,0.55,'IL − Io, ramps down with iL','svgtxt',-4]]}
+  ]});
+  // half-wave rectifier: one sine period per unit
+  const S=n=>{const a=[];for(let i=0;i<=n;i++)a.push(i/n*2);return a;};
+  lanes('wfRect',{span:2,marks:[{t:0,label:'0'},{t:0.5,label:'T/2'},{t:1,label:'T'},{t:1.5,label:'3T/2'},{t:2,label:'2T'}],lanes:[
+    {name:'vin',lo:-1.2,hi:1.2,h:90,cls:'sch',pts:()=>S(160).map(t=>[t,Math.sin(2*Math.PI*t)]),labels:[[0.2,1,'Vm','svgtxt-i',-4]]},
+    {name:'vout',lo:-0.2,hi:1.2,h:90,cls:'sa',fill:'fa',pts:()=>S(160).map(t=>[t,Math.max(0,Math.sin(2*Math.PI*t))]),
+      extra:[{cls:'sb',dash:true,pts:()=>S(160).map(t=>[t,Math.max(0,Math.sin(2*Math.PI*t)-0.15)])}],
+      labels:[[0.28,1,'ideal: Vm','ca',-4],[0.58,0.15,'practical: Vm − 0.7 V (dashed)','cb',-30],[0.62,0,'diode blocks → 0','svgtxt',-6]]}
+  ]});
+  lanes('wfInv',{span:2,marks:[{t:0,label:'0'},{t:0.5,label:'T/2'},{t:1,label:'T'},{t:1.5,label:'3T/2'},{t:2,label:'2T'}],lanes:[
+    {name:'S1',lo:-0.2,hi:1.3,h:40,cls:'sc',pts:()=>per(k=>[[k,1],[k+0.5,1],[k+0.5,0],[k+1,0]]),labels:[[0.15,1,'on','svgtxt']]},
+    {name:'S2',lo:-0.2,hi:1.3,h:40,cls:'sc',pts:()=>per(k=>[[k,0],[k+0.5,0],[k+0.5,1],[k+1,1]]),labels:[[0.65,1,'on','svgtxt']]},
+    {name:'vo',lo:-1.3,hi:1.3,h:110,cls:'sa',fill:'fa',pts:()=>per(k=>[[k,1],[k+0.5,1],[k+0.5,-1],[k+1,-1]]),labels:[[0.05,1,'+Vdc/2 (S1 on)','ca'],[0.55,-1,'−Vdc/2 (S2 on)','cb',16]]}
+  ]});
+})();
+/* ---------- Converter explorer ---------- */
+(function(){
+  const svg=document.getElementById('wave');
+  const dS=document.getElementById('dS'),vS=document.getElementById('vS');
+  const bBuck=document.getElementById('mBuck'),bBoost=document.getElementById('mBoost');
+  let mode='buck';
+  const NS='http://www.w3.org/2000/svg';
+  function el(tag,attrs,txt){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(txt!=null)e.textContent=txt;svg.appendChild(e);return e;}
+  const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  function fmt(x){return (Math.abs(x)<0.005?0:x).toFixed(2);}
+  function draw(){
+    const D=+dS.value,Vs=+vS.value;
+    document.getElementById('dV').textContent=D.toFixed(2);
+    document.getElementById('vV').textContent=Vs+' V';
+    let Vo,von,voff;
+    if(mode==='buck'){Vo=D*Vs;von=Vs-Vo;voff=-Vo;}
+    else{Vo=Vs/(1-D);von=Vs;voff=Vs-Vo;}
+    const A=von*D,B=voff*(1-D);
+    document.getElementById('rVo').textContent=Vo.toFixed(1)+' V';
+    document.getElementById('rA').textContent=fmt(A)+' V·Ts';
+    document.getElementById('rB').textContent=fmt(B)+' V·Ts';
+    document.getElementById('rS').textContent=fmt(A+B)+' V·Ts';
+    while(svg.firstChild)svg.removeChild(svg.firstChild);
+    const ink=css('--ink'),mut=css('--muted'),rule=css('--rule'),acc=css('--accent'),tr=css('--trace'),amb=css('--amber');
+    const x0=60,W=600,P=W/2; // two periods
+    const X=t=>x0+t*P;       // t in periods
+    // lanes
+    const lanes=[{y:20,h:50,name:'SW'},{y:100,h:110,name:'vL'},{y:240,h:70,name:'iL'}];
+    lanes.forEach(l=>{el('text',{x:4,y:l.y+l.h/2+4},l.name);});
+    // period markers
+    [0,D,1,1+D,2].forEach(t=>el('line',{x1:X(t),x2:X(t),y1:14,y2:316,stroke:rule,'stroke-dasharray':'3 4'}));
+    el('text',{x:X(D)-8,y:328},'DTs');el('text',{x:X(1)-6,y:328},'Ts');el('text',{x:X(2)-12,y:328},'2Ts');
+    // switch
+    const sy=lanes[0].y,sh=lanes[0].h;
+    let d='';
+    for(let k=0;k<2;k++){d+=(k?'L':'M')+X(k)+' '+(sy+sh)+' V'+sy+' H'+X(k+D)+' V'+(sy+sh)+' H'+X(k+1);}
+    el('path',{d,fill:'none',stroke:amb,'stroke-width':2});
+    el('text',{x:X(D/2)-8,y:sy+14},'ON');el('text',{x:X(D+(1-D)/2)-10,y:sy+14},'OFF');
+    // vL
+    const vy=lanes[1].y,vh=lanes[1].h,mid=vy+vh/2;
+    const vmax=Math.max(Math.abs(von),Math.abs(voff),1);
+    const Y=v=>mid-v/vmax*(vh/2-4);
+    el('line',{x1:x0,x2:x0+W,y1:mid,y2:mid,stroke:mut});
+    for(let k=0;k<2;k++){
+      el('rect',{x:X(k),y:Math.min(Y(von),mid),width:X(k+D)-X(k),height:Math.abs(Y(von)-mid),fill:acc,'fill-opacity':0.18});
+      el('rect',{x:X(k+D),y:Math.min(Y(voff),mid),width:X(k+1)-X(k+D),height:Math.abs(Y(voff)-mid),fill:tr,'fill-opacity':0.18});
+    }
+    d='';
+    for(let k=0;k<2;k++){d+=(k?'L':'M')+X(k)+' '+Y(von)+' H'+X(k+D)+' V'+Y(voff)+' H'+X(k+1)+(k<1?' V'+Y(von):'');}
+    el('path',{d,fill:'none',stroke:ink,'stroke-width':2});
+    el('text',{x:X(D)+4,y:Y(von)+(von>=0?-4:12)},(mode==='buck'?'Vs−Vo = ':'Vs = ')+von.toFixed(1)+' V');
+    el('text',{x:X(D)+6,y:Y(voff)+(voff<0?14:-4)},(mode==='buck'?'−Vo = ':'Vs−Vo = ')+voff.toFixed(1)+' V');
+    el('text',{x:x0+W-14,y:mid-4},'0');
+    // iL triangle: slope proportional to vL; ripple scaled for display
+    const iy=lanes[2].y,ih=lanes[2].h,imid=iy+ih/2;
+    const rip=(von*D)/ (mode==='buck'?Math.max(Vs*0.25,1):Math.max(Vs*0.9,1)); // relative ripple
+    const amp=Math.min(ih/2-4,Math.max(6,rip*(ih/2)));
+    el('line',{x1:x0,x2:x0+W,y1:imid,y2:imid,stroke:rule,'stroke-dasharray':'2 3'});
+    el('text',{x:x0+W-20,y:imid-4},'IL');
+    d='';
+    for(let k=0;k<2;k++){d+=(k?'L':'M')+X(k)+' '+(imid+amp)+' L'+X(k+D)+' '+(imid-amp)+' L'+X(k+1)+' '+(imid+amp);}
+    el('path',{d,fill:'none',stroke:acc,'stroke-width':2});
+    el('text',{x:X(D)+4,y:imid-amp-4},'rises while vL > 0');
+  }
+  function setMode(m){mode=m;bBuck.setAttribute('aria-pressed',m==='buck');bBoost.setAttribute('aria-pressed',m==='boost');draw();}
+  bBuck.addEventListener('click',()=>setMode('buck'));
+  bBoost.addEventListener('click',()=>setMode('boost'));
+  dS.addEventListener('input',draw);vS.addEventListener('input',draw);
+  if(window.matchMedia)matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',draw);
+  new MutationObserver(draw).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+  draw();
+})();
+
+/* ---------- Figures drawn from data ---------- */
+(function(){
+  const NS='http://www.w3.org/2000/svg';
+  function add(svg,tag,attrs,txt){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(txt!=null)e.textContent=txt;svg.appendChild(e);return e;}
+
+  /* exponential rise / fall plot, x in time constants */
+  function expPlot(id,rise,fall,xl){
+    const svg=document.getElementById(id); if(!svg)return;
+    const x0=50,y0=190,W=440,H=160,X=x=>x0+x/5*W,Y=y=>y0-y*H;
+    for(let k=1;k<=5;k++){add(svg,'path',{class:'grid',d:`M${X(k)} ${y0} V${Y(1)}`});add(svg,'text',{class:'svgtxt',x:X(k)-8,y:y0+16},k+xl);}
+    [0.368,0.632,1].forEach(v=>add(svg,'path',{class:'grid',d:`M${x0} ${Y(v)} H${X(5)}`}));
+    add(svg,'path',{class:'ax',d:`M${x0} ${y0} H${X(5)+8} M${x0} ${y0} V${Y(1)-10}`});
+    add(svg,'text',{class:'svgtxt',x:x0-30,y:Y(1)+4},'1.0');
+    add(svg,'text',{class:'svgtxt',x:x0-42,y:Y(0.632)+4},'0.632');
+    add(svg,'text',{class:'svgtxt',x:x0-42,y:Y(0.368)+4},'0.368');
+    add(svg,'text',{class:'svgtxt',x:x0-14,y:y0+4},'0');
+    let a='',b='';
+    for(let i=0;i<=100;i++){const x=i/20;a+=(i?'L':'M')+X(x).toFixed(1)+' '+Y(1-Math.exp(-x)).toFixed(1)+' ';b+=(i?'L':'M')+X(x).toFixed(1)+' '+Y(Math.exp(-x)).toFixed(1)+' ';}
+    add(svg,'path',{d:a,class:'sa',style:'fill:none;stroke-width:2.5'});
+    add(svg,'path',{d:b,class:'sb',style:'fill:none;stroke-width:2.5'});
+    add(svg,'circle',{cx:X(1),cy:Y(0.632),r:4,class:'fa'});
+    add(svg,'circle',{cx:X(1),cy:Y(0.368),r:4,class:'fb'});
+    add(svg,'text',{class:'ca',x:X(2.4),y:Y(0.74),style:'font-family:var(--f-mono);font-size:13px'},rise);
+    add(svg,'text',{class:'cb',x:X(2.2),y:Y(0.3),style:'font-family:var(--f-mono);font-size:13px'},fall);
+  }
+  expPlot('expToolkit','1 − e^(−x)  rises','e^(−x)  falls','');
+  expPlot('rcPlot','vC / Vs   (rises)','i·R / Vs   (falls)','τ');
+  expPlot('rlPlot','i·R / Vs   (rises)','vL / Vs   (falls)','τ');
+
+  /* volt-second area figure */
+  function vsFig(id,o){
+    const svg=document.getElementById(id); if(!svg)return;
+    const x0=60,W=420,mid=110,sc=80/Math.max(Math.abs(o.von),Math.abs(o.voff));
+    const X=t=>x0+t*W,Y=v=>mid-v*sc;
+    add(svg,'rect',{x:X(0),y:Math.min(Y(o.von),mid),width:X(o.D)-X(0),height:Math.abs(Y(o.von)-mid),class:'fa','fill-opacity':0.22});
+    add(svg,'rect',{x:X(o.D),y:Math.min(Y(o.voff),mid),width:X(1)-X(o.D),height:Math.abs(Y(o.voff)-mid),class:'fb','fill-opacity':0.22});
+    add(svg,'path',{class:'ax',d:`M${x0} ${mid} H${X(1)+14} M${x0} 15 V215`});
+    add(svg,'path',{class:'sch',d:`M${X(0)} ${Y(o.von)} H${X(o.D)} V${Y(o.voff)} H${X(1)}`});
+    add(svg,'path',{class:'grid',d:`M${X(o.D)} 15 V215 M${X(1)} 15 V215`});
+    add(svg,'text',{class:'svgtxt',x:x0-8,y:226},'0');add(svg,'text',{class:'svgtxt',x:X(o.D)-12,y:226},'DTs');add(svg,'text',{class:'svgtxt',x:X(1)-8,y:226},'Ts');
+    add(svg,'text',{class:'svgtxt',x:6,y:mid+4},'vL = 0');
+    const A=o.von*o.D, B=o.voff*(1-o.D);
+    add(svg,'text',{class:'ca',x:X(0)+8,y:Y(o.von)-6,style:'font-family:var(--f-mono);font-size:12px'},o.vonL+' = '+o.von.toFixed(1)+' V');
+    add(svg,'text',{class:'ca',x:X(0)+8,y:(Y(o.von)+mid)/2+5,style:'font-family:var(--f-mono);font-size:13px'},'+'+A.toFixed(2));
+    add(svg,'text',{class:'cb',x:X(o.D)+8,y:Y(o.voff)+16,style:'font-family:var(--f-mono);font-size:12px'},o.voffL+' = '+o.voff.toFixed(1)+' V');
+    add(svg,'text',{class:'cb',x:X(o.D)+8,y:(Y(o.voff)+mid)/2+5,style:'font-family:var(--f-mono);font-size:13px'},B.toFixed(2));
+    add(svg,'text',{class:'svgtxt-i',x:X(1)+14,y:22,'text-anchor':'end'},'sum of areas = '+(Math.abs(A+B)<1e-9?0:A+B).toFixed(2)+' → balance');
+  }
+  vsFig('vsBuck',{D:0.4,von:24-9.6,voff:-9.6,vonL:'Vs − Vo',voffL:'−Vo'});
+  vsFig('vsBoost',{D:0.6,von:24,voff:24-60,vonL:'Vs',voffL:'Vs − Vo'});
+
+  /* converter state schematics: flag per state, 0 = idle, 1 = main current loop, 2 = second loop */
+  const coil=(x,y)=>`M${x} ${y} a7.5 7.5 0 0 1 15 0 a7.5 7.5 0 0 1 15 0 a7.5 7.5 0 0 1 15 0 a7.5 7.5 0 0 1 15 0`;
+  const res=x=>`M${x} 30 V50 l-7 4 l14 7 l-14 7 l14 7 l-14 7 l7 4 V120`;
+  const cap=x=>`M${x} 30 V70 M${x} 80 V120 M${x-14} 70 H${x+14} M${x-14} 80 H${x+14}`;
+  const T={
+    buck:[
+      ['M40 30 V64 M40 96 V120',1,0],['C40,80,16',1,0],['M40 30 H90',1,0],
+      ['M90 30 H130',1,null],['M90 30 L126 16',null,0],
+      ['M130 30 H180',1,0],['M180 30 H200',1,1],[coil(200,30),1,1],['M260 30 H380',1,1],
+      [cap(310),1,1],[res(380),1,1],['M180 120 H380',1,1],['M40 120 H180',1,0],
+      ['M180 30 V64 M180 82 V120 M169 63 H191',0,1],['P170,82 190,82 180,64',0,1]
+    ],
+    boost:[
+      ['M40 30 V64 M40 96 V120',1,1],['C40,80,16',1,1],['M40 30 H80',1,1],[coil(80,30),1,1],['M140 30 H165',1,1],
+      ['M165 30 V120',1,null],['M165 30 V60 M165 96 V120 M165 96 L152 64',null,0],
+      ['M40 120 H165',1,1],['M165 30 H196',0,1],['P196,20 196,40 214,30',0,1],['M215 19 V41 M215 30 H300',0,1],
+      ['M300 30 H380',2,1],[cap(300),2,1],[res(380),2,1],['M300 120 H380',2,1],['M165 120 H300',0,1]
+    ]
+  };
+  const LBL={
+    buck:[[6,84,'Vs'],[100,12,'S'],[150,78,'D'],[222,12,'L'],[282,104,'C'],[392,80,'Vo']],
+    boost:[[6,84,'Vs'],[102,12,'L'],[134,84,'S'],[198,12,'D'],[272,104,'C'],[392,80,'Vo']]
+  };
+  function conv(id,topo,state){
+    const svg=document.getElementById(id); if(!svg)return;
+    T[topo].forEach(([d,fOn,fOff])=>{
+      const f=state==='on'?fOn:fOff; if(f===null)return;
+      const cls=state==='plain'?'sch':f===1?'hot':f===2?'hot2':'dim';
+      if(d[0]==='C'){const [x,y,r]=d.slice(1).split(',');add(svg,'circle',{cx:x,cy:y,r,class:cls});}
+      else if(d[0]==='P'){add(svg,'polygon',{points:d.slice(1),class:cls});}
+      else add(svg,'path',{d,class:cls});
+    });
+    LBL[topo].forEach(([x,y,t])=>add(svg,'text',{x,y,class:'sch-t'},t));
+    const lx=topo==='buck'?212:92;
+    add(svg,'text',{x:lx,y:54,class:'ca',style:'font-family:var(--f-mono);font-size:12px'},'+ vL −');
+    if(state!=='plain'){const msg={on:'ON: S closed, D off',off:'OFF: S open, D conducts'}[state];
+    add(svg,'text',{x:40,y:150,class:'sch-m'},msg);}
+  }
+  conv('buckOn','buck','on');conv('buckOff','buck','off');
+  conv('boostOn','boost','on');conv('boostOff','boost','off');
+  conv('drBuck','buck','plain');conv('drBuckOn','buck','on');conv('drBuckOff','buck','off');
+  conv('drBoost','boost','plain');conv('drBoostOn','boost','on');conv('drBoostOff','boost','off');
+  expPlot('drRC','vC / Vs','i·R / Vs','τ');expPlot('drRL','i·R / Vs','vL / Vs','τ');
+})();
+</script>
+<script>
+window.MathJax={
+  tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']],
+    packages:{'[+]':['html','cancel']},
+    macros:{A:['\\class{ca}{#1}',1],B:['\\class{cb}{#1}',1],C:['\\class{cc}{#1}',1],G:['\\class{cg}{#1}',1],X:['\\class{cx}{\\cancel{#1}}',1]}},
+  svg:{fontCache:'global'},
+  options:{skipHtmlTags:['script','noscript','style','textarea']}
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg-full.js" async></script>
+</body>
+</html>
+

@@ -7,12 +7,13 @@
 import katex from '../vendor/katex/katex.mjs';
 import { MODULES, PARTS, COURSES } from '../js/content/index.js';
 import { REFERENCE } from '../js/content/reference.js';
-import { WIDGET_NAMES } from '../js/widgets.js';
+import { WIDGET_NAMES, PE_FIGURES } from '../js/widgets.js';
 import { compile } from '../js/matlab/compile.js';
 import { Matlab } from '../js/matlab/interp.js';
 import { runMatlabChecks } from '../js/matlab/checks.js';
-import { checkPart } from '../js/check.js';
+import { checkPart, checkText } from '../js/check.js';
 import { parse } from '../js/matlab/parser.js';
+import { TAG_MACROS, KATEX_TRUST, KINDS, TAG_ID, tagIds, resolveSteps } from '../js/derive-core.js';
 
 // expression-valued widget config keys and the variables they use
 const EXPR_KEYS = {
@@ -56,6 +57,9 @@ function checkExprString(expr, params, where, issues, samples) {
 function checkWidget(b, where, issues) {
   if (!WIDGET_NAMES.includes(b.name)) { issues.push(`${where}: unknown widget "${b.name}"`); return; }
   const cfg = b.config || {};
+  if (b.name === 'pefig' && !(cfg.fig in PE_FIGURES)) issues.push(`${where}: unknown pefig "${cfg.fig}" (one of ${Object.keys(PE_FIGURES).join(', ')})`);
+  if (b.name === 'pefig') mathIn(cfg.caption, where, issues);
+  if (b.name === 'converter' && cfg.topology && !['buck', 'boost'].includes(cfg.topology)) issues.push(`${where}: converter topology must be buck or boost`);
   const params = Object.keys(cfg.params || {});
   for (const [k, vars] of Object.entries(EXPR_KEYS)) {
     if (k in cfg && typeof cfg[k] === 'string') {
@@ -105,6 +109,45 @@ function checkLiveBlocks(blocks, where, issues) {
     else if (b.type === 'text') mathIn(b.content, w, issues);
     else if (b.type === 'code' && !b.expectError) runCode(b.content, w, issues, m);
   });
+}
+
+function deriveTex(src, where, issues) {
+  // tag ids (e.g. "sin-1") are names, not LaTeX commands: drop them before the lost-backslash check
+  const lost = LOST_BACKSLASH.exec(String(src).replace(/\\T\{[^}]*\}/g, '\\T{}').replace(/\\(text|mathrm|operatorname|textrm|mathit)\{[^}]*\}/g, ' '));
+  if (lost) issues.push(`${where}: "${lost[2]}" without a backslash in "${String(src).slice(0, 80)}" — use String.raw.`);
+  try { katex.renderToString(String(src), { throwOnError: true, strict: 'ignore', displayMode: true, trust: KATEX_TRUST, macros: { ...TAG_MACROS } }); } catch (e) {
+    issues.push(`${where}: LaTeX error in "${String(src).slice(0, 80)}": ${e.message.replace(/^KaTeX parse error: /, '')}`);
+  }
+}
+
+function validateDerive(b, next, w, issues) {
+  mathIn(b.title, w, issues);
+  if (b.given) deriveTex(b.given, `${w} given`, issues);
+  let steps;
+  try { steps = resolveSteps(b); } catch (e) { issues.push(`${w}: ${e.message}`); return; }
+  if (!steps.length) issues.push(`${w}: derive block has no steps`);
+  steps.forEach((st, i) => {
+    const sw = `${w} step ${i + 1}`;
+    if (!KINDS.includes(st.kind)) issues.push(`${sw}: unknown step kind "${st.kind}"`);
+    mathIn(st.label, sw, issues); mathIn(st.why, sw, issues);
+    deriveTex(st.from, `${sw} from`, issues); deriveTex(st.to, `${sw} to`, issues);
+    const ids = { from: tagIds(st.from), to: tagIds(st.to) };
+    for (const [line, list] of Object.entries(ids)) {
+      const dup = list.find((id, j) => list.indexOf(id) !== j);
+      if (dup) issues.push(`${sw}: duplicate tag "${dup}" in ${line} line`);
+      const bad = list.find((id) => !TAG_ID.test(id));
+      if (bad) issues.push(`${sw}: tag id "${bad}" should look like prefix-n`);
+    }
+    for (const k of Object.keys(st.arrows || {})) {
+      if (!ids.from.includes(k)) issues.push(`${w}: arrows key "${k}" not in step ${i + 1} from line`);
+      else if (![].concat((st.map || {})[k] ?? k).some((t) => ids.to.includes(t))) issues.push(`${w}: arrows key "${k}" has no destination in step ${i + 1} (no arrow would be drawn)`);
+    }
+    for (const [k, ts] of Object.entries(st.map || {})) {
+      if (!ids.from.includes(k)) issues.push(`${sw}: map key "${k}" not in from line`);
+      for (const t of [].concat(ts)) if (!ids.to.includes(t)) issues.push(`${sw}: map target "${t}" not in to line`);
+    }
+  });
+  if (b.symbolic && !(next && next.type === 'derive' && next.given)) issues.push(`${w}: symbolic derivation needs a numbers companion (a derive block with "given") right after it`);
 }
 
 export function validateBlocks(blocks, where, issues) {
@@ -161,6 +204,35 @@ export function validateBlocks(blocks, where, issues) {
       }
       case 'livescript': checkLiveBlocks(b.blocks || [], w, issues); break;
       case 'answer': validatePart(b.part, w, issues); break;
+      case 'derive': validateDerive(b, blocks[i + 1], w, issues); break;
+      case 'figure':
+        if (!/^\s*<svg[\s>]/.test(b.svg || '')) issues.push(`${w}: figure needs an <svg> element`);
+        mathIn(b.caption, w, issues);
+        break;
+      case 'reveal':
+        mathIn(b.prompt, w, issues); (b.checklist || []).forEach((c) => mathIn(c, w, issues));
+        validateBlocks(b.blocks || [], `${w} reference`, issues);
+        break;
+      case 'blanks':
+        (b.items || []).forEach((it, j) => {
+          mathIn(it.html, `${w} item ${j + 1}`, issues);
+          const gaps = (String(it.html).match(/\[\[\]\]/g) || []).length;
+          const n = (it.answers || []).length;
+          if (!gaps || gaps !== n) issues.push(`${w} item ${j + 1}: ${gaps} gaps but ${n} answers`);
+          (it.answers || []).forEach((a) => {
+            const spec = typeof a === 'string' ? { answers: a.split('|') } : a;
+            if (!checkText(spec, typeof a === 'string' ? a.split('|')[0] : String(a.num)).ok) issues.push(`${w} item ${j + 1}: answer ${JSON.stringify(a)} does not check against itself`);
+          });
+        });
+        break;
+      case 'examquiz':
+        (b.questions || []).forEach((q, j) => {
+          const qw = `${w} Q${j + 1}`;
+          mathIn(q.q, qw, issues); (q.choices || []).forEach((c) => mathIn(c, qw, issues)); mathIn(q.explain, qw, issues);
+          if (!Array.isArray(q.choices) || q.choices.length < 2) issues.push(`${qw}: needs at least 2 choices`);
+          if (!(Number.isInteger(q.answer) && q.answer >= 0 && q.answer < (q.choices || []).length)) issues.push(`${qw}: answer index ${q.answer} out of range`);
+        });
+        break;
       default: issues.push(`${w}: unknown block type`);
     }
   });
@@ -168,6 +240,12 @@ export function validateBlocks(blocks, where, issues) {
 
 function checkStepList(steps, w, issues, min) {
   if (!Array.isArray(steps) || steps.length < min) { issues.push(`${w}: needs at least ${min} steps`); return; }
+  // block form (e.g. a walkthrough written as text + derive): validate as blocks and require a derivation
+  if (steps[0] && steps[0].type) {
+    validateBlocks(steps, w, issues);
+    if (!steps.some((b) => b.type === 'derive')) issues.push(`${w}: a walkthrough written as blocks needs a derive block`);
+    return;
+  }
   steps.forEach((st, k) => {
     if (typeof st === 'string' || !st.do || !st.why) issues.push(`${w} step[${k}]: every worked step must be { do, why } — the line of maths and the reason in plain words`);
     if (typeof st === 'string') mathIn(st, w, issues); else { mathIn(st.do, w, issues); mathIn(st.why, w, issues); }
@@ -179,9 +257,10 @@ function validatePart(p, w, issues, { lenient = false } = {}) {
     (p.hints || []).forEach((x) => mathIn(x, w, issues));
     if (p.kind !== 'writeup' && (!p.hints || p.hints.length < 2)) issues.push(`${w}: needs a hint ladder "hints" with at least 2 levels (nudge, then method/first step)`);
     if ((p.kind === 'numeric' || p.kind === 'expression') && !p.walkthrough) issues.push(`${w}: needs a step-by-step "walkthrough"`);
-    if (p.walkthrough) checkStepList(p.walkthrough, `${w} walkthrough`, issues, 3);
+    if (p.walkthrough) checkStepList(p.walkthrough, `${w} walkthrough`, issues, p.walkthrough[0]?.type ? 1 : 3);
   }
-  mathIn(p.prompt, w, issues); mathIn(p.hint, w, issues); mathIn(p.solution, w, issues); mathIn(p.feedback, w, issues);
+  mathIn(p.prompt, w, issues); mathIn(p.hint, w, issues); mathIn(p.feedback, w, issues);
+  if (Array.isArray(p.solution)) validateBlocks(p.solution, `${w} solution`, issues); else mathIn(p.solution, w, issues);
   (p.choices || []).forEach((c) => mathIn(c, w, issues));
   if (p.kind === 'numeric') {
     const r = checkPart(p, typeof p.answer === 'number' ? String(p.answer) : String(p.answer));
@@ -231,7 +310,7 @@ export function validateModule(m) {
       const refs = a.examples.map((r) => findLesson(r, m));
       a.examples.forEach((r, k) => { if (!refs[k]) issues.push(`${aw}: example "${r}" is not a lesson id`); });
       const blocks = refs.filter(Boolean).flatMap((l) => l.blocks || []);
-      if (!blocks.some((b) => b.type === 'steps')) issues.push(`${aw}: none of its example lessons contains a worked example (steps block)`);
+      if (!blocks.some((b) => b.type === 'steps' || b.type === 'derive')) issues.push(`${aw}: none of its example lessons contains a worked example (steps or derive block)`);
       if (!blocks.some((b) => b.type === 'guided')) issues.push(`${aw}: none of its example lessons contains a guided exercise`);
     }
     if ((a.parts || []).some((p) => p.kind === 'writeup') && !a.solution) issues.push(`${aw}: a writeup part needs a model "solution"`);

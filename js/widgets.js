@@ -6,6 +6,7 @@ import { Plot } from './plot.js';
 import { compile } from './matlab/compile.js';
 import { integrate, fzero } from './matlab/numeric.js';
 import { h, renderMath } from './util.js';
+import { PE_FIGURES, drawPeFigure, mountConverter } from './pefig.js';
 
 const C = {
   accent: 'var(--accent)',
@@ -1187,7 +1188,24 @@ WIDGETS.phasor = (container, cfg) => {
   update();
 };
 
+// Power electronics figures (schematics, waveforms) drawn by the code ported from the PE1 study page.
+WIDGETS.pefig = (container, cfg) => {
+  const box = h('figure', { class: 'pefig pefig-figure' });
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', PE_FIGURES[cfg.fig] || '0 0 520 230');
+  svg.setAttribute('role', 'img');
+  if (cfg.alt) svg.setAttribute('aria-label', cfg.alt);
+  box.appendChild(svg);
+  if (cfg.caption) { const cap = h('figcaption', {}); cap.innerHTML = cfg.caption; renderMath(cap); box.appendChild(cap); }
+  container.appendChild(box);
+  drawPeFigure(svg, cfg.fig);
+};
+
+// Buck/boost explorer: duty cycle and source voltage sliders, inductor volt-second areas.
+WIDGETS.converter = (container, cfg) => { mountConverter(container, cfg); };
+
 export const WIDGET_NAMES = Object.keys(WIDGETS);
+export { PE_FIGURES };
 
 export function mountWidget(container, name, config) {
   const w = WIDGETS[name];
