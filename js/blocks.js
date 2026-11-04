@@ -7,6 +7,7 @@ import { checkPart } from './check.js';
 import { runMatlabChecks } from './matlab/checks.js';
 import { LiveScript, renderLiveDoc } from './livescript.js';
 import { progress } from './progress.js';
+import { renderDerive } from './derive.js';
 
 export function askTutor(prompt, context = '') {
   window.dispatchEvent(new CustomEvent('tutor:ask', { detail: { prompt, context } }));
@@ -168,6 +169,8 @@ RENDER.livescript = (b, ctx) => {
   return el;
 };
 
+RENDER.derive = (b) => renderDerive(b);
+
 RENDER.answer = (b, ctx) => renderPart(b.part, ctx?.key ? `${ctx.key}/answer/${ctx.index}` : null, ctx);
 
 export function renderBlocks(container, blocks, ctx = {}) {
@@ -231,7 +234,7 @@ export function renderPart(part, key, ctx = {}) {
     }
     ctx.onResult?.();
   };
-  const solBtn = h('button', { class: 'btn btn-small btn-ghost' + (part.solution ? '' : ' hidden'), onclick: () => { sol.classList.toggle('hidden'); if (!sol.innerHTML) html(sol, part.solution); } }, 'Show solution');
+  const solBtn = h('button', { class: 'btn btn-small btn-ghost' + (part.solution ? '' : ' hidden'), onclick: () => { sol.classList.toggle('hidden'); if (!sol.childNodes.length) { if (Array.isArray(part.solution)) renderBlocks(sol, part.solution, { module: ctx.module }); else html(sol, part.solution); } } }, 'Show solution');
   const row = h('div', { class: 'row' });
   if (part.kind !== 'writeup') row.appendChild(h('button', { class: 'btn btn-small btn-primary', onclick: doCheck }, 'Check'));
   if (part.hint) row.appendChild(h('button', { class: 'btn btn-small btn-ghost', onclick: (e) => e.target.replaceWith(html(h('div', { class: 'hint' }), 'Hint: ' + part.hint)) }, 'Hint'));

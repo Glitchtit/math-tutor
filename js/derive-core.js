@@ -100,14 +100,20 @@ export function route(src, dst, obstacles, line) {
     { side: 'right', end: [dst.x + dst.w + 2, zm], c: (q) => [[laneR, p0[1] + 25], [laneR, q[1]]], pen: 110 },
   ];
   let best = null;
+  const scores = [];
   for (const cd of cands) {
     const [p1, p2] = cd.c(cd.end);
-    let hits = 0;
-    for (let i = 3; i <= 77; i++) {
-      const [x, y] = bez(p0, p1, p2, cd.end, i / 80);
-      if (obstacles.some((b) => x > b.x && x < b.x + b.w && y > b.y && y < b.y + b.h)) hits++;
+    let hits = 0, len = 0, prev = p0;
+    for (let i = 1; i <= 80; i++) {
+      const pt = bez(p0, p1, p2, cd.end, i / 80);
+      len += Math.hypot(pt[0] - prev[0], pt[1] - prev[1]);
+      prev = pt;
+      const [x, y] = pt;
+      if (i >= 3 && i <= 77 && obstacles.some((b) => x > b.x && x < b.x + b.w && y > b.y && y < b.y + b.h)) hits++;
     }
-    const score = hits * 1000 + Math.hypot(cd.end[0] - p0[0], cd.end[1] - p0[1]) + cd.pen;
+    // drawn curve length, not chord length: a wide loop must lose to a short detour
+    const score = hits * 1000 + len + cd.pen;
+    scores.push([cd.side, hits, Math.round(score)]);
     if (!best || score < best.score) best = { score, hits, p1, p2, end: cd.end, side: cd.side };
   }
   // pull the drawn end back so the arrowhead tip lands on the target edge
@@ -115,5 +121,5 @@ export function route(src, dst, obstacles, line) {
   const dx = end[0] - p2[0], dy = end[1] - p2[1], L = Math.hypot(dx, dy) || 1;
   const tip = [end[0] - (dx / L) * 6, end[1] - (dy / L) * 6];
   const d = `M${r1(p0[0])},${r1(p0[1])} C${r1(p1[0])},${r1(p1[1])} ${r1(p2[0])},${r1(p2[1])} ${r1(tip[0])},${r1(tip[1])}`;
-  return { d, start: p0, end, side: best.side, hits: best.hits };
+  return { d, start: p0, end, side: best.side, hits: best.hits, scores };
 }
