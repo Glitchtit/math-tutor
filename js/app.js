@@ -4,6 +4,8 @@ import { h, renderMath, markdown, store, downloadBlob } from './util.js';
 import { MODULES, PARTS, COURSES, HOMEWORK_TEMPLATE } from './content/index.js';
 import { renderBlocks, renderAssignment } from './blocks.js';
 import { progress, moduleKeys } from './progress.js';
+import { renderTrainPage } from './train.js';
+import { hasDrills } from './train-core.js';
 import { LiveScript } from './livescript.js';
 import { TutorPanel } from './tutorpanel.js';
 import { setCourseOutline, generateAssignments, generateLesson, connectionMode } from './ai.js';
@@ -140,11 +142,15 @@ function modulePage(m) {
   const intro = h('div', { class: 'prose' });
   intro.innerHTML = m.intro || `<p>${m.summary}</p>`;
   const hasMatlab = (m.matlab || []).length > 0;
+  const hasTrain = hasDrills(m);
+  let n = 1;
   const cols = h('div', { class: 'mod-cols' },
-    h('section', { class: 'mod-col' }, h('h3', {}, '1 · Learn'), h('p', { class: 'muted small' }, 'Graphs first, then fully worked examples and step-by-step guided practice.'), moduleNavList(m, 'learn', m.lessons || [])),
+    h('section', { class: 'mod-col' }, h('h3', {}, `${n++} · Learn`), h('p', { class: 'muted small' }, 'Graphs first, then fully worked examples and step-by-step guided practice.'), moduleNavList(m, 'learn', m.lessons || [])),
     // courses without MATLAB pages (e.g. Power Electronics) skip the Live Editor column
-    hasMatlab ? h('section', { class: 'mod-col' }, h('h3', {}, '2 · MATLAB Live Editor'), h('p', { class: 'muted small' }, 'Write the same mathematics as in your homework.'), moduleNavList(m, 'matlab', m.matlab || [])) : null,
-    h('section', { class: 'mod-col' }, h('h3', {}, `${hasMatlab ? 3 : 2} · Assignments`), h('p', { class: 'muted small' }, 'Only problem types you have already practised, with hints and walkthroughs.'),
+    hasMatlab ? h('section', { class: 'mod-col' }, h('h3', {}, `${n++} · MATLAB Live Editor`), h('p', { class: 'muted small' }, 'Write the same mathematics as in your homework.'), moduleNavList(m, 'matlab', m.matlab || [])) : null,
+    hasTrain ? h('section', { class: 'mod-col' }, h('h3', {}, `${n++} · Train`), h('p', { class: 'muted small' }, 'Type the worked derivations yourself, one part at a time: copy, then cover, then recall.'),
+      h('a', { class: `btn btn-small${progress.isDone(`${m.id}/train`) ? '' : ' btn-primary'}`, href: `#/module/${m.id}/train` }, progress.isDone(`${m.id}/train`) ? 'Train again ✓' : 'Start training')) : null,
+    h('section', { class: 'mod-col' }, h('h3', {}, `${n++} · Assignments`), h('p', { class: 'muted small' }, 'Only problem types you have already practised, with hints and walkthroughs.'),
       h('ol', { class: 'lesson-list' }, ...(m.assignments || []).map((a) => h('li', { class: progress.isDone(`${m.id}/assign/${a.id}`) ? 'done' : '' }, h('a', { href: `#/module/${m.id}/assign#${a.id}` }, a.title), progress.isDone(`${m.id}/assign/${a.id}`) ? h('span', { class: 'check' }, '✓') : null))),
       h('a', { class: 'btn btn-small', href: `#/module/${m.id}/assign` }, 'Open assignments')));
   const aiRow = h('div', { class: 'row' },
@@ -167,6 +173,7 @@ function sequenceOf(m) {
   return [
     ...(m.lessons || []).map((l) => ({ kind: 'learn', item: l })),
     ...(m.matlab || []).map((l) => ({ kind: 'matlab', item: l })),
+    ...(hasDrills(m) ? [{ kind: 'train', item: { id: '', title: 'Train' } }] : []),
     { kind: 'assign', item: { id: '', title: 'Assignments' } },
   ];
 }
@@ -183,7 +190,7 @@ function lessonPage(m, kind, id) {
   const seq = sequenceOf(m);
   const pos = seq.findIndex((s) => s.kind === kind && s.item.id === id);
   const prev = seq[pos - 1], next = seq[pos + 1];
-  const href = (s) => (s.kind === 'assign' ? `#/module/${m.id}/assign` : `#/module/${m.id}/${s.kind}/${s.item.id}`);
+  const href = (s) => (s.kind === 'assign' || s.kind === 'train' ? `#/module/${m.id}/${s.kind}` : `#/module/${m.id}/${s.kind}/${s.item.id}`);
   const doneBtn = h('button', { class: `btn ${progress.isDone(key) ? '' : 'btn-primary'}`, onclick: () => {
     progress.markDone(key, true);
     buildNav();
@@ -196,6 +203,19 @@ function lessonPage(m, kind, id) {
     h('div', { class: 'lesson-nav' },
       prev ? h('a', { class: 'btn btn-ghost', href: href(prev) }, `← ${prev.item.title}`) : h('span'),
       doneBtn));
+}
+
+function trainPage(m) {
+  setCourse(m.course);
+  progress.visit(`${m.id}/train`);
+  const wrap = h('div', { class: 'train' });
+  page(`Train · ${m.title}`,
+    crumbs({ label: 'Course', href: '#/' }, { label: `Module ${m.number}: ${m.title}`, href: `#/module/${m.id}` }, { label: 'Train' }),
+    h('header', { class: 'lesson-head' }, h('div', { class: 'mod-num' }, `Module ${m.number}`), h('h1', {}, 'Train')),
+    h('p', { class: 'muted' }, 'Every worked derivation from Learn, typed by you one part at a time. Each drill has three rounds: Copy, Cover, Recall. Finish a round with at most one miss per line to move up.'),
+    wrap,
+    h('div', { class: 'lesson-nav' }, h('a', { class: 'btn btn-ghost', href: `#/module/${m.id}` }, '← Module overview'), h('a', { class: 'btn btn-primary', href: `#/module/${m.id}/assign` }, 'Assignments →')));
+  renderTrainPage(wrap, m, () => buildNav());
 }
 
 function assignPage(m) {
@@ -374,6 +394,7 @@ function route() {
     modId = m.id;
     if (seg.length === 2) modulePage(m);
     else if (seg[2] === 'assign') assignPage(m);
+    else if (seg[2] === 'train' && hasDrills(m)) trainPage(m);
     else if ((seg[2] === 'learn' || seg[2] === 'matlab') && seg[3]) lessonPage(m, seg[2], seg[3]);
     else notFound();
   } else if (seg[0] === 'editor') editorPage();

@@ -169,6 +169,12 @@ An assignment part's `solution` may be an HTML string or an **array of lesson bl
 solution restructures a formula over two or more lines; keep a string for one-line or purely verbal
 solutions. (The assignment-level Live Script `solution` and `writeupTemplate` stay Live Script.)
 
+### Train drills (automatic)
+
+The module's **Train** page (`#/module/<id>/train`, between Learn and Assignments) turns every `derive` block in the module's lessons into a typing drill (`js/train-core.js`). The student types each line one chunk at a time: a tagged `\T{}` term together with the operator in front of it, or a relation together with its right-hand side. They type plain text (`(x+1)/(x-1)`, `x^(n+1)`, `int_a^b f dx`, `lim_(x->0)`). Drills have three rounds: Copy, Cover and Recall.
+
+You don't author drills: good tags and clear step labels make good drills. A line is skipped if it uses `\underbrace`, `\begin`, `\binom`, `\overset`, `\xrightarrow`, `\lceil`, `\overline`, `\not` or `\bar`. `npm test` checks that at least 85% of derive lines convert.
+
 ## Practice blocks and power-electronics widgets
 
 * `blanks` answers: one per `[[]]` gap, either a string with `|`-separated alternatives

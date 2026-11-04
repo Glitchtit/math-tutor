@@ -29,7 +29,7 @@ export function tokenizeTex(src) {
   return toks;
 }
 
-function parseGroup(toks, pos, close) {
+export function parseGroup(toks, pos, close) {
   const items = [];
   while (pos.i < toks.length) {
     const t = toks[pos.i++];

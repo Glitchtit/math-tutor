@@ -1,9 +1,11 @@
 // Learner progress, stored in the browser. Also produces a compact summary for the AI tutor.
 
 import { store } from './util.js';
+import { hasDrills } from './train-core.js';
 
 const KEY = 'progress';
 let state = store.get(KEY, null) || { visited: {}, done: {}, attempts: {}, log: [] };
+state.train ||= {};
 
 function save() { store.set(KEY, state); }
 
@@ -33,9 +35,12 @@ export const progress = {
     return a;
   },
   getAttempt(key) { return state.attempts[key] || null; },
-  reset() { state = { visited: {}, done: {}, attempts: {}, log: [] }; save(); },
+  // Train drills: round 0 (new) .. 3 (mastered after copy, cover, recall)
+  trainRound(key) { return state.train[key] || 0; },
+  setTrainRound(key, n) { state.train[key] = Math.max(0, Math.min(3, n)); save(); },
+  reset() { state = { visited: {}, done: {}, attempts: {}, log: [], train: {} }; save(); },
   export() { return JSON.stringify(state, null, 2); },
-  import(json) { state = JSON.parse(json); save(); },
+  import(json) { state = JSON.parse(json); state.train ||= {}; save(); },
 
   moduleStats(mod) {
     const keys = moduleKeys(mod);
@@ -65,6 +70,7 @@ export function moduleKeys(mod) {
   const keys = [];
   (mod.lessons || []).forEach((l) => keys.push(`${mod.id}/learn/${l.id}`));
   (mod.matlab || []).forEach((l) => keys.push(`${mod.id}/matlab/${l.id}`));
+  if (hasDrills(mod)) keys.push(`${mod.id}/train`);
   (mod.assignments || []).forEach((a) => keys.push(`${mod.id}/assign/${a.id}`));
   return keys;
 }
