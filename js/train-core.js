@@ -176,6 +176,27 @@ export function checkChunk(input, expected) {
   return { ok: false, at: [...a].findIndex((c, i) => c !== b[i]) };
 }
 
+// Live check of a whole line as it is typed: how many chunks are finished, and where the first typo is.
+// alts remembers equal-valued forms already accepted per chunk, so backspacing re-evaluates correctly.
+export function matchLine(chunks, input, alts = {}) {
+  const text = normPlain(input), full = normPlain(chunks.map((c) => c.plain).join(''));
+  let pos = 0, start = 0, acc = '';
+  for (let i = 0; i < chunks.length; i++) {
+    acc += chunks[i].plain;
+    const end = normPlain(acc).length, exp = full.slice(start, end);
+    start = end;
+    const rest = text.slice(pos);
+    if (rest.startsWith(exp)) { pos += exp.length; continue; }
+    if (alts[i] && rest.startsWith(alts[i])) { pos += alts[i].length; continue; }
+    if (exp.startsWith(rest)) return { done: i, typoAt: -1, text };
+    if (checkChunk(rest, chunks[i].plain).ok) { alts[i] = rest; pos += rest.length; continue; }
+    let k = 0;
+    while (rest[k] === exp[k]) k++;
+    return { done: i, typoAt: pos + k, text };
+  }
+  return { done: chunks.length, typoAt: pos < text.length ? pos : -1, text };
+}
+
 // ------------------------------------------------------------------ drills
 
 function derivesIn(o, out = []) {

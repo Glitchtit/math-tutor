@@ -641,4 +641,5 @@ details.refresher summary { color: var(--accent); }
 .train-prompt { margin: 10px 0 6px; }
 .train-target { font-size: 1.05em; padding: 2px 6px; }
 .train-input { flex: 1; min-width: 0; font-size: 1.05em; }
+.train-input.typo { border-color: var(--bad, #e5484d); outline-color: var(--bad, #e5484d); }
 .train-done { padding: 20px 0; }

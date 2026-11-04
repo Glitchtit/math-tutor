@@ -4,7 +4,7 @@
 import { h, renderMath } from './util.js';
 import { texDerive } from './derive.js';
 import { colourSlot } from './derive-core.js';
-import { drillsOf, checkChunk, normPlain } from './train-core.js';
+import { drillsOf, matchLine } from './train-core.js';
 import { progress } from './progress.js';
 
 const ROUNDS = ['Copy', 'Cover', 'Recall'];
@@ -20,6 +20,7 @@ const CHEAT = [
   ['relations', String.raw`\le\ \ge\ \ne\ \approx\ \to\ \Rightarrow`, '<= >= != ~ -> =>'], ['plus-minus', String.raw`\pm`, '+-'],
   ['integral', String.raw`\int_a^b f\,dx`, 'int_a^b f dx'], ['limit', String.raw`\lim_{x\to 0}`, 'lim_(x->0)'], ['sum', String.raw`\sum_{n=1}^{\infty}`, 'sum_(n=1)^inf'],
 ];
+const LINE_PAUSE_MS = 500; // long enough to see the finished line before the next one
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const playedRound = (key) => Math.min(progress.trainRound(key), 2); // 0-based round to play next
@@ -80,7 +81,7 @@ export function runDrill(el, drill, round, onDone) {
     title, h('p', { class: 'muted small' }, ROUND_HELP[round]), prevBox, stepBox, lineBox, prompt,
     h('div', { class: 'answer-row' }, inp, round ? showBtn : null), fb);
 
-  let li = 0, ci = 0, misses = 0, revealed = false, busy = false, first = true;
+  let li = 0, ci = 0, misses = 0, chunkMisses = 0, revealed = false, typo = false, stopped = false, alts = {};
   const missesPerLine = [];
   const line = () => drill.lines[li];
 
@@ -99,7 +100,7 @@ export function runDrill(el, drill, round, onDone) {
 
   function drawPrompt() {
     const c = line().chunks[ci];
-    const lead = first ? 'Type this:' : ci === 0 ? 'Next line. Type this:' : 'Good, now this:';
+    const lead = ci > 0 ? 'Good, now this:' : li === 0 ? 'Type this:' : 'Next line. Type this:';
     const show = round === 0 || revealed;
     prompt.replaceChildren(h('b', {}, lead), ' ', show ? h('code', { class: 'train-target' }, c.plain) : h('span', { class: 'muted' }, round === 2 ? 'the next part of the line (the box)' : 'the highlighted part'));
     showBtn.classList.toggle('hidden', show);
@@ -107,11 +108,10 @@ export function runDrill(el, drill, round, onDone) {
 
   function startLine() {
     const L = line();
-    ci = 0; misses = 0; revealed = false;
+    ci = 0; misses = 0; chunkMisses = 0; revealed = false; typo = false; alts = {};
+    inp.value = ''; inp.readOnly = false; inp.classList.remove('typo');
+    fb.className = 'feedback'; fb.replaceChildren();
     counter.textContent = `Line ${li + 1} of ${drill.lines.length}`;
-    const prev = drill.lines[li - 1];
-    prevBox.innerHTML = prev ? texDerive(prev.tex) : '';
-    if (prev) colourise(prevBox);
     stepBox.replaceChildren();
     if (L.label || (round === 2 && L.why)) {
       const s = h('div', {}); s.innerHTML = `<b>${L.label || 'Step'}</b>${round === 2 && L.why ? ` — ${L.why}` : ''}`; renderMath(s); stepBox.append(s);
@@ -119,32 +119,40 @@ export function runDrill(el, drill, round, onDone) {
     drawLine(); drawPrompt();
   }
 
-  async function submit() {
-    if (busy || !inp.value.trim()) return;
-    const c = line().chunks[ci];
-    const r = checkChunk(inp.value, c.plain);
-    if (!r.ok) {
-      misses++;
-      const typed = normPlain(inp.value), at = Math.max(0, r.at);
+  // finished lines stay on screen, so the derivation grows as it is typed
+  function keepLine() {
+    const done = h('div'); done.innerHTML = texDerive(line().tex);
+    colourise(done); prevBox.append(done);
+  }
+
+  async function onType() {
+    const r = matchLine(line().chunks, inp.value, alts);
+    const wasTypo = typo;
+    typo = r.typoAt >= 0;
+    inp.classList.toggle('typo', typo);
+    if (typo) {
+      if (!wasTypo) { misses++; chunkMisses++; }
+      const at = r.typoAt;
       fb.className = 'feedback bad';
-      fb.replaceChildren(h('b', {}, 'Not quite. '), 'You typed ', h('code', {}, typed.slice(0, at), h('mark', {}, typed.slice(at, at + 1) || ' '), typed.slice(at + 1)), at < typed.length ? ' — check from the marked character.' : ' — something is missing at the end.');
-      if (misses >= 2 && !revealed) { revealed = true; drawPrompt(); }
-      inp.select();
-      return;
-    }
-    fb.className = 'feedback ok';
-    fb.replaceChildren(r.alt ? h('span', {}, 'Correct — also fine. Written here as ', h('code', {}, c.plain), '.') : 'Good.');
-    inp.value = ''; first = false; ci++;
-    drawLine();
-    if (ci < line().chunks.length) { revealed = false; drawPrompt(); return; }
+      fb.replaceChildren(h('b', {}, 'Typo: '), h('code', {}, r.text.slice(0, at), h('mark', {}, r.text.slice(at, at + 1)), r.text.slice(at + 1)), ' — fix the marked character.');
+    } else { fb.className = 'feedback'; fb.replaceChildren(); }
+    const moved = !typo && r.done !== ci;
+    if (r.done !== ci) { ci = r.done; chunkMisses = 0; revealed = false; drawLine(); }
+    if (typo && chunkMisses >= 2) revealed = true;
+    if (ci < line().chunks.length) { if (moved || typo) drawPrompt(); return; }
+    if (typo) return;
+    inp.readOnly = true;
     missesPerLine.push(misses);
+    prompt.replaceChildren(h('b', {}, 'Line complete ✓'));
+    showBtn.classList.add('hidden');
+    await wait(LINE_PAUSE_MS);
+    if (stopped) return;
     if (li + 1 >= drill.lines.length) return finish(missesPerLine.every((x) => x <= 1));
-    busy = true; prompt.replaceChildren(h('b', {}, 'Line complete ✓'));
-    await wait(700);
-    busy = false; li++; startLine();
+    keepLine(); li++; startLine();
   }
 
   function finish(clean) {
+    stopped = true;
     const nav = onDone(clean ?? false);
     if (clean === null) return nav.list();
     const total = missesPerLine.reduce((a, b) => a + b, 0);
@@ -157,7 +165,7 @@ export function runDrill(el, drill, round, onDone) {
     nextBtn.focus();
   }
 
-  inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
+  inp.addEventListener('input', onType);
   showBtn.onclick = () => { revealed = true; misses = Math.max(misses, 2); drawPrompt(); inp.focus(); };
   startLine();
   inp.focus();

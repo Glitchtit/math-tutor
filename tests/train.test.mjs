@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { texToPlain, chunkLine, checkChunk, drillsOf } from '../js/train-core.js';
+import { texToPlain, chunkLine, checkChunk, matchLine, drillsOf } from '../js/train-core.js';
 import { resolveSteps } from '../js/derive-core.js';
 import { MODULES } from '../js/content/index.js';
 
@@ -33,6 +33,31 @@ test('checkChunk: forgiving on spacing, * and redundant brackets, strict on stru
   assert.ok(!checkChunk('4.7/4.7+1.2', '4.7/(4.7+1.2)').ok);
   assert.ok(!checkChunk('<=0', '>=0').ok);
   assert.equal(checkChunk('x+4', 'x+3').at, 2);
+});
+
+test('matchLine follows the line as it is typed', () => {
+  const c = chunkLine(String.raw`\T{x-1}{x} + \T{three-1}{3} \ge 0`);
+  assert.deepEqual(matchLine(c, ''), { done: 0, typoAt: -1, text: '' });
+  assert.equal(matchLine(c, 'x').done, 1);
+  assert.equal(matchLine(c, 'x +').done, 1);
+  assert.equal(matchLine(c, 'x+3').done, 2);
+  assert.equal(matchLine(c, 'x+3>').typoAt, -1);
+  assert.equal(matchLine(c, 'x+3>=0').done, 3);
+  assert.equal(matchLine(c, 'x+4').typoAt, 2);
+  assert.equal(matchLine(c, 'x+3>=0 1').typoAt, 6);
+  const f = chunkLine(String.raw`V = \dfrac{4.7}{4.7+1.2}\cdot 24`), alts = {};
+  assert.equal(matchLine(f, 'V=(4.7)/(4.7+1.2)', alts).done, 2); // equal-valued form
+  assert.equal(matchLine(f, 'V=(4.7)/(4.7+1.2)*24', alts).done, 3);
+  const m = chunkLine(String.raw`3\cdot 4 = 12`);
+  assert.equal(matchLine(m, '3*').typoAt, -1);
+  assert.equal(matchLine(m, '3*4=12').done, m.length);
+});
+
+test('every drill line completes when its chunks are typed one after another', () => {
+  for (const m of MODULES) for (const d of drillsOf(m)) for (const l of d.lines) {
+    let typed = '';
+    l.chunks.forEach((c, i) => { typed += c.plain; const r = matchLine(l.chunks, typed); assert.equal(r.typoAt, -1, typed); assert.ok(r.done >= i + 1, typed); });
+  }
 });
 
 test('coverage: nearly every lesson derive line becomes a drill line, and every chunk accepts itself', () => {
