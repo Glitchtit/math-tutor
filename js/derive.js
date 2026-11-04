@@ -59,6 +59,8 @@ export function renderDerive(b) {
     svg.setAttribute('class', 'derive-svg');
     svg.setAttribute('aria-hidden', 'true');
     const inner = h('div', { class: `derive-inner${hasArrows ? ' has-arrows' : ''}` }, oldL, h('div', { class: 'derive-gap' }), newL, svg);
+    // a step that only states the starting line (from === to) shows it once
+    if (st.from === st.to) { oldL.hidden = true; inner.querySelector('.derive-gap').hidden = true; }
     const li = h('li', { class: `derive-step${kind === 'result' || kind === 'check' ? ' is-result' : ''}` },
       head, h('div', { class: 'derive-scroll' }, inner));
     if (st.why) li.appendChild(proseInto(h('div', { class: 'derive-why' }), st.why));
