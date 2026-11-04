@@ -108,20 +108,21 @@ export function route(src, dst, obstacles, line) {
     cands.push({ side: 'top', pen: st.pen, segs: [[p0, out(st, drop(entry.top[1])), [zc, entry.top[1] - (entry.top[1] - p0[1]) * 0.55], entry.top]] });
     cands.push({ side: 'left', pen: st.pen + 10, segs: [[p0, out(st, drop(zm)), [dst.x - 42, zm], entry.left]] });
     cands.push({ side: 'right', pen: st.pen + 10, segs: [[p0, out(st, drop(zm)), [dst.x + dst.w + 42, zm], entry.right]] });
-    cands.push({ side: 'bottom', pen: st.pen + 60, segs: [[p0, st.dir[1] === 1 ? [p0[0], below] : out(st, 40), [zc, below], entry.bottom]] });
-    // through a waypoint beside the new line, in the gap above it
-    for (const lane of [laneL, laneR]) {
+    // through a waypoint beside the new line (or just beside the target), in the gap above it
+    for (const lane of [laneL, laneR, dst.x - 16, dst.x + dst.w + 16]) {
+      const local = lane !== laneL && lane !== laneR;
       const w = [lane, line.y - 10];
       const toW = [p0, out(st, drop(w[1])), [lane, w[1] - 24], w];
       const sgn = lane < zc ? -1 : 1;
-      cands.push({ side: 'bottom', pen: st.pen + 90, segs: [toW, [w, [lane, below], [zc, below + 6], entry.bottom]] });
-      cands.push({ side: sgn < 0 ? 'left' : 'right', pen: st.pen + 90, segs: [toW, [w, [lane, zm], [entry[sgn < 0 ? 'left' : 'right'][0] + sgn * 30, zm], entry[sgn < 0 ? 'left' : 'right']]] });
+      const under = local ? dst.y + dst.h + 14 : below;
+      cands.push({ side: 'bottom', pen: st.pen + (local ? 120 : 250), segs: [toW, [w, [lane, under], [zc, under + 6], entry.bottom]] });
+      if (!local) cands.push({ side: sgn < 0 ? 'left' : 'right', pen: st.pen + 250, segs: [toW, [w, [lane, zm], [entry[sgn < 0 ? 'left' : 'right'][0] + sgn * 30, zm], entry[sgn < 0 ? 'left' : 'right']]] });
     }
   }
   let best = null;
   const scores = [];
   for (const cd of cands) {
-    let hits = 0, len = 0;
+    let hits = 0, cost = 0, len = 0;
     const n = 80 * cd.segs.length;
     cd.segs.forEach((sg, k) => {
       let prev = sg[0];
@@ -130,11 +131,14 @@ export function route(src, dst, obstacles, line) {
         len += Math.hypot(pt[0] - prev[0], pt[1] - prev[1]);
         prev = pt;
         const g = k * 80 + i; // skip the very start and end, which touch source and target
-        if (g >= 3 && g <= n - 3 && obstacles.some((b) => pt[0] > b.x && pt[0] < b.x + b.w && pt[1] > b.y && pt[1] < b.y + b.h)) hits++;
+        if (g < 3 || g > n - 3) continue;
+        const hit = obstacles.filter((b) => pt[0] > b.x && pt[0] < b.x + b.w && pt[1] > b.y && pt[1] < b.y + b.h);
+        // leaving through the old line's own fraction bar is expected; crossing the new line is not
+        if (hit.length) { hits++; cost += hit.some((b) => !b.old) ? 1000 : 150; }
       }
     });
     // drawn curve length, not chord length: a wide loop must lose to a short detour
-    const score = hits * 1000 + len + cd.pen;
+    const score = cost + len + cd.pen;
     scores.push([cd.side, hits, Math.round(score)]);
     if (!best || score < best.score) best = { ...cd, score, hits };
   }

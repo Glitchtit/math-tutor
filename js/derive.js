@@ -84,7 +84,14 @@ export function renderDerive(b) {
     const c = inner.getBoundingClientRect();
     let l = Infinity, t = Infinity, r = -Infinity, bt = -Infinity;
     for (const x of [el, ...el.querySelectorAll('*')]) {
-      const q = x.getBoundingClientRect();
+      if (x.ownerSVGElement) continue; // shapes inside an svg: the svg itself is measured
+      let q = x.getBoundingClientRect();
+      // KaTeX draws roots and wide accents as a 400em svg clipped by its parent: measure only the visible part
+      if (x.tagName.toLowerCase() === 'svg' && x.parentElement) {
+        const pr = x.parentElement.getBoundingClientRect();
+        q = { left: Math.max(q.left, pr.left), right: Math.min(q.right, pr.right), top: q.top, bottom: q.bottom, width: 1, height: q.height };
+        if (q.right <= q.left) continue;
+      }
       if (!q.width || !q.height) continue;
       l = Math.min(l, q.left); t = Math.min(t, q.top); r = Math.max(r, q.right); bt = Math.max(bt, q.bottom);
     }
@@ -117,7 +124,7 @@ export function renderDerive(b) {
           const r = boxIn(inner, g);
           if (!r) return null;
           const pad = Math.max(0, (8 - r.h) / 2);
-          return { x: r.x - 3, y: r.y - 3 - pad, w: r.w + 6, h: r.h + 6 + 2 * pad };
+          return { x: r.x - 3, y: r.y - 3 - pad, w: r.w + 6, h: r.h + 6 + 2 * pad, old: S.oldL.contains(g) };
         }).filter((r) => r && r.w > 6);
         const rt = route(src, dst, obstacles, lineBox);
         const path = document.createElementNS(SVG, 'path');
@@ -136,20 +143,50 @@ export function renderDerive(b) {
         head.dataset.mv = mv.id;
         svg.appendChild(head);
         const label = st.arrows[mv.id];
-        if (label && j === 0) labels.push({ id: mv.id, label, slot, start: rt.start, left: rt.end[0] < rt.start[0] - 4 });
+        if (label && j === 0) labels.push({ id: mv.id, label, slot, path });
       });
     }
-    // stack labels from one baseline under the lowest arrow start, so neighbouring labels never overlap
-    const base = Math.max(0, ...labels.map((l) => l.start[1]));
-    labels.forEach((l, k) => {
+    placeLabels(S, labels, ink.map((g) => boxIn(inner, g)).filter(Boolean));
+  }
+
+  // put each label beside its own arrow where it covers no glyph, no other label and as little arrow as possible
+  function placeLabels(S, labels, inkBoxes) {
+    const { inner, svg } = S;
+    const W = inner.clientWidth;
+    const paths = [...svg.querySelectorAll('.derive-arrow')].map((p) => {
+      const L = p.getTotalLength(), pts = [];
+      for (let s = 0; s <= L; s += 3) { const q = p.getPointAtLength(s); pts.push([q.x, q.y]); }
+      return { p, pts, L };
+    });
+    const ov = (a, b) => Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x)) * Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
+    const placed = [];
+    for (const l of labels) {
       const text = document.createElementNS(SVG, 'text');
-      text.setAttribute('x', l.start[0] + (l.left ? -10 : 10));
-      text.setAttribute('y', base + 16 + 18 * k);
-      text.setAttribute('text-anchor', l.left ? 'end' : 'start');
       text.setAttribute('class', `derive-lbl ${l.slot}`);
+      text.dataset.mv = l.id;
       text.textContent = l.label;
       svg.appendChild(text);
-    });
+      const bb = text.getBBox(), w = bb.width + 4, hgt = bb.height;
+      const own = paths.find((q) => q.p === l.path);
+      let best = null;
+      for (const t of [0.12, 0.25, 0.4, 0.55, 0.7, 0.85]) {
+        const q = l.path.getPointAtLength(own.L * t);
+        for (const side of [1, -1, 0]) {
+          // side 0: pulled inside the step on narrow screens, even if it then sits on its own arrow
+          const x = side > 0 ? q.x + 7 : side < 0 ? q.x - 7 - w : Math.min(Math.max(0, q.x - w / 2), W - w);
+          const box = { x, y: q.y - hgt / 2, w, h: hgt };
+          let sc = t * 30 + (side < 0 ? 4 : side === 0 ? 150 : 0);
+          if (box.x < 0 || box.x + box.w > W) sc += 5000;
+          for (const g of inkBoxes) sc += ov(box, { x: g.x - 2, y: g.y - 2, w: g.w + 4, h: g.h + 4 }) > 0 ? 1000 : 0;
+          for (const o of placed) sc += ov(box, { x: o.x - 3, y: o.y - 2, w: o.w + 6, h: o.h + 4 }) > 0 ? 1000 : 0;
+          for (const pp of paths) for (const [x, y] of pp.pts) if (x > box.x - 2 && x < box.x + box.w + 2 && y > box.y - 2 && y < box.y + box.h + 2) sc += pp === own ? 60 : 40;
+          if (!best || sc < best.sc) best = { sc, box };
+        }
+      }
+      text.setAttribute('x', best.box.x + 2);
+      text.setAttribute('y', best.box.y + hgt * 0.78);
+      placed.push(best.box);
+    }
   }
 
   async function playStep(S, fromPlayAll = false) {
@@ -184,30 +221,57 @@ export function renderDerive(b) {
           w.style.left = `${a.left - c.left}px`; w.style.top = `${a.top - c.top}px`;
           w.appendChild(e.cloneNode(true));
           g.targets.push(t);
-          g.clones.push([w, `translate(${z.left - a.left}px, ${z.top - a.top}px) scale(${a.height ? z.height / a.height : 1})`]);
+          g.clones.push([w, a, z]);
         }
         if (g.clones.length) groups.push(g);
       }
+      // terms that merge into one slot move back to back (stable: otherwise keep the old line's order)
+      const lead = groups.map((g) => groups.findIndex((o) => o.targets.some((t) => g.targets.includes(t))));
+      groups.splice(0, groups.length, ...groups.map((g, i) => [g, lead[i], i]).sort((x, y) => x[1] - y[1] || x[2] - y[2]).map((x) => x[0]));
       // the unchanged skeleton of the new line appears first, with empty slots the terms then slide into
-      groups.forEach((g) => g.targets.forEach((t) => t.classList.add('pending')));
+      const landed = new Map(); // target -> copies parked on it until the slot fills
+      const waiting = new Map(); // target -> moves still to land in it (several terms can merge into one)
+      groups.forEach((g) => g.targets.forEach((t) => { t.classList.add('pending'); waiting.set(t, (waiting.get(t) || 0) + 1); }));
+      // tagged terms that come from nowhere (results of the step) appear after the moves, not with the skeleton
+      const slots = [...waiting.keys()];
+      const fresh = [...newL.querySelectorAll('[data-t]')].filter((x) => !slots.some((t) => t === x || t.contains(x) || x.contains(t)));
+      fresh.forEach((x) => x.classList.add('pending'));
       newL.style.transition = 'opacity .3s'; newL.style.opacity = 1;
       await wait(450);
       for (const g of groups) {
         S.svg.querySelectorAll('.active').forEach((x) => x.classList.remove('active'));
         S.svg.querySelectorAll(`[data-mv="${CSS.escape(g.id)}"]`).forEach((x) => x.classList.add('active'));
-        g.clones.forEach(([w]) => inner.appendChild(w));
+        for (const [w, a, z] of g.clones) {
+          inner.appendChild(w);
+          // the copied term can sit offset inside its wrapper (KaTeX vertical alignment), so pin the term itself, not the wrapper
+          const o = w.firstChild.getBoundingClientRect(), ox = o.left - a.left, oy = o.top - a.top;
+          w.style.left = `${a.left - c.left - ox}px`; w.style.top = `${a.top - c.top - oy}px`;
+          const k = a.height ? z.height / a.height : 1;
+          w.dataset.tr = `translate(${z.left - a.left + ox - k * ox}px, ${z.top - a.top + oy - k * oy}px) scale(${k})`;
+        }
         g.e.classList.add('ghosted');
         await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-        g.clones.forEach(([w, tr]) => { w.style.transform = tr; });
+        g.clones.forEach(([w]) => { w.style.transform = w.dataset.tr; });
         await wait(SLIDE_MS + 50);
-        g.targets.forEach((t) => t.classList.remove('pending'));
-        g.clones.forEach(([w]) => w.remove());
+        g.clones.forEach(([w], j) => {
+          const t = g.targets[j];
+          landed.set(t, [...(landed.get(t) || []), w]);
+          waiting.set(t, waiting.get(t) - 1);
+          if (!waiting.get(t)) { t.classList.remove('pending'); landed.get(t).forEach((x) => x.remove()); }
+        });
         await wait(GAP_MS);
       }
       S.svg.querySelectorAll('.active').forEach((x) => x.classList.remove('active'));
+      if (fresh.length) {
+        fresh.forEach((x) => { x.style.transition = 'opacity .4s'; x.classList.remove('pending'); });
+        await wait(450);
+        fresh.forEach((x) => { x.style.transition = ''; });
+      }
       oldL.querySelectorAll('.ghosted').forEach((e) => e.classList.remove('ghosted'));
       newL.style.transition = '';
     } finally {
+      S.inner.querySelectorAll('.derive-clone').forEach((x) => x.remove());
+      S.newL.querySelectorAll('.pending').forEach((x) => x.classList.remove('pending'));
       S.inner.classList.remove('playing');
       busy = false;
     }
