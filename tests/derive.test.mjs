@@ -48,12 +48,16 @@ test('colourSlot: explicit colours win, otherwise order of first appearance', ()
 });
 
 function cubicPoints(d, n = 200) {
-  const m = d.match(/M([-\d.e]+),([-\d.e]+) C([-\d.e]+),([-\d.e]+) ([-\d.e]+),([-\d.e]+) ([-\d.e]+),([-\d.e]+)/).slice(1).map(Number);
-  const [x0, y0, x1, y1, x2, y2, x3, y3] = m;
+  const nums = d.match(/-?[\d.]+(e-?\d+)?/g).map(Number);
+  let p = [nums[0], nums[1]];
   const pts = [];
-  for (let i = 1; i < n; i++) {
-    const t = i / n, u = 1 - t;
-    pts.push([u ** 3 * x0 + 3 * u * u * t * x1 + 3 * u * t * t * x2 + t ** 3 * x3, u ** 3 * y0 + 3 * u * u * t * y1 + 3 * u * t * t * y2 + t ** 3 * y3]);
+  for (let k = 2; k + 5 < nums.length; k += 6) {
+    const [x1, y1, x2, y2, x3, y3] = nums.slice(k, k + 6);
+    for (let i = 1; i < n; i++) {
+      const t = i / n, u = 1 - t;
+      pts.push([u ** 3 * p[0] + 3 * u * u * t * x1 + 3 * u * t * t * x2 + t ** 3 * x3, u ** 3 * p[1] + 3 * u * u * t * y1 + 3 * u * t * t * y2 + t ** 3 * y3]);
+    }
+    p = [x3, y3];
   }
   return pts;
 }
@@ -135,4 +139,15 @@ test('colourSlot: still returns a slot when all 8 are pinned', () => {
   const all = { a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7, h: 8 };
   const s = colourSlot('z-1', all, []);
   assert.ok(Number.isInteger(s) && s >= 1 && s <= 8, String(s));
+});
+
+test('plan: map targets may be a single string', () => {
+  assert.deepEqual(plan(['L-1', 'R-1'], ['S-1'], { 'L-1': 'S-1', 'R-1': ['S-1'] }).moves, [{ id: 'L-1', targets: ['S-1'] }, { id: 'R-1', targets: ['S-1'] }]);
+});
+
+test('route: a source in a numerator leaves sideways instead of cutting through its denominator', () => {
+  const denom = { x: 95, y: 26, w: 30, h: 22 };
+  const r = route({ x: 100, y: 0, w: 20, h: 22 }, { x: 60, y: 130, w: 20, h: 20 }, [denom], { x: 40, y: 125, w: 200, h: 30 });
+  assert.equal(r.hits, 0);
+  assert.ok(cubicPoints(r.d).every((p) => !inside(p, denom)));
 });

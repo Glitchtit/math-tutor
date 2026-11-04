@@ -53,7 +53,7 @@ export function resolveSteps(block) {
 // moves: tags that travel to one or more new tags; cancelled: tags that vanish (and have no surviving descendant).
 export function plan(oldIds, newIds, map = {}, parentOf = {}) {
   const have = new Set(newIds);
-  const targets = (id) => (map[id] || [id]).filter((t) => have.has(t));
+  const targets = (id) => [].concat(map[id] ?? id).filter((t) => have.has(t)); // map values: id or [ids]
   const children = {};
   for (const id of oldIds) { const p = parentOf[id]; if (p) (children[p] ||= []).push(id); }
   const lives = (id) => targets(id).length > 0 || (children[id] || []).some(lives);
@@ -84,44 +84,66 @@ const bez = (p0, p1, p2, p3, t) => {
 const r1 = (v) => Math.round(v * 10) / 10;
 
 // Choose an arrow from src (old line) to dst (new line) that crosses the fewest obstacle boxes.
-// line: box of the new line, used for the "go around underneath / around the ends" candidates.
+// line: box of the new line. Candidates are one cubic (direct entries from the top, sides or below)
+// or two cubics through a waypoint beside the new line (for targets boxed in by other symbols).
 export function route(src, dst, obstacles, line) {
-  const p0 = [src.x + src.w / 2, src.y + src.h + 1];
   const zc = dst.x + dst.w / 2, zm = dst.y + dst.h / 2;
   const below = line.y + line.h + 26;
   const laneL = line.x - 30, laneR = line.x + line.w + 30;
-  const down = (y) => [p0[0], p0[1] + (y - p0[1]) * 0.55];
-  const cands = [
-    { side: 'top', end: [zc, dst.y - 2], c: (q) => [down(q[1]), [q[0], q[1] - (q[1] - p0[1]) * 0.55]], pen: 0 },
-    { side: 'left', end: [dst.x - 2, zm], c: (q) => [down(q[1]), [q[0] - 40, q[1]]], pen: 10 },
-    { side: 'right', end: [dst.x + dst.w + 2, zm], c: (q) => [down(q[1]), [q[0] + 40, q[1]]], pen: 10 },
-    { side: 'bottom', end: [zc, dst.y + dst.h + 2], c: (q) => [[p0[0], below], [q[0], below]], pen: 60 },
-    { side: 'bottom', end: [zc, dst.y + dst.h + 2], c: (q) => [[laneL, below], [q[0], below + 6]], pen: 110 },
-    { side: 'bottom', end: [zc, dst.y + dst.h + 2], c: (q) => [[laneR, below], [q[0], below + 6]], pen: 110 },
-    { side: 'left', end: [dst.x - 2, zm], c: (q) => [[laneL, p0[1] + 25], [laneL, q[1]]], pen: 110 },
-    { side: 'right', end: [dst.x + dst.w + 2, zm], c: (q) => [[laneR, p0[1] + 25], [laneR, q[1]]], pen: 110 },
+  const entry = {
+    top: [zc, dst.y - 2], left: [dst.x - 2, zm], right: [dst.x + dst.w + 2, zm], bottom: [zc, dst.y + dst.h + 2],
+  };
+  const starts = [
+    { p0: [src.x + src.w / 2, src.y + src.h + 1], dir: [0, 1], pen: 0 },
+    { p0: [src.x - 2, src.y + src.h / 2], dir: [-1, 0.2], pen: 30 },
+    { p0: [src.x + src.w + 2, src.y + src.h / 2], dir: [1, 0.2], pen: 30 },
   ];
+  const out = (st, k) => [st.p0[0] + st.dir[0] * k, st.p0[1] + st.dir[1] * k];
+  const cands = [];
+  for (const st of starts) {
+    const p0 = st.p0;
+    const drop = (y) => Math.max(30, (y - p0[1]) * 0.55);
+    // direct
+    cands.push({ side: 'top', pen: st.pen, segs: [[p0, out(st, drop(entry.top[1])), [zc, entry.top[1] - (entry.top[1] - p0[1]) * 0.55], entry.top]] });
+    cands.push({ side: 'left', pen: st.pen + 10, segs: [[p0, out(st, drop(zm)), [dst.x - 42, zm], entry.left]] });
+    cands.push({ side: 'right', pen: st.pen + 10, segs: [[p0, out(st, drop(zm)), [dst.x + dst.w + 42, zm], entry.right]] });
+    cands.push({ side: 'bottom', pen: st.pen + 60, segs: [[p0, st.dir[1] === 1 ? [p0[0], below] : out(st, 40), [zc, below], entry.bottom]] });
+    // through a waypoint beside the new line, in the gap above it
+    for (const lane of [laneL, laneR]) {
+      const w = [lane, line.y - 10];
+      const toW = [p0, out(st, drop(w[1])), [lane, w[1] - 24], w];
+      const sgn = lane < zc ? -1 : 1;
+      cands.push({ side: 'bottom', pen: st.pen + 90, segs: [toW, [w, [lane, below], [zc, below + 6], entry.bottom]] });
+      cands.push({ side: sgn < 0 ? 'left' : 'right', pen: st.pen + 90, segs: [toW, [w, [lane, zm], [entry[sgn < 0 ? 'left' : 'right'][0] + sgn * 30, zm], entry[sgn < 0 ? 'left' : 'right']]] });
+    }
+  }
   let best = null;
   const scores = [];
   for (const cd of cands) {
-    const [p1, p2] = cd.c(cd.end);
-    let hits = 0, len = 0, prev = p0;
-    for (let i = 1; i <= 80; i++) {
-      const pt = bez(p0, p1, p2, cd.end, i / 80);
-      len += Math.hypot(pt[0] - prev[0], pt[1] - prev[1]);
-      prev = pt;
-      const [x, y] = pt;
-      if (i >= 3 && i <= 77 && obstacles.some((b) => x > b.x && x < b.x + b.w && y > b.y && y < b.y + b.h)) hits++;
-    }
+    let hits = 0, len = 0;
+    const n = 80 * cd.segs.length;
+    cd.segs.forEach((sg, k) => {
+      let prev = sg[0];
+      for (let i = 1; i <= 80; i++) {
+        const pt = bez(sg[0], sg[1], sg[2], sg[3], i / 80);
+        len += Math.hypot(pt[0] - prev[0], pt[1] - prev[1]);
+        prev = pt;
+        const g = k * 80 + i; // skip the very start and end, which touch source and target
+        if (g >= 3 && g <= n - 3 && obstacles.some((b) => pt[0] > b.x && pt[0] < b.x + b.w && pt[1] > b.y && pt[1] < b.y + b.h)) hits++;
+      }
+    });
     // drawn curve length, not chord length: a wide loop must lose to a short detour
     const score = hits * 1000 + len + cd.pen;
     scores.push([cd.side, hits, Math.round(score)]);
-    if (!best || score < best.score) best = { score, hits, p1, p2, end: cd.end, side: cd.side };
+    if (!best || score < best.score) best = { ...cd, score, hits };
   }
   // pull the drawn end back so the arrowhead tip lands on the target edge
-  const { p1, p2, end } = best;
-  const dx = end[0] - p2[0], dy = end[1] - p2[1], L = Math.hypot(dx, dy) || 1;
-  const tip = [end[0] - (dx / L) * 6, end[1] - (dy / L) * 6];
-  const d = `M${r1(p0[0])},${r1(p0[1])} C${r1(p1[0])},${r1(p1[1])} ${r1(p2[0])},${r1(p2[1])} ${r1(tip[0])},${r1(tip[1])}`;
-  return { d, start: p0, end, side: best.side, hits: best.hits, scores };
+  const segs = best.segs.map((sg) => sg.slice());
+  const last = segs[segs.length - 1];
+  const end = last[3], c2 = last[2];
+  const dx = end[0] - c2[0], dy = end[1] - c2[1], L = Math.hypot(dx, dy) || 1;
+  last[3] = [end[0] - (dx / L) * 6, end[1] - (dy / L) * 6];
+  const P = (q) => `${r1(q[0])},${r1(q[1])}`;
+  const d = `M${P(segs[0][0])} ` + segs.map((sg) => `C${P(sg[1])} ${P(sg[2])} ${P(sg[3])}`).join(' ');
+  return { d, start: segs[0][0], end, side: best.side, hits: best.hits, scores, tangentFrom: c2 };
 }

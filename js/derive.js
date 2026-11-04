@@ -101,7 +101,7 @@ export function renderDerive(b) {
     if (!lineInk.length) return;
     const lx = Math.min(...lineInk.map((r) => r.x)), ly = Math.min(...lineInk.map((r) => r.y));
     const lineBox = { x: lx, y: ly, w: Math.max(...lineInk.map((r) => r.x + r.w)) - lx, h: Math.max(...lineInk.map((r) => r.y + r.h)) - ly };
-    let k = 0;
+    const labels = [];
     for (const mv of S.moves) {
       if (!(mv.id in (st.arrows || {}))) continue;
       const srcEl = S.oldL.querySelector(`[data-t="${CSS.escape(mv.id)}"]`);
@@ -125,28 +125,28 @@ export function renderDerive(b) {
         if (window.__deriveDebug) path.dataset.scores = JSON.stringify(rt.scores);
         svg.appendChild(path);
         // arrowhead along the final tangent
-        const m = rt.d.match(/C[^ ]+ ([-\d.]+),([-\d.]+) ([-\d.]+),([-\d.]+)$/);
-        const [cx, cy, ex, ey] = m ? m.slice(1).map(Number) : [rt.end[0], rt.end[1] - 1, rt.end[0], rt.end[1]];
         const tx = rt.end[0], ty = rt.end[1];
-        const ang = Math.atan2(ty - cy, tx - cx) || Math.atan2(ey - cy, ex - cx);
+        const ang = Math.atan2(ty - rt.tangentFrom[1], tx - rt.tangentFrom[0]);
         const head = document.createElementNS(SVG, 'path');
         const a1 = ang + Math.PI * 0.85, a2 = ang - Math.PI * 0.85;
         head.setAttribute('d', `M${tx},${ty} L${tx + 9 * Math.cos(a1)},${ty + 9 * Math.sin(a1)} L${tx + 9 * Math.cos(a2)},${ty + 9 * Math.sin(a2)} Z`);
         head.setAttribute('class', `derive-head-tip ${slot}`);
         svg.appendChild(head);
         const label = st.arrows[mv.id];
-        if (label && j === 0) {
-          const left = rt.end[0] < rt.start[0] - 4;
-          const text = document.createElementNS(SVG, 'text');
-          text.setAttribute('x', rt.start[0] + (left ? -10 : 10));
-          text.setAttribute('y', rt.start[1] + 16 + 20 * k++);
-          text.setAttribute('text-anchor', left ? 'end' : 'start');
-          text.setAttribute('class', `derive-lbl ${slot}`);
-          text.textContent = label;
-          svg.appendChild(text);
-        }
+        if (label && j === 0) labels.push({ label, slot, start: rt.start, left: rt.end[0] < rt.start[0] - 4 });
       });
     }
+    // stack labels from one baseline under the lowest arrow start, so neighbouring labels never overlap
+    const base = Math.max(0, ...labels.map((l) => l.start[1]));
+    labels.forEach((l, k) => {
+      const text = document.createElementNS(SVG, 'text');
+      text.setAttribute('x', l.start[0] + (l.left ? -10 : 10));
+      text.setAttribute('y', base + 16 + 18 * k);
+      text.setAttribute('text-anchor', l.left ? 'end' : 'start');
+      text.setAttribute('class', `derive-lbl ${l.slot}`);
+      text.textContent = l.label;
+      svg.appendChild(text);
+    });
   }
 
   async function playStep(S) {
