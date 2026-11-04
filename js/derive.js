@@ -67,8 +67,8 @@ export function renderDerive(b) {
     const oldTags = [...oldL.querySelectorAll('[data-t]')];
     const newTags = [...newL.querySelectorAll('[data-t]')];
     const p = plan(oldTags.map((t) => t.dataset.t), newTags.map((t) => t.dataset.t), st.map || {}, tagParents(st.from));
-    // in evaluation steps a vanishing term was computed, not cancelled: fade it instead of striking it out
-    const evaluated = kind === 'calc' || kind === 'calculus';
+    // in substitution/evaluation steps a vanishing term was replaced or computed, not cancelled: fade it instead of striking it out
+    const evaluated = ['calc', 'calculus', 'sub', 'check'].includes(kind);
     for (const id of p.cancelled) oldL.querySelector(`[data-t="${CSS.escape(id)}"]`)?.classList.add(evaluated ? 'faded' : 'gone');
     const S = { st, li, inner, oldL, newL, svg, moves: p.moves, play };
     play.onclick = () => playStep(S);
