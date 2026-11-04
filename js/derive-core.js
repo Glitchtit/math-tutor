@@ -71,7 +71,9 @@ export function colourSlot(id, colors = {}, seen = []) {
   if (colors[p]) return colors[p];
   if (!seen.includes(p)) seen.push(p);
   const used = new Set(Object.values(colors));
-  const free = [1, 2, 3, 4, 5, 6, 7, 8].filter((n) => !used.has(n));
+  const all = [1, 2, 3, 4, 5, 6, 7, 8];
+  const free = all.filter((n) => !used.has(n));
+  if (!free.length) return all[seen.indexOf(p) % all.length]; // every slot pinned: share colours
   return free[seen.indexOf(p) % free.length];
 }
 

@@ -130,3 +130,9 @@ test('validator: practice blocks', () => {
   assert.deepEqual(issuesOf([{ type: 'reveal', prompt: 'Draw it', blocks: [{ type: 'widget', name: 'pefig', config: { fig: 'wfBuck' } }], checklist: ['$v_L$ is a rectangle'] }]), []);
   assert.ok(issuesOf([{ type: 'widget', name: 'pefig', config: { fig: 'nope' } }]).some((s) => /unknown pefig/.test(s)));
 });
+
+test('colourSlot: still returns a slot when all 8 are pinned', () => {
+  const all = { a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7, h: 8 };
+  const s = colourSlot('z-1', all, []);
+  assert.ok(Number.isInteger(s) && s >= 1 && s <= 8, String(s));
+});
