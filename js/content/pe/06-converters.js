@@ -206,6 +206,12 @@ export default {
             from: String.raw`I_o\,R=V_o`, to: String.raw`2\cdot 4.8=9.6\text{ V}\ \checkmark`,
             why: String.raw`The load current times the load resistance gives back the output voltage.` },
         ] },
+        { type: 'guided', title: 'Your turn: buck output and currents', problem: String.raw`An ideal buck converter runs from $V_s=20$ V at $D=0.35$ and feeds a $3.5\ \Omega$ load. Find $V_o$, $I_o$ and $I_L$, the same way as the two numbers blocks above.`, steps: [
+          { prompt: String.raw`<b>Output voltage.</b> $V_o=DV_s$. Find $V_o$ in V.`, ask: { kind: 'numeric', answer: '7', label: 'Vo =' }, hint: String.raw`$0.35\cdot20$: a third of 20 is about 7, and $0.35\cdot20=7$ exactly.`, reveal: String.raw`$V_o=0.35\cdot20=7$ V.` },
+          { prompt: '<b>Check with volt-second balance:</b>', show: String.raw`$(20-7)\cdot0.35+(-7)\cdot0.65=4.55-4.55=0\ \checkmark$`, why: 'The on-area and off-area of the inductor voltage cancel, so 7 V is right.' },
+          { prompt: String.raw`<b>Load current.</b> Ohm's law on the load: $I_o$ in A.`, ask: { kind: 'numeric', answer: '2', label: 'Io =' }, hint: String.raw`$I_o=\frac{V_o}{R}=\frac{7}{3.5}$.`, reveal: String.raw`$I_o=\frac{7}{3.5}=2$ A.` },
+          { prompt: String.raw`<b>Inductor current.</b> Average $I_L$ in A.`, ask: { kind: 'numeric', answer: '2', label: 'IL =' }, hint: String.raw`Amp-second balance for a buck gives $I_L=I_o$.`, reveal: String.raw`$I_L=I_o=2$ A: the inductor carries the whole average load current.` },
+        ], finale: String.raw`Voltage from volt-second balance ($V_o=DV_s$), load current from Ohm's law, inductor current from amp-second balance ($I_L=I_o$).` },
         { type: 'callout', kind: 'note', title: 'Beyond the slides', html: String.raw`<p><strong>Power check and ripple (buck).</strong> Input current flows only while S is on, so $I_s=DI_L$. An ideal lossless converter must have $P_{in}=P_{out}$. Inductor ripple (peak-to-peak) follows from the constant current slope during the on-time. Larger $L$ or higher $f_s$ gives smaller ripple.</p>` },
         { type: 'derive', symbolic: true, title: 'Buck power check', colors: { ...COL, Is: 8 }, steps: [
           { kind: 'sub', label: String.raw`Input: $I_s=DI_L$`,
@@ -254,6 +260,13 @@ export default {
             from: String.raw`\Delta i_L=\frac{V_o\,(1-D)\,T_s}{L}`, to: String.raw`\Delta i_L=\frac{9.6\cdot 0.6\cdot 10}{100}=0.576\text{ A}\ \checkmark`,
             why: String.raw`During the off-time $v_L=-V_o$ for $(1-D)T_s$. In steady state the current must fall by exactly what it rose.` },
         ] },
+        { type: 'guided', title: 'Your turn: size a buck from its load power', problem: String.raw`An ideal buck converter turns $V_s=30$ V into $V_o=12$ V for a 36 W load, switching at $f_s=100$ kHz. The inductor ripple may be at most $\Delta i_L=0.6$ A. Find $D$, $I_L$, $I_s$ and the smallest $L$.`, steps: [
+          { prompt: String.raw`<b>Duty cycle.</b> $D=V_o/V_s$.`, ask: { kind: 'numeric', answer: '0.4', label: 'D =' }, hint: String.raw`$\frac{12}{30}$; divide top and bottom by 6.`, reveal: String.raw`$D=\frac{12}{30}=0.4$.` },
+          { prompt: String.raw`<b>Inductor current from the power.</b> $P=V_oI_o$ gives $I_o$; in a buck $I_L=I_o$. $I_L$ in A:`, ask: { kind: 'numeric', answer: '3', label: 'IL =' }, hint: String.raw`Divide both sides of $P=V_oI_o$ by $V_o$: $I_o=\frac{36}{12}$.`, reveal: String.raw`$I_o=\frac{36}{12}=3$ A, so $I_L=3$ A.` },
+          { prompt: String.raw`<b>Source current.</b> $I_s=DI_L$, in A:`, ask: { kind: 'numeric', answer: '1.2', label: 'Is =' }, hint: String.raw`The source delivers $I_L$ only during the on-time: $0.4\cdot3$.`, reveal: String.raw`$I_s=0.4\cdot3=1.2$ A. Power check: $30\cdot1.2=36$ W ✓.` },
+          { prompt: String.raw`<b>Rearrange the ripple formula</b> for $L$ (both sides $\times L$, then $\div\Delta i_L$):`, show: String.raw`$\Delta i_L=\dfrac{(V_s-V_o)DT_s}{L}\;\Rightarrow\;L=\dfrac{(V_s-V_o)DT_s}{\Delta i_L}$`, why: String.raw`$L$ sits in the denominator; multiplying by $L$ brings it up, dividing by $\Delta i_L$ leaves it alone.` },
+          { prompt: String.raw`<b>Put the numbers in.</b> $T_s=1/f_s=10\ \mu$s. Smallest $L$ in µH:`, ask: { kind: 'numeric', answer: '120', label: 'L (µH) =' }, hint: String.raw`$V_s-V_o=18$ V; $18\cdot0.4\cdot10=72$ V·µs; divide by 0.6 A.`, reveal: String.raw`$L=\frac{18\cdot0.4\cdot10\ \mu\text{s}}{0.6\text{ A}}=\frac{72}{0.6}=120\ \mu$H.` },
+        ], finale: 'Gain → duty cycle, power → current, rearranged ripple formula → inductor. The largest allowed ripple gives the smallest inductor.' },
         { type: 'quiz', question: "In the buck converter's off-state", choices: ['The switch conducts and the diode blocks', String.raw`The diode conducts and $v_L=-V_o$`, 'The capacitor is disconnected', String.raw`$v_L=V_s-V_o$`], answer: 1, explain: 'Inductor current freewheels through the diode; the inductor sees the output voltage reversed.' },
         { type: 'quiz', question: String.raw`A buck converter has $V_s=24$ V and $D=0.5$. $V_o$ is`, choices: ['48 V', '24 V', '12 V', '6 V'], answer: 2, explain: String.raw`$V_o=DV_s=0.5\cdot24=12$ V.` },
       ],
@@ -443,6 +456,13 @@ export default {
             from: String.raw`V_s\,D+V_o\,(1-D)=0`, to: String.raw`12\cdot 0.6+(-18)\cdot 0.4=7.2-7.2=0\ \checkmark`,
             why: String.raw`The two inductor-voltage areas cancel, so $-18$ V is right.` },
         ] },
+        { type: 'guided', title: 'Your turn: boost duty cycle and inductor current', problem: String.raw`An ideal boost converter must make $V_o=75$ V from $V_s=15$ V and feeds a $25\ \Omega$ load. Find $D$, then $I_o$ and $I_L$, as in the 12 V → 30 V numbers blocks.`, steps: [
+          { prompt: String.raw`<b>Voltage ratio.</b> $\dfrac{V_o}{V_s}=\dfrac{1}{1-D}$. First compute $\dfrac{V_o}{V_s}$.`, ask: { kind: 'numeric', answer: '5', label: 'Vo/Vs =' }, hint: String.raw`$\frac{75}{15}$.`, reveal: String.raw`$\frac{75}{15}=5=\frac{1}{1-D}$.` },
+          { prompt: String.raw`<b>Free the bracket.</b> Multiply both sides by $(1-D)$, then divide both sides by 5. What is $1-D$?`, ask: { kind: 'numeric', answer: '0.2', label: '1 − D =' }, hint: String.raw`$5\,(1-D)=1$, so $1-D=\frac15$.`, reveal: String.raw`$5\,(1-D)=1\;\Rightarrow\;1-D=\frac15=0.2$.` },
+          { prompt: String.raw`<b>Duty cycle.</b> $D$ = ?`, ask: { kind: 'numeric', answer: '0.8', label: 'D =' }, hint: String.raw`Add $D$ and subtract $0.2$ on both sides: $D=1-0.2$.`, reveal: String.raw`$D=1-0.2=0.8$. Check: $\frac{15}{1-0.8}=\frac{15}{0.2}=75$ V ✓.` },
+          { prompt: String.raw`<b>Load current</b> from Ohm's law, in A:`, ask: { kind: 'numeric', answer: '3', label: 'Io =' }, hint: String.raw`$I_o=\frac{75}{25}$.`, reveal: String.raw`$I_o=\frac{75}{25}=3$ A.` },
+          { prompt: String.raw`<b>Inductor current.</b> $I_L=\dfrac{I_o}{1-D}$, in A:`, ask: { kind: 'numeric', answer: '15', label: 'IL =' }, hint: String.raw`$\frac{3}{0.2}$: dividing by $\frac15$ is multiplying by 5.`, reveal: String.raw`$I_L=\frac{3}{0.2}=15$ A. Power check ($I_s=I_L$): $15\cdot15=225$ W $=75\cdot3$ ✓.` },
+        ], finale: 'The input current is 5 times the load current, the same factor as the voltage gain.' },
         { type: 'quiz', question: "In the boost converter's on-state, the capacitor current is", choices: [String.raw`$-I_o$: the capacitor alone feeds the load`, String.raw`$I_L-I_o$`, 'Zero', String.raw`$I_L$`], answer: 0, explain: 'The closed switch shorts the inductor end to ground and the diode blocks, isolating the output.' },
         { type: 'quiz', question: String.raw`For a boost converter, $I_o=I_L(1-D)$. With $D=0.75$ and $I_o=2$ A, the inductor current is`, choices: ['0.5 A', '1.5 A', '8 A', '2.67 A'], answer: 2, explain: String.raw`$I_L=I_o/(1-D)=2/0.25=8$ A.` },
       ],
@@ -469,10 +489,13 @@ export default {
   assignments: [
     {
       id: 'a1', title: 'Problem 1 — Buck converter from 36 V', difficulty: 'core',
+      examples: ['buck'],
       statement: String.raw`<p>An ideal buck converter supplies $V_o=9$ V to a $3\ \Omega$ load from $V_s=36$ V. Assume steady state and small ripple.</p>`,
       parts: [
-        { label: '(a)', prompt: 'Duty cycle $D$', kind: 'numeric', answer: '0.25', hint: String.raw`Buck: $V_o/V_s=D$.`,
-          solution: [
+        { label: '(a)', prompt: 'Duty cycle $D$', kind: 'numeric', answer: '0.25',
+          hints: ['Which converter is it, and which formula links its two voltages to D?', String.raw`Buck: $V_o/V_s=D$.`, String.raw`$D=\frac{9}{36}$.`],
+          solution: String.raw`$D=V_o/V_s=9/36=0.25$.`,
+          walkthrough: [
             { type: 'text', html: '<p>We put the voltages into the buck gain and read off $D$.</p>' },
             { type: 'derive', steps: [
               { kind: 'sub', label: 'Put the values into $V_o/V_s=D$', from: String.raw`\frac{\T{Vo-x}{V_o}}{\T{Vs-x}{V_s}}=D\qquad V_o=\T{Vo-1}{9},\ V_s=\T{Vs-1}{36}`, to: String.raw`\frac{\T{Vo-1}{9}}{\T{Vs-1}{36}}=D`, arrows: { 'Vo-1': '', 'Vs-1': '' }, why: 'Both in volts; the units cancel.' },
@@ -481,7 +504,9 @@ export default {
             ] },
           ] },
         { label: '(b)', prompt: 'Load current $I_o$ in A', kind: 'numeric', answer: '3',
-          solution: [
+          hints: ['The load is a plain resistor across the output.', String.raw`Ohm's law: $I_o=V_o/R$.`, String.raw`$I_o=\frac{9}{3}$.`],
+          solution: String.raw`$I_o=V_o/R=9/3=3$ A.`,
+          walkthrough: [
             { type: 'text', html: "<p>We apply Ohm's law to the load.</p>" },
             { type: 'derive', steps: [
               { kind: 'sub', label: 'Put the values into $I_o=V_o/R$', from: String.raw`I_o=\frac{\T{Vo-x}{V_o}}{\T{R-x}{R}}\qquad V_o=\T{Vo-1}{9},\ R=\T{R-1}{3}`, to: String.raw`I_o=\frac{\T{Vo-1}{9}}{\T{R-1}{3}}`, arrows: { 'Vo-1': '', 'R-1': '' }, why: 'The load is a resistor across the output.' },
@@ -490,15 +515,19 @@ export default {
             ] },
           ] },
         { label: '(c)', prompt: 'Average inductor current $I_L$ in A', kind: 'numeric', answer: '3',
-          solution: [
+          hints: ['Amp-second balance on the capacitor links $I_L$ and $I_o$.', String.raw`Buck: $I_L=I_o$ (the capacitor carries only ripple).`, String.raw`$I_L=I_o$ from (b).`],
+          solution: String.raw`Buck: $I_L=I_o=3$ A.`,
+          walkthrough: [
             { type: 'text', html: '<p>We use the buck amp-second result.</p>' },
             { type: 'derive', steps: [
               { kind: 'sub', label: String.raw`Buck: $I_L=I_o$`, from: String.raw`I_L=\T{Io-1}{I_o}`, to: String.raw`I_L=\T{Io-1}{3}\text{ A}`, arrows: { 'Io-1': 'Io = 3 A' }, why: 'Amp-second balance on the capacitor gives $I_L=I_o$ in a buck.' },
               { kind: 'check', label: 'Check with the capacitor current', from: String.raw`i_C=I_L-I_o`, to: String.raw`i_C=3-3=0\text{ A on average}\ \checkmark`, why: 'The capacitor carries only ripple, so its average current is zero.' },
             ] },
           ] },
-        { label: '(d)', prompt: 'Average input current $I_s$ in A', kind: 'numeric', answer: '0.75', hint: 'The source supplies current only while the switch is on.',
-          solution: [
+        { label: '(d)', prompt: 'Average input current $I_s$ in A', kind: 'numeric', answer: '0.75',
+          hints: ['The source supplies current only while the switch is on.', String.raw`So the average source current is $I_s=DI_L$.`, String.raw`$I_s=0.25\cdot3$; check with $V_sI_s=V_oI_o$.`],
+          solution: String.raw`$I_s=DI_L=0.25\cdot3=0.75$ A.`,
+          walkthrough: [
             { type: 'text', html: '<p>The source delivers $I_L$ only during the on-time, so we scale it by $D$, then check with the power balance.</p>' },
             { type: 'derive', steps: [
               { kind: 'sub', label: String.raw`Put the values into $I_s=DI_L$`, from: String.raw`I_s=\T{D-x}{D}\,\T{IL-x}{I_L}\qquad D=\T{D-1}{0.25},\ I_L=\T{IL-1}{3}`, to: String.raw`I_s=\T{D-1}{0.25}\cdot\T{IL-1}{3}`, arrows: { 'D-1': '', 'IL-1': '' }, why: 'Average of a current that flows a fraction $D$ of the time.' },
@@ -510,10 +539,13 @@ export default {
     },
     {
       id: 'a2', title: 'Problem 2 — Boost converter from 18 V to 72 V', difficulty: 'core',
+      examples: ['boost'],
       statement: String.raw`<p>An ideal boost converter raises $V_s=18$ V to $V_o=72$ V and feeds a $24\ \Omega$ load. Assume steady state and small ripple.</p>`,
       parts: [
-        { label: '(a)', prompt: 'Duty cycle $D$', kind: 'numeric', answer: '0.75', hint: String.raw`Boost: $V_o/V_s=1/(1-D)$.`,
-          solution: [
+        { label: '(a)', prompt: 'Duty cycle $D$', kind: 'numeric', answer: '0.75',
+          hints: [String.raw`The output is higher than the input: which converter, which gain?`, String.raw`Boost: $V_o/V_s=1/(1-D)$. Compute the ratio first, then free $D$ one operation at a time.`, String.raw`$\frac{72}{18}=4=\frac{1}{1-D}$, so $1-D=\frac14$.`],
+          solution: String.raw`$\frac{72}{18}=4=\frac{1}{1-D}$, so $1-D=0.25$ and $D=0.75$.`,
+          walkthrough: [
             { type: 'text', html: '<p>We put the voltages into the boost gain and solve for $D$, one operation at a time.</p>' },
             { type: 'derive', colors: { ...COL, n: 8 }, steps: [
               { kind: 'sub', label: 'Put the values into the gain', from: String.raw`\frac{\T{Vo-x}{V_o}}{\T{Vs-x}{V_s}}=\frac{1}{1-D}\qquad V_o=\T{Vo-1}{72},\ V_s=\T{Vs-1}{18}`, to: String.raw`\frac{\T{Vo-1}{72}}{\T{Vs-1}{18}}=\frac{1}{1-D}`, arrows: { 'Vo-1': '', 'Vs-1': '' }, why: 'Both in volts; the units cancel.' },
@@ -525,7 +557,9 @@ export default {
             ] },
           ] },
         { label: '(b)', prompt: 'Load current $I_o$ in A', kind: 'numeric', answer: '3',
-          solution: [
+          hints: ['The load is a plain resistor across the output.', String.raw`Ohm's law: $I_o=V_o/R$.`, String.raw`$I_o=\frac{72}{24}$.`],
+          solution: String.raw`$I_o=V_o/R=72/24=3$ A.`,
+          walkthrough: [
             { type: 'text', html: "<p>We apply Ohm's law to the load.</p>" },
             { type: 'derive', steps: [
               { kind: 'sub', label: 'Put the values into $I_o=V_o/R$', from: String.raw`I_o=\frac{\T{Vo-x}{V_o}}{\T{R-x}{R}}\qquad V_o=\T{Vo-1}{72},\ R=\T{R-1}{24}`, to: String.raw`I_o=\frac{\T{Vo-1}{72}}{\T{R-1}{24}}`, arrows: { 'Vo-1': '', 'R-1': '' }, why: 'The load is a resistor across the output.' },
@@ -533,8 +567,10 @@ export default {
               { kind: 'check', label: 'Put the answer back in', from: String.raw`V_o=I_oR`, to: String.raw`V_o=3\cdot24=72\text{ V}\ \checkmark`, why: 'Recovers the output voltage.' },
             ] },
           ] },
-        { label: '(c)', prompt: 'Average inductor current $I_L$ in A', kind: 'numeric', answer: '12', hint: String.raw`Boost: $I_o=I_L(1-D)$.`,
-          solution: [
+        { label: '(c)', prompt: 'Average inductor current $I_L$ in A', kind: 'numeric', answer: '12',
+          hints: ['In a boost the inductor current is larger than the load current. By what factor?', String.raw`Boost: $I_o=I_L(1-D)$, so $I_L=\frac{I_o}{1-D}$.`, String.raw`$I_L=\frac{3}{0.25}$.`],
+          solution: String.raw`$I_L=\frac{I_o}{1-D}=\frac{3}{0.25}=12$ A.`,
+          walkthrough: [
             { type: 'text', html: '<p>We rearrange the boost current result for $I_L$, put the numbers in, and check with the power balance.</p>' },
             { type: 'derive', steps: [
               { kind: 'both', label: String.raw`Both sides $\div(1-D)$`, from: String.raw`\T{Io-1}{I_o}=\T{IL-1}{I_L}\,\T{omd-1}{(1-D)}`, to: String.raw`\T{IL-1}{I_L}=\frac{\T{Io-1}{I_o}}{\T{omd-1}{1-D}}`, arrows: { 'omd-1': '÷(1−D)', 'IL-1': 'swap sides' }, why: 'Dividing both sides by $(1-D)$ leaves $I_L$ alone.' },
@@ -547,10 +583,13 @@ export default {
     },
     {
       id: 'a3', title: 'Problem 3 — Design a 48 V → 12 V, 60 W buck', difficulty: 'exam',
+      examples: ['buck'],
       statement: String.raw`<p>A 48 V battery must supply a 12 V, 60 W load through an ideal buck converter switching at $f_s=50$ kHz. The peak-to-peak inductor ripple must not exceed $\Delta i_L=1$ A. Use $\Delta i_L=\frac{(V_s-V_o)DT_s}{L}$.</p>`,
       parts: [
         { label: '(a)', prompt: 'Duty cycle $D$', kind: 'numeric', answer: '0.25',
-          solution: [
+          hints: ['A buck: which formula links the two voltages to D?', String.raw`Buck: $D=V_o/V_s$.`, String.raw`$D=\frac{12}{48}$.`],
+          solution: String.raw`$D=V_o/V_s=12/48=0.25$.`,
+          walkthrough: [
             { type: 'text', html: '<p>We use the buck gain $V_o/V_s=D$.</p>' },
             { type: 'derive', steps: [
               { kind: 'sub', label: 'Put the values in', from: String.raw`D=\frac{\T{Vo-x}{V_o}}{\T{Vs-x}{V_s}}\qquad V_o=\T{Vo-1}{12},\ V_s=\T{Vs-1}{48}`, to: String.raw`D=\frac{\T{Vo-1}{12}}{\T{Vs-1}{48}}=0.25`, arrows: { 'Vo-1': '', 'Vs-1': '' }, why: '$12/48=1/4$.' },
@@ -558,7 +597,9 @@ export default {
             ] },
           ] },
         { label: '(b)', prompt: 'Average inductor current $I_L$ in A', kind: 'numeric', answer: '5',
-          solution: [
+          hints: ['You know the load power and voltage. What gives the load current?', String.raw`$P=V_oI_o$, so $I_o=P/V_o$; in a buck $I_L=I_o$.`, String.raw`$I_o=\frac{60}{12}$.`],
+          solution: String.raw`$I_L=I_o=P/V_o=60/12=5$ A.`,
+          walkthrough: [
             { type: 'text', html: '<p>We get the load current from the power, then use $I_L=I_o$ for a buck.</p>' },
             { type: 'derive', steps: [
               { kind: 'both', label: String.raw`Both sides $\div V_o$`, from: String.raw`P=\T{Vo-1}{V_o}\,I_o`, to: String.raw`I_o=\frac{P}{\T{Vo-1}{V_o}}`, arrows: { 'Vo-1': '÷Vo' }, why: 'Dividing $P=V_oI_o$ by $V_o$ leaves $I_o$ alone.' },
@@ -567,15 +608,19 @@ export default {
             ] },
           ] },
         { label: '(c)', prompt: 'Average battery current $I_s$ in A', kind: 'numeric', answer: '1.25',
-          solution: [
+          hints: ['The battery supplies current only while the switch is on.', String.raw`$I_s=DI_L$ (or from power balance $V_sI_s=P$).`, String.raw`$I_s=0.25\cdot5$.`],
+          solution: String.raw`$I_s=DI_L=0.25\cdot5=1.25$ A.`,
+          walkthrough: [
             { type: 'text', html: '<p>The battery delivers $I_L$ only during the on-time.</p>' },
             { type: 'derive', steps: [
               { kind: 'sub', label: String.raw`Put the values into $I_s=DI_L$`, from: String.raw`I_s=\T{D-x}{D}\,\T{IL-x}{I_L}\qquad D=\T{D-1}{0.25},\ I_L=\T{IL-1}{5}`, to: String.raw`I_s=\T{D-1}{0.25}\cdot\T{IL-1}{5}=1.25\text{ A}`, arrows: { 'D-1': '', 'IL-1': '' }, why: 'Average of a current that flows a quarter of the time.' },
               { kind: 'check', label: 'Power balance', from: String.raw`V_sI_s=P`, to: String.raw`48\cdot1.25=60\text{ W}\ \checkmark`, why: 'An ideal converter loses no power.' },
             ] },
           ] },
-        { label: '(d)', prompt: 'Minimum inductance $L$ in µH', kind: 'numeric', answer: '180', hint: String.raw`Rearrange the ripple formula for $L$; $T_s=1/f_s$.`,
-          solution: [
+        { label: '(d)', prompt: 'Minimum inductance $L$ in µH', kind: 'numeric', answer: '180',
+          hints: [String.raw`$L$ sits in the denominator of the ripple formula. Free it first, then put the numbers in.`, String.raw`Rearrange to $L=\frac{(V_s-V_o)DT_s}{\Delta i_L}$; $T_s=1/f_s$.`, String.raw`$T_s=\frac{1}{50\text{ kHz}}=20\ \mu$s, so $L=\frac{36\cdot0.25\cdot20\ \mu\text{s}}{1\text{ A}}$.`],
+          solution: String.raw`$L=\frac{(V_s-V_o)DT_s}{\Delta i_L}=\frac{36\cdot0.25\cdot20\ \mu\text{s}}{1\text{ A}}=180\ \mu$H.`,
+          walkthrough: [
             { type: 'text', html: '<p>We rearrange the ripple formula for $L$ in symbols first, then put the numbers in. The largest allowed ripple gives the smallest inductor.</p>' },
             { type: 'derive', colors: { ...COLR, di: 8 }, steps: [
               { kind: 'both', label: String.raw`Both sides $\times L$`, from: String.raw`\T{di-1}{\Delta i_L}=\frac{(V_s-V_o)\,D\,T_s}{\T{L-1}{L}}`, to: String.raw`\T{L-1}{L}\,\T{di-1}{\Delta i_L}=(V_s-V_o)\,D\,T_s`, arrows: { 'L-1': '× L on both sides' }, why: 'Multiplying by $L$ removes it from the denominator on the right.' },

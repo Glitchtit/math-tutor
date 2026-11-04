@@ -135,6 +135,13 @@ export default {
             to: String.raw`100=64+16+20\text{ V}\ \checkmark`,
             why: String.raw`The three drops in loop 2 add up to the source voltage, so the currents are right.` },
         ] },
+        { type: 'guided', title: 'Your turn: the slide-31 circuit with new sources', problem: String.raw`Same circuit and arrows as slide 31 ($R_1=10\ \Omega$, $R_2=5\ \Omega$, $R_3=20\ \Omega$), but now $V_1=30$ V and $V_2=80$ V. Find $I_3$, $I_2$ and $I_1$ in the same order as the worked example: the equation with the fewest unknowns first.`, steps: [
+          { prompt: String.raw`<b>Loop 1</b> reads $V_1-R_1I_3=0$, here $30-10\,I_3=0$. Solve it: $I_3$ in A.`, ask: { kind: 'numeric', answer: '3', label: 'I3 =' }, hint: String.raw`Add $10I_3$ to both sides, then divide both sides by $10$.`, reveal: String.raw`$30=10\,I_3\;\Rightarrow\;I_3=\frac{30}{10}=3$ A.` },
+          { prompt: String.raw`<b>Loop 2</b> with the values and $I_3=3$ A put in:`, show: String.raw`$80-20\,I_2-5\,I_2-10\cdot3=0$`, why: String.raw`Same loop as equation (3); only $V_2$ changed. Now only $I_2$ is unknown.` },
+          { prompt: String.raw`Collect like terms and solve for $I_2$ in A.`, ask: { kind: 'numeric', answer: '2', label: 'I2 =' }, hint: String.raw`Numbers: $80-30=50$. $I_2$-terms: $-20I_2-5I_2=-25I_2$. So $50-25I_2=0$.`, reveal: String.raw`$50-25\,I_2=0\;\Rightarrow\;50=25\,I_2\;\Rightarrow\;I_2=\frac{50}{25}=2$ A.` },
+          { prompt: String.raw`<b>Node B</b>: $I_1+I_2=I_3$. Find $I_1$ in A.`, ask: { kind: 'numeric', answer: '1', label: 'I1 =' }, hint: String.raw`Subtract $I_2$ from both sides: $I_1=I_3-I_2$.`, reveal: String.raw`$I_1=I_3-I_2=3-2=1$ A. Positive this time: $I_1$ flows A → B as drawn.` },
+          { prompt: '<b>Check loop 2</b> with the drops on each resistor:', show: String.raw`$V_{R3}+V_{R2}+V_{R1}=20\cdot2+5\cdot2+10\cdot3=40+10+30=80\text{ V}=V_2\ \checkmark$`, why: 'The drops add up to the source voltage, so the currents are right.' },
+        ], finale: String.raw`Same order as the worked example: the one-unknown loop, then the other loop, then KCL. With the smaller $V_2$ the current in V1 changes direction.` },
         { type: 'quiz', question: String.raw`Solving KCL/KVL gives $I_1=-1.2$ A. This means`, choices: ['The calculation is wrong', 'The real current is 1.2 A opposite to the assumed arrow', 'The current is AC', 'The branch carries no power'], answer: 1,
           explain: 'Directions are assumed first; a negative result just reverses the arrow.' },
       ],
@@ -181,6 +188,11 @@ export default {
             to: String.raw`\T{w-1}{12}\T{w-2}{-20\,\T{Ib-1}{I_2}}\T{w-3}{-40\,\T{Id-1}{I_4}}=0`,
             why: String.raw`Through the battery from − to +: $+12$. L→B with $I_2$, B→R with $I_4$: two drops. This completes part (a): 3 KCL + 3 KVL.` },
         ] },
+        { type: 'guided', title: 'Your turn: KCL at node B', problem: String.raw`In the same bridge (arrows as in the figure) a measurement gives $I_2=0.9$ A and $I_5=0.4$ A. Write KCL at node B and find $I_4$.`, steps: [
+          { prompt: String.raw`<b>Which currents enter node B?</b> Look at the arrows at B.`, ask: { kind: 'choice', choices: [String.raw`$I_2$ and $I_5$ enter, $I_4$ leaves`, String.raw`$I_4$ enters, $I_2$ and $I_5$ leave`, String.raw`$I_2$ and $I_4$ enter, $I_5$ leaves`, String.raw`all three enter`], answer: 0 }, hint: String.raw`$I_2$ comes down from L through 20 Ω, $I_5$ comes down from T through the middle, $I_4$ goes on to R.`, reveal: String.raw`In: $I_2$, $I_5$. Out: $I_4$. So in = out reads $I_2+I_5=I_4$.` },
+          { prompt: String.raw`<b>Write it as sum = 0</b> (in counted +, out counted −).`, ask: { kind: 'choice', choices: [String.raw`$I_2+I_5+I_4=0$`, String.raw`$I_2+I_5-I_4=0$`, String.raw`$I_2-I_5-I_4=0$`, String.raw`$I_4-I_2=0$`], answer: 1 }, hint: String.raw`Subtract the outgoing current $I_4$ from both sides of $I_2+I_5=I_4$.`, reveal: String.raw`$I_2+I_5-I_4=0$, the same node-B equation as in the derivation above.` },
+          { prompt: String.raw`<b>Solve for $I_4$</b> in A.`, ask: { kind: 'numeric', answer: '1.3', label: 'I4 =' }, hint: String.raw`Add $I_4$ to both sides: $I_4=I_2+I_5$.`, reveal: String.raw`$I_4=I_2+I_5=0.9+0.4=1.3$ A.` },
+        ], finale: 'Every KCL equation is written the same way: list in and out from the arrows, then in − out = 0.' },
         { type: 'blanks', items: [
           { html: 'A bridge with 4 nodes needs [[]] independent KCL equations.', answers: [{ num: 3 }] },
           { html: 'With 6 branches and 4 nodes, the number of independent KVL equations is [[]].', answers: [{ num: 3 }] },
@@ -219,6 +231,12 @@ export default {
             to: String.raw`\T{Ia-1}{0.5}-\T{Ic-1}{0.2}-\T{Ie-1}{0.3}=0\ \checkmark`,
             why: String.raw`What enters T equals what leaves it.` },
         ] },
+        { type: 'guided', title: String.raw`Your turn: $I_5$ from two currents`, problem: String.raw`Same bridge and arrows, but now $I_1=0.7$ A and $I_3=1.1$ A. Find $I_5$ and say which way it really flows.`, steps: [
+          { prompt: String.raw`<b>Pick the node.</b> Where do $I_1$, $I_3$ and $I_5$ meet?`, ask: { kind: 'choice', choices: ['Node L', 'Node T', 'Node B', 'Node R'], answer: 1 }, hint: String.raw`$I_1$ arrives through 10 Ω, $I_3$ leaves through 30 Ω, $I_5$ goes down the middle. All three touch the top node.`, reveal: String.raw`Node T: $I_1=I_3+I_5$.` },
+          { prompt: String.raw`<b>Rearrange</b> for $I_5$.`, ask: { kind: 'choice', choices: [String.raw`$I_5=I_1+I_3$`, String.raw`$I_5=I_3-I_1$`, String.raw`$I_5=I_1-I_3$`, String.raw`$I_5=\frac{I_1}{I_3}$`], answer: 2 }, hint: String.raw`Subtract $I_3$ from both sides of $I_1=I_3+I_5$.`, reveal: String.raw`$I_5=I_1-I_3$.` },
+          { prompt: String.raw`<b>Put the numbers in.</b> $I_5$ in A (keep the sign).`, ask: { kind: 'numeric', answer: '-0.4', label: 'I5 =' }, hint: String.raw`$0.7-1.1$. The second number is bigger, so the result is negative.`, reveal: String.raw`$I_5=0.7-1.1=-0.4$ A.` },
+          { prompt: '<b>Read the sign.</b> What does the negative result mean?', ask: { kind: 'choice', choices: ['The calculation is wrong', '0.4 A flows upward, from B to T', 'The bridge is balanced', '0.4 A flows downward, from T to B'], answer: 1 }, hint: 'Negative means opposite to the assumed (downward) arrow, same size.', reveal: String.raw`0.4 A flows upward, B → T. Node B is at the higher potential, and since $I_5\neq0$ the bridge is unbalanced.` },
+        ], finale: 'Same three moves as the worked example: pick the node that links the currents, rearrange, then read the sign.' },
         { type: 'text', html: String.raw`<p><strong>Check the direction without solving anything.</strong> Remove R5: each side becomes a voltage divider (bottom of battery = 0 V). The voltage at T is the drop across the 30 Ω resistor; at B, the drop across the 40 Ω resistor. Current flows from higher to lower potential.</p><p><strong>When is a bridge balanced ($I_5=0$)?</strong> Generic labels: $R_1$ = L–T, $R_2$ = L–B, $R_3$ = T–R, $R_4$ = B–R. The derivation below gives the condition; the numbers block after it does the direction check with the exam values.</p>` },
         { type: 'derive', symbolic: true, title: 'Balance condition', colors: { Ra: 1, Rb: 7, Rc: 6, Rd: 2, Vs: 8, A: 4, B: 5, x: 3 }, steps: [
           { kind: 'start', label: String.raw`$I_5=0$ means T and B are at the same potential`,
@@ -274,6 +292,11 @@ export default {
             to: String.raw`\frac{\T{Ra-1}{10}}{\T{Rc-1}{30}}=0.33\;\neq\;\frac{\T{Rb-1}{20}}{\T{Rd-1}{40}}=0.5\ \checkmark`,
             why: String.raw`Not equal, so unbalanced, which agrees with $V_T\neq V_B$ and $I_5\neq0$.` },
         ] },
+        { type: 'guided', title: 'Your turn: is this bridge balanced?', problem: String.raw`A bridge has $R_1=6\ \Omega$ (L–T), $R_3=18\ \Omega$ (T–R), $R_2=4\ \Omega$ (L–B), $R_4=12\ \Omega$ (B–R) and $V_s=24$ V. Remove the middle resistor, find $V_T$ and $V_B$, and decide whether $I_5=0$.`, steps: [
+          { prompt: String.raw`<b>Top divider.</b> $V_T=V_s\dfrac{R_3}{R_1+R_3}$. Find $V_T$ in V.`, ask: { kind: 'numeric', answer: '18', label: 'VT =' }, hint: String.raw`$R_1+R_3=6+18=24$, so $V_T=24\cdot\frac{18}{24}$.`, reveal: String.raw`$V_T=24\cdot\frac{18}{24}=18$ V.` },
+          { prompt: String.raw`<b>Bottom divider.</b> $V_B=V_s\dfrac{R_4}{R_2+R_4}$. Find $V_B$ in V.`, ask: { kind: 'numeric', answer: '18', label: 'VB =' }, hint: String.raw`$R_2+R_4=4+12=16$, so $V_B=24\cdot\frac{12}{16}=24\cdot0.75$.`, reveal: String.raw`$V_B=24\cdot\frac{12}{16}=18$ V.` },
+          { prompt: String.raw`<b>Ratio check.</b> Compare $\frac{R_1}{R_3}$ with $\frac{R_2}{R_4}$. What follows?`, ask: { kind: 'choice', choices: [String.raw`The ratios differ, so $I_5$ flows T → B`, String.raw`The ratios are equal ($\frac13$), so the bridge is balanced and $I_5=0$`, String.raw`The ratios differ, so $I_5$ flows B → T`, String.raw`It depends on $V_s$`], answer: 1 }, hint: String.raw`$\frac{6}{18}$ and $\frac{4}{12}$: simplify both fractions.`, reveal: String.raw`$\frac{6}{18}=\frac13=\frac{4}{12}$. Balanced: $V_T=V_B=18$ V, so no current flows in the middle resistor, whatever its value.` },
+        ], finale: String.raw`The divider voltages and the ratio test always agree. Equal ratios mean $I_5=0$.` },
         { type: 'callout', kind: 'warn', title: String.raw`If the given $I$ was the total source current`, html: String.raw`<p>$I$ only appears at nodes L and R, and $I_5$ only at T and B, so no single node links them. You would first need $I_1$: for example from Loop 3 and node R ($I_4=I-I_3=0.3$ A, then $I_2=(12-40\cdot0.3)/20=0$). That gives $I_1=0.5$ and the same $I_5=0.3$ A. Write down which node or loop you use; examiners give credit for a correct method even if the labels were read differently.</p>` },
         { type: 'text', html: String.raw`<p>The slide's "food for thought" ($V_1=100$ V, $V_2=20$ V) is worked in problem P5.</p>` },
         { type: 'quiz', question: String.raw`In a bridge you assumed $I_5$ flows downward and calculated $I_5=-0.3$ A. This means`, choices: ['The calculation must be wrong', 'The bridge is balanced', '0.3 A flows upward, and the bottom middle node is at the higher potential', 'No current flows in R5'], answer: 2,
@@ -289,11 +312,15 @@ export default {
       id: 'p11-bridge-full-solve',
       title: 'P11 — Bridge, full solve',
       difficulty: 'exam',
+      examples: ['method', 'bridge-equations', 'bridge-current-balance'],
       statement: String.raw`<p>Same bridge as the Mini Exam figure (lesson "Bridge circuit (Mini Exam 1): writing the equations") but with $V_s=12$ V, $R_1=2\ \Omega$ (L–T), $R_2=4\ \Omega$ (L–B), $R_3=4\ \Omega$ (T–R), $R_4=2\ \Omega$ (B–R), $R_5=4\ \Omega$ (T–B). Current directions as in the figure. Solve all six currents.</p>`,
       parts: [
         { label: '(a)', prompt: String.raw`$I_5$ in A (positive = downward, T → B)`, kind: 'numeric', answer: '0.6', tol: 1e-3,
-          hint: String.raw`Use the two KCL equations at T and B to remove $I_3$ and $I_4$ from the loops, then eliminate $I_1$ and $I_2$.`,
-          solution: [
+          hints: [String.raw`Write the 3 KCL + 3 KVL equations of the bridge (lesson "writing the equations") with these resistor values. Six unknowns, six equations.`,
+            String.raw`Use KCL to remove unknowns: node T gives $I_3=I_1-I_5$, node B gives $I_4=I_2+I_5$. Put these into loops 2 and 3, and solve loop 1 for $I_1$.`,
+            String.raw`Loop 1, $-2I_1-4I_5+4I_2=0$, gives $I_1=2I_2-2I_5$. Loop 3 becomes $12-6I_2-2I_5=0$.`],
+          solution: String.raw`Eliminate $I_3$, $I_4$ (KCL at T and B) and $I_1$ (loop 1): $I_2=3I_5$ and $12-20I_5=0$, so $I_5=0.6$ A.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>We write the 3 KCL + 3 KVL equations with these values, use KCL to remove $I_3$ and $I_4$, and solve the three loop equations for $I_1$, $I_2$, $I_5$.</p>` },
             { type: 'derive', title: String.raw`Solve for $I_5$`, colors: { ...BRIDGE_COLORS, m: 4, p: 4, q: 4, k: 8 }, steps: [
               { kind: 'start', label: 'The 3 KCL + 3 KVL from the bridge section, with these values',
@@ -374,40 +401,50 @@ export default {
                 why: String.raw`Positive: downward, T higher than B.` },
             ] },
           ] },
-        { label: '(b)', prompt: String.raw`$I_2$ in A`, kind: 'numeric', answer: '1.8', tol: 1e-3, hint: String.raw`From the solution of (a): $I_2=3I_5$.`,
-          solution: [
+        { label: '(b)', prompt: String.raw`$I_2$ in A`, kind: 'numeric', answer: '1.8', tol: 1e-3,
+          hints: [String.raw`You already met $I_2$ while solving (a). Which relation between $I_2$ and $I_5$ came out of loop 2?`, String.raw`From the solution of (a): $I_2=3I_5$.`, String.raw`$I_2=3\cdot0.6$.`],
+          solution: String.raw`$I_2=3I_5=3\cdot0.6=1.8$ A.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>We put $I_5=0.6$ A into $I_2=3I_5$ from part (a).</p>` },
             { type: 'derive', colors: BRIDGE_COLORS, steps: [
               sub1(String.raw`$I_5=0.6$`, String.raw`I_2=3\,\T{Ie-x}{I_5}\qquad I_5=\T{Ie-1}{0.6}`, String.raw`I_2=3\cdot\T{Ie-1}{0.6}`, { 'Ie-1': 'I5 = 0.6 A' }, String.raw`Back-substitute the value just found.`),
               { kind: 'result', label: String.raw`$3\cdot0.6$`, to: String.raw`\T{Ib-1}{I_2}=1.8\text{ A}`, why: String.raw`Positive: flows as drawn, L → B.` },
             ] },
           ] },
-        { label: '(c)', prompt: String.raw`$I_1$ in A`, kind: 'numeric', answer: '2.4', tol: 1e-3, hint: String.raw`From L1: $I_1=2I_2-2I_5$.`,
-          solution: [
+        { label: '(c)', prompt: String.raw`$I_1$ in A`, kind: 'numeric', answer: '2.4', tol: 1e-3,
+          hints: [String.raw`Loop 1 contains only $I_1$, $I_2$ and $I_5$, and you now know two of them.`, String.raw`From L1: $I_1=2I_2-2I_5$.`, String.raw`$I_1=2\cdot1.8-2\cdot0.6$.`],
+          solution: String.raw`$I_1=2I_2-2I_5=3.6-1.2=2.4$ A.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>We put $I_2$ and $I_5$ into $I_1=2I_2-2I_5$ (L1 rearranged).</p>` },
             { type: 'derive', colors: BRIDGE_COLORS, steps: [
               sub1(String.raw`$I_2=1.8$, $I_5=0.6$`, String.raw`I_1=2\,\T{Ib-x}{I_2}-2\,\T{Ie-x}{I_5}\qquad I_2=\T{Ib-1}{1.8},\quad I_5=\T{Ie-1}{0.6}`, String.raw`I_1=2\cdot\T{Ib-1}{1.8}-2\cdot\T{Ie-1}{0.6}`, { 'Ib-1': '', 'Ie-1': '' }, String.raw`Each number keeps the colour of its current.`),
               { kind: 'result', label: String.raw`$3.6-1.2$`, to: String.raw`\T{Ia-1}{I_1}=3.6-1.2=2.4\text{ A}`, why: String.raw`Positive: L → T as drawn.` },
             ] },
           ] },
-        { label: '(d)', prompt: String.raw`$I_3$ in A`, kind: 'numeric', answer: '1.8', tol: 1e-3, hint: String.raw`Node T: $I_3=I_1-I_5$.`,
-          solution: [
+        { label: '(d)', prompt: String.raw`$I_3$ in A`, kind: 'numeric', answer: '1.8', tol: 1e-3,
+          hints: [String.raw`Which node has $I_3$ together with two currents you already know?`, String.raw`Node T: $I_3=I_1-I_5$.`, String.raw`$I_3=2.4-0.6$.`],
+          solution: String.raw`KCL at T: $I_3=I_1-I_5=2.4-0.6=1.8$ A.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>We use KCL at node T, $I_3=I_1-I_5$.</p>` },
             { type: 'derive', colors: BRIDGE_COLORS, steps: [
               sub1(String.raw`$I_1=2.4$, $I_5=0.6$`, String.raw`I_3=\T{Ia-x}{I_1}-\T{Ie-x}{I_5}\qquad I_1=\T{Ia-1}{2.4},\quad I_5=\T{Ie-1}{0.6}`, String.raw`I_3=\T{Ia-1}{2.4}-\T{Ie-1}{0.6}`, { 'Ia-1': '', 'Ie-1': '' }, String.raw`What enters T through $R_1$ and does not go down $R_5$ leaves through $R_3$.`),
               { kind: 'result', label: String.raw`$2.4-0.6$`, to: String.raw`\T{Ic-1}{I_3}=1.8\text{ A}`, why: String.raw`Positive: T → R as drawn.` },
             ] },
           ] },
-        { label: '(e)', prompt: String.raw`$I_4$ in A`, kind: 'numeric', answer: '2.4', tol: 1e-3, hint: String.raw`Node B: $I_4=I_2+I_5$.`,
-          solution: [
+        { label: '(e)', prompt: String.raw`$I_4$ in A`, kind: 'numeric', answer: '2.4', tol: 1e-3,
+          hints: [String.raw`Which node has $I_4$ together with two currents you already know?`, String.raw`Node B: $I_4=I_2+I_5$.`, String.raw`$I_4=1.8+0.6$.`],
+          solution: String.raw`KCL at B: $I_4=I_2+I_5=1.8+0.6=2.4$ A.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>We use KCL at node B, $I_4=I_2+I_5$.</p>` },
             { type: 'derive', colors: BRIDGE_COLORS, steps: [
               sub1(String.raw`$I_2=1.8$, $I_5=0.6$`, String.raw`I_4=\T{Ib-x}{I_2}+\T{Ie-x}{I_5}\qquad I_2=\T{Ib-1}{1.8},\quad I_5=\T{Ie-1}{0.6}`, String.raw`I_4=\T{Ib-1}{1.8}+\T{Ie-1}{0.6}`, { 'Ib-1': '', 'Ie-1': '' }, String.raw`Both currents flow into B; together they leave through $R_4$.`),
               { kind: 'result', label: String.raw`$1.8+0.6$`, to: String.raw`\T{Id-1}{I_4}=2.4\text{ A}`, why: String.raw`Positive: B → R as drawn.` },
             ] },
           ] },
-        { label: '(f)', prompt: String.raw`Source current $I$ in A`, kind: 'numeric', answer: '4.2', tol: 1e-3, hint: String.raw`Node L: $I=I_1+I_2$.`,
-          solution: [
+        { label: '(f)', prompt: String.raw`Source current $I$ in A`, kind: 'numeric', answer: '4.2', tol: 1e-3,
+          hints: [String.raw`The source current enters the bridge at node L. Where does it go from there?`, String.raw`Node L: $I=I_1+I_2$.`, String.raw`$I=2.4+1.8$; check with loop 3.`],
+          solution: String.raw`KCL at L: $I=I_1+I_2=2.4+1.8=4.2$ A.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>We use KCL at node L, then check the answer in loop 3.</p>` },
             { type: 'derive', colors: BRIDGE_COLORS, steps: [
               sub1(String.raw`$I_1=2.4$, $I_2=1.8$`, String.raw`I=\T{Ia-x}{I_1}+\T{Ib-x}{I_2}\qquad I_1=\T{Ia-1}{2.4},\quad I_2=\T{Ib-1}{1.8}`, String.raw`I=\T{Ia-1}{2.4}+\T{Ib-1}{1.8}`, { 'Ia-1': '', 'Ib-1': '' }, String.raw`The source current splits into the two top branches at L.`),
