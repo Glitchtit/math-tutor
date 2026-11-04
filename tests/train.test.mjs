@@ -30,6 +30,11 @@ test('checkChunk: forgiving on spacing, * and redundant brackets, strict on stru
   assert.ok(checkChunk('(4.7)/(4.7+1.2)', '4.7/(4.7+1.2)').ok);
   assert.ok(checkChunk('2*x', '2x').ok);
   assert.ok(checkChunk('≥ 0', '>=0').ok);
+  assert.ok(checkChunk('=I²R', '=I^2R').ok);
+  assert.ok(checkChunk('x³', 'x^3').ok);
+  assert.ok(checkChunk('√(x)', 'sqrt(x)').ok);
+  assert.ok(checkChunk('2πµ', '2pi mu').ok);
+  assert.ok(checkChunk('Ω', 'Omega').ok);
   assert.ok(!checkChunk('4.7/4.7+1.2', '4.7/(4.7+1.2)').ok);
   assert.ok(!checkChunk('<=0', '>=0').ok);
   assert.equal(checkChunk('x+4', 'x+3').at, 2);
@@ -48,6 +53,7 @@ test('matchLine follows the line as it is typed', () => {
   const f = chunkLine(String.raw`V = \dfrac{4.7}{4.7+1.2}\cdot 24`), alts = {};
   assert.equal(matchLine(f, 'V=(4.7)/(4.7+1.2)', alts).done, 2); // equal-valued form
   assert.equal(matchLine(f, 'V=(4.7)/(4.7+1.2)*24', alts).done, 3);
+  assert.equal(matchLine(chunkLine(String.raw`P = \T{i-1}{I^2}R`), 'P=I²R').done, 2);
   const m = chunkLine(String.raw`3\cdot 4 = 12`);
   assert.equal(matchLine(m, '3*').typoAt, -1);
   assert.equal(matchLine(m, '3*4=12').done, m.length);
