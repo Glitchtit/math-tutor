@@ -643,3 +643,5 @@ details.refresher summary { color: var(--accent); }
 .train-input { flex: 1; min-width: 0; font-size: 1.05em; }
 .train-input.typo { border-color: var(--bad, #e5484d); outline-color: var(--bad, #e5484d); }
 .train-done { padding: 20px 0; }
+/* the prompt must show the literal keys: no != -> >= ligatures */
+.train code, .train-input { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
