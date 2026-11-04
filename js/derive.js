@@ -150,7 +150,7 @@ export function renderDerive(b) {
   }
 
   async function playStep(S) {
-    if (busy) return;
+    if (busy || S.st.from === S.st.to) return; // nothing moves in a statement-only step
     busy = true;
     try {
       const { inner, newL, oldL } = S;
