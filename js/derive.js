@@ -6,7 +6,8 @@ import { h, renderMath } from './util.js';
 import { TAG_MACROS, KATEX_TRUST, resolveSteps, tagParents, plan, colourSlot, route } from './derive-core.js';
 
 const KIND_LABEL = { start: 'Start', sub: 'Substitute', both: 'Both sides', expand: 'Expand', factor: 'Factor', cancel: 'Cancel', calc: 'Calculate', calculus: 'Calculus', check: 'Check', result: 'Result' };
-const SLIDE_MS = 1100;
+const SLIDE_MS = 800;
+const GAP_MS = 350; // pause between terms so the eye can follow one move at a time
 const SVG = 'http://www.w3.org/2000/svg';
 const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -122,6 +123,7 @@ export function renderDerive(b) {
         const path = document.createElementNS(SVG, 'path');
         path.setAttribute('d', rt.d);
         path.setAttribute('class', `derive-arrow ${slot}`);
+        path.dataset.mv = mv.id;
         if (window.__deriveDebug) path.dataset.scores = JSON.stringify(rt.scores);
         svg.appendChild(path);
         // arrowhead along the final tangent
@@ -131,9 +133,10 @@ export function renderDerive(b) {
         const a1 = ang + Math.PI * 0.85, a2 = ang - Math.PI * 0.85;
         head.setAttribute('d', `M${tx},${ty} L${tx + 9 * Math.cos(a1)},${ty + 9 * Math.sin(a1)} L${tx + 9 * Math.cos(a2)},${ty + 9 * Math.sin(a2)} Z`);
         head.setAttribute('class', `derive-head-tip ${slot}`);
+        head.dataset.mv = mv.id;
         svg.appendChild(head);
         const label = st.arrows[mv.id];
-        if (label && j === 0) labels.push({ label, slot, start: rt.start, left: rt.end[0] < rt.start[0] - 4 });
+        if (label && j === 0) labels.push({ id: mv.id, label, slot, start: rt.start, left: rt.end[0] < rt.start[0] - 4 });
       });
     }
     // stack labels from one baseline under the lowest arrow start, so neighbouring labels never overlap
@@ -166,11 +169,12 @@ export function renderDerive(b) {
       const c = inner.getBoundingClientRect();
       const fs = getComputedStyle(oldL.querySelector('.katex') || oldL).fontSize;
       newL.style.transition = 'none'; newL.style.opacity = 0;
-      const clones = [];
+      const groups = []; // one group per moving term (a term copied to several targets moves as one)
       for (const mv of S.moves) {
         const e = oldL.querySelector(`[data-t="${CSS.escape(mv.id)}"]`);
         if (!e) continue;
         const a = e.getBoundingClientRect();
+        const g = { id: mv.id, e, clones: [] };
         for (const tid of mv.targets) {
           const t = newL.querySelector(`[data-t="${CSS.escape(tid)}"]`);
           if (!t) continue;
@@ -179,14 +183,22 @@ export function renderDerive(b) {
           w.style.fontSize = fs;
           w.style.left = `${a.left - c.left}px`; w.style.top = `${a.top - c.top}px`;
           w.appendChild(e.cloneNode(true));
-          inner.appendChild(w);
-          clones.push([w, `translate(${z.left - a.left}px, ${z.top - a.top}px) scale(${a.height ? z.height / a.height : 1})`]);
+          g.clones.push([w, `translate(${z.left - a.left}px, ${z.top - a.top}px) scale(${a.height ? z.height / a.height : 1})`]);
         }
-        e.classList.add('ghosted');
+        if (g.clones.length) groups.push(g);
       }
-      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-      clones.forEach(([w, tr]) => { w.style.transform = tr; });
-      await wait(SLIDE_MS + 50);
+      const clones = groups.flatMap((g) => g.clones);
+      for (const [k, g] of groups.entries()) {
+        if (k) await wait(GAP_MS);
+        S.svg.querySelectorAll('.active').forEach((x) => x.classList.remove('active'));
+        S.svg.querySelectorAll(`[data-mv="${CSS.escape(g.id)}"]`).forEach((x) => x.classList.add('active'));
+        g.clones.forEach(([w]) => inner.appendChild(w));
+        g.e.classList.add('ghosted');
+        await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+        g.clones.forEach(([w, tr]) => { w.style.transform = tr; });
+        await wait(SLIDE_MS + 50);
+      }
+      S.svg.querySelectorAll('.active').forEach((x) => x.classList.remove('active'));
       newL.style.transition = 'opacity .3s'; newL.style.opacity = 1;
       await wait(320);
       clones.forEach(([w]) => w.remove());
