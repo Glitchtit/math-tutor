@@ -56,9 +56,237 @@ export default {
       id: 'how-to-practise',
       title: 'How to practise',
       blocks: [
-        { type: 'text', html: String.raw`<p>The mini exam mixes fill in the blanks and multiple choice (both with negative marking), drawing circuits and waveforms, short theory answers and calculations. A formula sheet is provided. Each lesson here practises one of those parts; the worked problems are under Assignments. The full exam strategy is in the exam module.</p>` },
+        { type: 'text', html: String.raw`<p>The mini exam mixes fill in the blanks and multiple choice (both with negative marking), drawing circuits and waveforms, short theory answers and calculations. A formula sheet is provided. Each lesson here practises one of those parts. The four "Worked examples" lessons show each calculation type fully worked, then let you do one step by step; the exam-style problems are under Assignments. The full exam strategy is in the exam module.</p>` },
         { type: 'callout', kind: 'exam', title: 'Negative marking: rule of thumb', html: String.raw`<p>Leave it blank if you truly have no idea. Guess once you can rule out at least one option, unless the penalty is −1 (then only with two ruled out, and even that only breaks even). For fill-in blanks there is no option list, so leave it blank unless you are fairly sure of the term.</p><p>Expected gain = P(right) × 1 − P(wrong) × penalty. Example, 3 options left at −0.5: $\frac13\cdot1-\frac23\cdot0.5=0$. The penalty is not stated on the slide: check Moodle.</p>` },
         { type: 'callout', kind: 'exam', title: 'Using the formula sheet', html: String.raw`<ul><li>You do not need to memorise formulas. You need to know <em>which</em> one applies, how to rearrange it, and the conditions behind it (steady state, small ripple, ideal components).</li><li>In a calculation, write the formula in symbols, rearrange in symbols, then insert numbers with units. Partial credit usually follows the written steps.</li><li>Convert prefixes first: k = $10^3$, m = $10^{-3}$, µ = $10^{-6}$, n = $10^{-9}$.</li><li>Finish with a check: power in = power out for ideal converters; $V_o<V_s$ for buck, $V_o>V_s$ for boost; $0\le D\le1$.</li></ul>` },
+      ],
+    },
+    {
+      id: 'worked-converters',
+      title: 'Worked examples: buck, boost and timing',
+      blocks: [
+        { type: 'text', html: String.raw`<p>Assignments P1–P4, P10 and the theory questions build on this lesson. For each problem type: first a fully worked example, then one you do yourself, one small step at a time, with a hint and "Show me this step" for every step. The formulas come from Lecture 4 (converters).</p>` },
+        { type: 'text', html: String.raw`<h3>1. Buck converter: voltage, currents, power</h3><p>Buck converter, $V_s=60$ V, $D=0.4$, load $R=8\ \Omega$. Find $V_o$, $I_o$, $I_L$, $I_s$ and check the power balance.</p>` },
+        { type: 'derive', title: 'Worked example: buck, $V_s=60$ V, $D=0.4$, $R=8\ \Omega$', given: String.raw`V_s=60\text{ V},\quad D=0.4,\quad R=8\ \Omega`, colors: { Vo: 1, Io: 2, D: 3, Vs: 4, IL: 6, Is: 7 }, steps: [
+          { kind: 'sub', label: 'Buck ratio, then numbers', from: String.raw`\T{Vo-1}{V_o}=\T{D-1}{D}\,\T{Vs-1}{V_s}`, to: String.raw`\T{Vo-1}{V_o}=\T{D-1}{0.4}\cdot\T{Vs-1}{60}=24\text{ V}`,
+            why: String.raw`In a buck converter the output is the input times the on-fraction $D$. $0.4\cdot60=24$.` },
+          { kind: 'sub', label: "Ohm's law on the load", from: String.raw`\T{Io-1}{I_o}=\frac{\T{Vo-1}{V_o}}{R}`, to: String.raw`\T{Io-1}{I_o}=\frac{\T{Vo-1}{24}}{8}=3\text{ A}`,
+            why: String.raw`The load resistor has $V_o$ across it, so its current is $V_o/R$.` },
+          { kind: 'sub', label: 'Amp-second balance', from: String.raw`\T{IL-1}{I_L}=\T{Io-1}{I_o}`, to: String.raw`\T{IL-1}{I_L}=\T{Io-1}{3}\text{ A}`,
+            why: String.raw`In steady state the average capacitor current is zero, so on average all of the inductor current goes to the load.` },
+          { kind: 'sub', label: 'Source current = on-fraction of the inductor current', from: String.raw`\T{Is-1}{I_s}=\T{D-1}{D}\,\T{IL-1}{I_L}`, to: String.raw`\T{Is-1}{I_s}=\T{D-1}{0.4}\cdot\T{IL-1}{3}=1.2\text{ A}`,
+            why: String.raw`The source carries $I_L$ only while the switch is on (a fraction $D$ of the time) and nothing while it is off.` },
+          { kind: 'check', label: 'Power in = power out', from: String.raw`P_{in}=\T{Vs-1}{V_s}\,\T{Is-1}{I_s}\qquad P_{out}=\T{Vo-1}{V_o}\,\T{Io-1}{I_o}`, to: String.raw`P_{in}=\T{Vs-1}{60}\cdot\T{Is-1}{1.2}=72\text{ W}\qquad P_{out}=\T{Vo-1}{24}\cdot\T{Io-1}{3}=72\text{ W}\ \checkmark`,
+            why: String.raw`An ideal converter loses nothing. Voltage down by 2.5, current up by 2.5.` },
+        ] },
+        { type: 'steps', title: 'Worked reasoning: why the buck needs its diode, and why $V_o<V_s$', steps: [
+          { do: String.raw`The switch S opens while the inductor carries $I_L$.`, why: String.raw`This is the moment that decides whether the circuit survives.` },
+          { do: String.raw`$v_L=L\,\dfrac{di_L}{dt}$: if $i_L$ fell to zero instantly, $\dfrac{di_L}{dt}$ and so $v_L$ would be infinite.`, why: String.raw`An inductor opposes sudden changes in its current. In practice the voltage across the opening switch would spike and destroy it.` },
+          { do: String.raw`The diode turns on and carries $i_L$ from ground through L to the output (freewheeling).`, why: String.raw`Now $v_L=-V_o$, a finite voltage, so $i_L$ ramps down gently instead of jumping.` },
+          { do: String.raw`During the on-time $v_L=V_s-V_o$. For $i_L$ to rise again this must be positive, so $V_o<V_s$.`, why: String.raw`Volt-second balance: the positive area $(V_s-V_o)\,t_{on}$ must cancel the negative area $V_o\,t_{off}$. With $V_o\ge V_s$ there is no positive area, which is why $V_o=DV_s$ with $D\le1$.` },
+        ] },
+        { type: 'guided', title: 'Buck, $V_s=36$ V, $D=0.5$, $R=9\ \Omega$', problem: String.raw`A buck converter has $V_s=36$ V, $D=0.5$ and load $R=9\ \Omega$. Find $V_o$, $I_o$ and $I_s$, check the power, then answer two concept questions. Same steps as the worked example.`, steps: [
+          { prompt: String.raw`<b>Output voltage.</b> $V_o$ in V:`, ask: { kind: 'numeric', answer: 18 }, hint: String.raw`Buck ratio $V_o=D\,V_s$.`, reveal: String.raw`$V_o=0.5\cdot36=18$ V.` },
+          { prompt: String.raw`<b>Load current.</b> $I_o$ in A:`, ask: { kind: 'numeric', answer: 2 }, hint: String.raw`Ohm's law on the load: $I_o=V_o/R$.`, reveal: String.raw`$I_o=18/9=2$ A, and by amp-second balance $I_L=I_o=2$ A.` },
+          { prompt: String.raw`<b>Source current.</b> $I_s$ in A:`, ask: { kind: 'numeric', answer: 1 }, hint: String.raw`The source carries $I_L$ only during the on-fraction: $I_s=D\,I_L$.`, reveal: String.raw`$I_s=0.5\cdot2=1$ A.` },
+          { prompt: String.raw`<b>Check the power balance.</b>`, show: String.raw`$P_{in}=V_sI_s=36\cdot1=36$ W and $P_{out}=V_oI_o=18\cdot2=36$ W ✓`, why: 'An ideal converter loses nothing, so the two must match.' },
+          { prompt: String.raw`<b>Concept.</b> When S opens, what keeps the inductor current flowing?`, ask: { kind: 'choice', choices: ['Nothing: the current simply stops', 'The diode, which gives it a freewheeling path through L to the output', 'The capacitor, which pushes current back into the source'], answer: 1 }, hint: String.raw`$v_L=L\,di/dt$: can the inductor current jump to zero?`, reveal: String.raw`The diode. The inductor current cannot change instantly, so it needs a path; without the diode the switch voltage would spike.` },
+          { prompt: String.raw`<b>Concept.</b> Could this buck converter make 40 V from the 36 V source?`, ask: { kind: 'choice', choices: [String.raw`Yes, with $D$ close to 1`, String.raw`No: $V_o=DV_s$ with $D\le1$, so $V_o\le V_s$`], answer: 1 }, hint: String.raw`What is the largest possible value of $D$?`, reveal: String.raw`No. $D\le1$ gives $V_o\le36$ V. For a higher output you need a boost converter.` },
+        ], finale: String.raw`Same chain as P1: ratio → Ohm → amp-second balance → source current → power check.` },
+        { type: 'text', html: String.raw`<h3>2. Boost converter: duty cycle and currents</h3><p>Boost converter, $V_s=20$ V, required $V_o=50$ V, load current $I_o=2$ A. Find $D$, $I_L$ and check the power balance. The unknown $D$ sits inside the bottom of a fraction, so we free it one operation at a time.</p>` },
+        { type: 'derive', title: 'Worked example: boost, 50 V from 20 V at 2 A', given: String.raw`V_s=20\text{ V},\quad V_o=50\text{ V},\quad I_o=2\text{ A}`, colors: { Vs: 1, Vo: 2, D: 3, omd: 4, k: 5, n: 8, IL: 6, Io: 7 }, steps: [
+          { kind: 'sub', label: 'Boost ratio, then numbers', from: String.raw`\T{Vo-1}{V_o}=\frac{\T{Vs-1}{V_s}}{1-\T{D-1}{D}}`, to: String.raw`\T{Vo-1}{50}=\frac{\T{Vs-1}{20}}{1-\T{D-1}{D}}`,
+            why: String.raw`Each number keeps the colour of the symbol it replaces.` },
+          { kind: 'both', label: String.raw`Both sides $\times(1-D)$`, from: String.raw`50=\frac{20}{\T{omd-1}{1-D}}`, to: String.raw`50\,\T{omd-1}{(1-D)}=20`,
+            arrows: { 'omd-1': '× (1−D) on both sides' },
+            why: String.raw`Multiplying by the bottom of a fraction removes the fraction: on the right $\frac{1-D}{1-D}=1$.` },
+          { kind: 'both', label: String.raw`Both sides $\div50$`, from: String.raw`\T{k-1}{50}\,(1-D)=20`, to: String.raw`1-D=\frac{20}{\T{k-1}{50}}=0.4`,
+            arrows: { 'k-1': '÷ 50 on both sides' },
+            why: String.raw`Dividing both sides by 50 leaves the bracket alone. $20/50=0.4$.` },
+          { kind: 'both', label: String.raw`Both sides $+D$`, from: String.raw`1-\T{D-1}{D}=0.4`, to: String.raw`1=0.4+\T{D-1}{D}`,
+            arrows: { 'D-1': '+D on both sides' },
+            why: String.raw`Adding $D$ to both sides cancels $-D$ on the left and makes $+D$ appear on the right.` },
+          { kind: 'both', label: String.raw`Both sides $-0.4$`, from: String.raw`1=\T{n-1}{0.4}+D`, to: String.raw`1-\T{n-1}{0.4}=D\quad\Rightarrow\quad D=0.6`,
+            arrows: { 'n-1': '−0.4 on both sides' },
+            why: String.raw`Subtracting 0.4 from both sides leaves $D$ alone. The switch is on 60 % of each period.` },
+          { kind: 'both', label: String.raw`Amp-second result, both sides $\div(1-D)$`, from: String.raw`\T{Io-1}{I_o}=\T{IL-1}{I_L}\,\T{omd-1}{(1-D)}`, to: String.raw`\frac{\T{Io-1}{I_o}}{\T{omd-1}{1-D}}=\T{IL-1}{I_L}`,
+            arrows: { 'omd-1': '÷ (1−D) on both sides' },
+            why: String.raw`The boost amp-second result is $I_o=I_L(1-D)$. Dividing by $(1-D)$ frees $I_L$.` },
+          { kind: 'sub', label: String.raw`Numbers: $I_o=2$, $1-D=0.4$`, from: String.raw`\T{IL-1}{I_L}=\frac{\T{Io-1}{I_o}}{\T{omd-1}{1-D}}`, to: String.raw`\T{IL-1}{I_L}=\frac{\T{Io-1}{2}}{\T{omd-1}{0.4}}=5\text{ A}`,
+            why: String.raw`Dividing by 0.4 is multiplying by 2.5. The inductor (and source) current is larger than the load current.` },
+          { kind: 'check', label: 'Power in = power out', from: String.raw`P_{in}=V_s\,\T{IL-1}{I_L}\qquad P_{out}=V_o\,\T{Io-1}{I_o}`, to: String.raw`P_{in}=20\cdot\T{IL-1}{5}=100\text{ W}\qquad P_{out}=50\cdot\T{Io-1}{2}=100\text{ W}\ \checkmark`,
+            why: String.raw`In a boost the inductor is in series with the source, so the source current is $I_L$.` },
+        ] },
+        { type: 'guided', title: 'Boost, 30 V from 12 V at 2 A', problem: String.raw`A boost converter must make $V_o=30$ V from $V_s=12$ V and deliver $I_o=2$ A. Find $D$ and $I_L$, then check the power.`, steps: [
+          { prompt: String.raw`<b>Free the bracket.</b> From $V_o=\dfrac{V_s}{1-D}$, multiply both sides by $(1-D)$ and divide by $V_o$. What is $1-D$?`, ask: { kind: 'numeric', answer: 0.4 }, hint: String.raw`$1-D=\dfrac{V_s}{V_o}=\dfrac{12}{30}$.`, reveal: String.raw`$1-D=12/30=0.4$.` },
+          { prompt: String.raw`<b>Duty cycle.</b> $D$ as a fraction:`, ask: { kind: 'numeric', answer: 0.6 }, hint: String.raw`Add $D$ and subtract 0.4 on both sides of $1-D=0.4$.`, reveal: String.raw`$D=1-0.4=0.6$.` },
+          { prompt: String.raw`<b>Inductor current.</b> $I_L$ in A:`, ask: { kind: 'numeric', answer: 5 }, hint: String.raw`$I_o=I_L(1-D)$, so $I_L=\dfrac{I_o}{1-D}$.`, reveal: String.raw`$I_L=2/0.4=5$ A.` },
+          { prompt: String.raw`<b>Check the power balance.</b>`, show: String.raw`$P_{in}=V_sI_L=12\cdot5=60$ W and $P_{out}=V_oI_o=30\cdot2=60$ W ✓`, why: 'In a boost the source current is the inductor current.' },
+        ], finale: String.raw`P2 and P3 are exactly these steps with other numbers.` },
+        { type: 'text', html: String.raw`<h3>3. Switching period, on-time and off-time</h3><p>A converter switches at $f_s=200$ kHz with $D=0.25$. Find $T_s$, $t_{on}$ and $t_{off}$.</p>` },
+        { type: 'derive', title: 'Worked example: $f_s=200$ kHz, $D=0.25$', given: String.raw`f_s=200\text{ kHz},\quad D=0.25`, colors: { Ts: 1, fs: 2, D: 3 }, steps: [
+          { kind: 'sub', label: 'Period = 1 / frequency', from: String.raw`\T{Ts-1}{T_s}=\frac{1}{\T{fs-1}{f_s}}`, to: String.raw`\T{Ts-1}{T_s}=\frac{1}{\T{fs-1}{200\,000\text{ Hz}}}=5\cdot10^{-6}\text{ s}=5\ \mu\text{s}`,
+            why: String.raw`200 kHz $=2\cdot10^5$ Hz and $\frac{1}{2\cdot10^5}=0.5\cdot10^{-5}=5\cdot10^{-6}$ s. 1 µs $=10^{-6}$ s.` },
+          { kind: 'sub', label: String.raw`On-time = $D$ × period`, from: String.raw`t_{on}=\T{D-1}{D}\,\T{Ts-1}{T_s}`, to: String.raw`t_{on}=\T{D-1}{0.25}\cdot\T{Ts-1}{5}=1.25\ \mu\text{s}`,
+            why: String.raw`$D$ is the fraction of each period that the switch is on.` },
+          { kind: 'sub', label: 'Off-time = the rest', from: String.raw`t_{off}=(1-\T{D-1}{D})\,\T{Ts-1}{T_s}`, to: String.raw`t_{off}=(1-\T{D-1}{0.25})\cdot\T{Ts-1}{5}=0.75\cdot5=3.75\ \mu\text{s}`,
+            why: String.raw`Check: $1.25+3.75=5$ µs ✓.` },
+        ] },
+        { type: 'guided', title: '$f_s=20$ kHz, $D=0.3$', problem: String.raw`A converter switches at $f_s=20$ kHz with $D=0.3$. Find $T_s$, $t_{on}$ and $t_{off}$ in µs.`, steps: [
+          { prompt: String.raw`<b>Period.</b> $T_s$ in µs:`, ask: { kind: 'numeric', answer: 50 }, hint: String.raw`$T_s=1/f_s$ with $f_s=20\,000$ Hz; then convert seconds to µs (×$10^6$).`, reveal: String.raw`$T_s=\frac{1}{20\,000}=5\cdot10^{-5}$ s $=50$ µs.` },
+          { prompt: String.raw`<b>On-time.</b> $t_{on}$ in µs:`, ask: { kind: 'numeric', answer: 15 }, hint: String.raw`$t_{on}=D\,T_s$.`, reveal: String.raw`$t_{on}=0.3\cdot50=15$ µs.` },
+          { prompt: String.raw`<b>Off-time.</b> $t_{off}$ in µs:`, ask: { kind: 'numeric', answer: 35 }, hint: String.raw`$t_{off}=(1-D)\,T_s$, or the rest of the period.`, reveal: String.raw`$t_{off}=0.7\cdot50=35$ µs. Check: $15+35=50$ ✓.` },
+        ] },
+      ],
+    },
+    {
+      id: 'worked-transients',
+      title: 'Worked examples: RC and RL transients',
+      blocks: [
+        { type: 'text', html: String.raw`<p>Assignments P6 and P7 build on this lesson (formulas from the Lecture 2 transients lesson). The hardest step is solving for a <em>time</em>: $t$ sits in an exponent, so first get the exponential alone, then undo it with ln.</p><h3>1. RC charging: time constant, start current, time to reach a voltage</h3><p>$R=20\ \text{k}\Omega$, $C=100\ \mu\text{F}$, $V_s=10$ V, capacitor initially empty. Find $\tau$, $i(0)$ and the time at which $v_C=8$ V.</p>` },
+        { type: 'derive', title: 'Worked example: RC, time to reach 8 V', given: String.raw`R=20\text{ k}\Omega,\quad C=100\ \mu\text{F},\quad V_s=10\text{ V}`, colors: { R: 1, C: 2, vc: 3, k: 5, e: 6, n: 8, mt: 4 }, steps: [
+          { kind: 'sub', label: String.raw`$\tau=RC$ with prefixes as powers of ten`, from: String.raw`\tau=\T{R-1}{R}\,\T{C-1}{C}`, to: String.raw`\tau=\T{R-1}{20\cdot10^{3}}\cdot\T{C-1}{100\cdot10^{-6}}=2\cdot10^{4}\cdot10^{-4}=2\text{ s}`,
+            why: String.raw`k $=10^3$, µ $=10^{-6}$. $20\cdot10^3=2\cdot10^4$ and $100\cdot10^{-6}=10^{-4}$; adding exponents $4+(-4)=0$ leaves 2 s.` },
+          { kind: 'sub', label: String.raw`Start current: empty capacitor = wire`, from: String.raw`i(0)=\frac{V_s}{\T{R-1}{R}}`, to: String.raw`i(0)=\frac{10}{\T{R-1}{20\,000}}=0.0005\text{ A}=0.5\text{ mA}`,
+            why: String.raw`At $t=0$ the capacitor has no voltage, so all of $V_s$ is across $R$.` },
+          { kind: 'sub', label: String.raw`Set $v_C=8$ in the charging curve`, from: String.raw`\T{vc-1}{v_C}=V_s\,(1-\T{e-1}{e^{-t/\tau}})`, to: String.raw`\T{vc-1}{8}=10\,(1-\T{e-1}{e^{-t/2}})`,
+            why: String.raw`$V_s=10$ V and $\tau=2$ s. We want the moment when the capacitor voltage is 8 V.` },
+          { kind: 'both', label: String.raw`Both sides $\div10$`, from: String.raw`8=\T{k-1}{10}\,(1-\T{e-1}{e^{-t/2}})`, to: String.raw`\frac{8}{\T{k-1}{10}}=1-\T{e-1}{e^{-t/2}}`,
+            arrows: { 'k-1': '÷ 10 on both sides' },
+            why: String.raw`Dividing both sides by 10 removes the factor in front of the bracket.` },
+          { kind: 'calc', label: String.raw`$8\div10$`, from: String.raw`\T{n-1}{\frac{8}{10}}=1-\T{e-1}{e^{-t/2}}`, to: String.raw`\T{n-1}{0.8}=1-\T{e-1}{e^{-t/2}}`,
+            why: String.raw`$8/10=0.8$.` },
+          { kind: 'both', label: String.raw`Both sides $+e^{-t/2}$`, to: String.raw`\T{n-1}{0.8}+\T{e-1}{e^{-t/2}}=1`,
+            arrows: { 'e-1': '+e^(−t/2) on both sides' },
+            why: String.raw`Adding the exponential to both sides cancels $-e^{-t/2}$ on the right and makes it positive on the left.` },
+          { kind: 'both', label: String.raw`Both sides $-0.8$`, to: String.raw`\T{e-1}{e^{-t/2}}=1-\T{n-1}{0.8}=0.2`,
+            arrows: { 'n-1': '−0.8 on both sides' },
+            why: String.raw`Subtracting 0.8 from both sides leaves the exponential alone.` },
+          { kind: 'both', label: 'ln on both sides', from: String.raw`\T{e-1}{e^{\T{mt-1}{-t/2}}}=0.2`, to: String.raw`\ln\big(\T{e-1}{e^{\T{mt-1}{-t/2}}}\big)=\ln0.2`,
+            why: String.raw`Taking ln of two equal numbers keeps them equal. ln undoes e.` },
+          { kind: 'cancel', label: String.raw`$\ln(e^{x})=x$`, to: String.raw`\T{mt-1}{-\frac{t}{2}}=\ln0.2=-1.609`,
+            why: String.raw`ln and e cancel, leaving the exponent. A calculator gives $\ln0.2\approx-1.609$.` },
+          { kind: 'both', label: String.raw`Both sides $\times(-2)$`, from: String.raw`-\frac{t}{\T{k-2}{2}}=-1.609`, to: String.raw`t=\T{k-2}{2}\cdot1.609=3.22\text{ s}`,
+            arrows: { 'k-2': '× (−2) on both sides' },
+            why: String.raw`Multiplying by $-2$ removes both the minus sign and the division by 2.` },
+          { kind: 'check', label: 'Put the answer back in', from: String.raw`v_C=10\,(1-e^{-\T{t-x}{t}/2})\qquad\qquad t=\T{t-1}{3.22}`, to: String.raw`v_C=10\,(1-e^{-\T{t-1}{3.22}/2})=10\,(1-0.2)=8\text{ V}\ \checkmark`,
+            arrows: { 't-1': '' },
+            why: String.raw`$e^{-1.61}\approx0.2$, so we get back 8 V.` },
+        ] },
+        { type: 'guided', title: 'RC: $R=5\ \text{k}\Omega$, $C=200\ \mu\text{F}$, $V_s=10$ V', problem: String.raw`An empty $200\ \mu\text{F}$ capacitor charges through $R=5\ \text{k}\Omega$ from $V_s=10$ V. Find $\tau$, $i(0)$ and the time to reach $v_C=5$ V.`, steps: [
+          { prompt: String.raw`<b>Time constant.</b> $\tau$ in s:`, ask: { kind: 'numeric', answer: 1 }, hint: String.raw`$\tau=RC=5\cdot10^{3}\cdot200\cdot10^{-6}$.`, reveal: String.raw`$\tau=5\cdot10^3\cdot2\cdot10^{-4}=10\cdot10^{-1}=1$ s.` },
+          { prompt: String.raw`<b>Start current.</b> $i(0)$ in mA:`, ask: { kind: 'numeric', answer: 2 }, hint: String.raw`Empty capacitor = wire, so $i(0)=V_s/R$.`, reveal: String.raw`$i(0)=10/5000=0.002$ A $=2$ mA.` },
+          { prompt: String.raw`<b>Get the exponential alone.</b> Set $5=10(1-e^{-t})$. What does $e^{-t}$ equal?`, ask: { kind: 'numeric', answer: 0.5 }, hint: String.raw`Divide both sides by 10, then move $e^{-t}$ to one side and the number to the other.`, reveal: String.raw`$0.5=1-e^{-t}$, so $e^{-t}=0.5$.` },
+          { prompt: String.raw`<b>Undo e with ln.</b> $t$ in s:`, ask: { kind: 'numeric', answer: 'log(2)', tol: 0.005 }, hint: String.raw`ln of both sides: $-t=\ln0.5$, then multiply by $-1$.`, reveal: String.raw`$-t=\ln0.5=-0.693$, so $t\approx0.693$ s. Half of $V_s$ is reached after $0.69\,\tau$.` },
+        ], finale: String.raw`P6(d) is the same: substitute, divide, isolate the exponential, take ln.` },
+        { type: 'text', html: String.raw`<h3>2. RL switch-on: time constant, final current, values at a given time</h3><p>$L=100$ mH, $R=20\ \Omega$, $V_s=10$ V, switched on at $t=0$. Find $\tau$, $i(\infty)$, and $i$ and $v_L$ at $t=10$ ms.</p>` },
+        { type: 'derive', title: 'Worked example: RL at $t=10$ ms', given: String.raw`L=100\text{ mH},\quad R=20\ \Omega,\quad V_s=10\text{ V}`, colors: { L: 1, R: 2, Vs: 3, t: 4, fin: 5, i: 6, vL: 7 }, steps: [
+          { kind: 'sub', label: String.raw`$\tau=L/R$ with $L$ in henry`, from: String.raw`\tau=\frac{\T{L-1}{L}}{\T{R-1}{R}}`, to: String.raw`\tau=\frac{\T{L-1}{0.1\text{ H}}}{\T{R-1}{20\ \Omega}}=0.005\text{ s}=5\text{ ms}`,
+            why: String.raw`100 mH $=0.1$ H.` },
+          { kind: 'sub', label: 'End value: inductor = wire', from: String.raw`i(\infty)=\frac{\T{Vs-1}{V_s}}{\T{R-1}{R}}`, to: String.raw`i(\infty)=\frac{\T{Vs-1}{10}}{\T{R-1}{20}}=0.5\text{ A}`,
+            why: String.raw`When the current stops changing, $v_L=L\,di/dt=0$, so all of $V_s$ is across $R$.` },
+          { kind: 'sub', label: String.raw`Rising current with $t/\tau=10/5=2$`, from: String.raw`i=\T{fin-1}{\frac{V_s}{R}}\,(1-e^{-\T{t-1}{t/\tau}})`, to: String.raw`i=\T{fin-1}{0.5}\,(1-e^{-\T{t-1}{2}})=0.5\cdot0.865=0.432\text{ A}`,
+            why: String.raw`$e^{-2}\approx0.135$, so after two time constants the current is at 86.5 % of its final value.` },
+          { kind: 'sub', label: String.raw`Decaying inductor voltage, $t/\tau=2$`, from: String.raw`v_L=\T{Vs-1}{V_s}\,e^{-\T{t-1}{t/\tau}}`, to: String.raw`v_L=\T{Vs-1}{10}\,e^{-\T{t-1}{2}}=10\cdot0.135=1.35\text{ V}`,
+            why: String.raw`The inductor voltage starts at $V_s$ and decays with the same $\tau$.` },
+          { kind: 'check', label: 'KVL check', from: String.raw`R\,\T{i-x}{i}+\T{vL-x}{v_L}=V_s\qquad\qquad i=\T{i-1}{0.432},\quad v_L=\T{vL-1}{1.35}`, to: String.raw`20\cdot\T{i-1}{0.432}+\T{vL-1}{1.35}=8.65+1.35=10\text{ V}\ \checkmark`,
+            arrows: { 'i-1': '', 'vL-1': '' },
+            why: String.raw`Resistor voltage plus inductor voltage equals the source voltage at every instant.` },
+        ] },
+        { type: 'guided', title: 'RL: $L=20$ mH, $R=4\ \Omega$, $V_s=12$ V', problem: String.raw`$L=20$ mH, $R=4\ \Omega$, $V_s=12$ V, switched on at $t=0$. Find $\tau$, $i(\infty)$, and $i$ and $v_L$ at $t=5$ ms.`, steps: [
+          { prompt: String.raw`<b>Time constant.</b> $\tau$ in ms:`, ask: { kind: 'numeric', answer: 5 }, hint: String.raw`$\tau=L/R$ with $L=0.02$ H.`, reveal: String.raw`$\tau=0.02/4=0.005$ s $=5$ ms.` },
+          { prompt: String.raw`<b>Final current.</b> $i(\infty)$ in A:`, ask: { kind: 'numeric', answer: 3 }, hint: String.raw`In DC steady state the inductor is a wire: $i(\infty)=V_s/R$.`, reveal: String.raw`$i(\infty)=12/4=3$ A.` },
+          { prompt: String.raw`<b>Current at 5 ms.</b> $i$ in A:`, ask: { kind: 'numeric', answer: '3*(1-exp(-1))', tol: 0.005 }, hint: String.raw`$t/\tau=5/5=1$, so $i=3\,(1-e^{-1})$.`, reveal: String.raw`$i=3\cdot0.632=1.90$ A.` },
+          { prompt: String.raw`<b>Inductor voltage at 5 ms.</b> $v_L$ in V:`, ask: { kind: 'numeric', answer: '12*exp(-1)', tol: 0.005 }, hint: String.raw`$v_L=V_s\,e^{-t/\tau}$ with $t/\tau=1$.`, reveal: String.raw`$v_L=12\cdot0.368=4.41$ V. KVL: $4\cdot1.90+4.41\approx12$ V ✓.` },
+        ], finale: String.raw`P7 uses exactly these four formulas.` },
+      ],
+    },
+    {
+      id: 'worked-component-laws',
+      title: 'Worked examples: inductor, capacitor and Faraday',
+      blocks: [
+        { type: 'text', html: String.raw`<p>Assignment P8 builds on this lesson (Lecture 2 components). Every one of these is "rate of change times a constant". Convert the time to seconds first.</p><p>(i) A 5 mH inductor's current ramps from 0.5 A to 2.5 A in 40 µs: inductor voltage? (ii) A 20 µF capacitor's voltage rises at 10 V/ms: current? (iii) A 50-turn coil's flux changes by 0.04 Wb in 20 ms: induced EMF?</p>` },
+        { type: 'derive', title: 'Worked example: three component laws', given: String.raw`L=5\text{ mH},\quad C=20\ \mu\text{F},\quad N=50`, colors: { i: 1, dt: 2, L: 3, d: 4, ms: 5, C: 6, N: 7 }, steps: [
+          { kind: 'calc', label: 'Inductor: slope = rise ÷ run', from: String.raw`\frac{di}{dt}=\frac{\T{i-1}{2.5}-\T{i-2}{0.5}}{\T{dt-1}{40\cdot10^{-6}}}`, to: String.raw`\frac{di}{dt}=\frac{\T{i-1}{2}}{\T{dt-1}{4\cdot10^{-5}}}=5\cdot10^{4}\text{ A/s}`,
+            map: { 'i-2': ['i-1'] },
+            why: String.raw`The current rises by $2.5-0.5=2$ A in $40\ \mu\text{s}=4\cdot10^{-5}$ s.` },
+          { kind: 'sub', label: String.raw`$v=L\,\frac{di}{dt}$`, from: String.raw`v=\T{L-1}{L}\,\T{d-1}{\frac{di}{dt}}`, to: String.raw`v=\T{L-1}{5\cdot10^{-3}}\cdot\T{d-1}{5\cdot10^{4}}=25\cdot10^{1}=250\text{ V}`,
+            why: String.raw`Multiply the numbers ($5\cdot5=25$) and add the exponents ($-3+4=1$).` },
+          { kind: 'calc', label: 'Capacitor: per millisecond → per second', from: String.raw`\frac{dv}{dt}=\frac{10\text{ V}}{\T{ms-1}{1\text{ ms}}}`, to: String.raw`\frac{dv}{dt}=\frac{10\text{ V}}{\T{ms-1}{10^{-3}\text{ s}}}=10^{4}\text{ V/s}`,
+            why: String.raw`1 ms $=10^{-3}$ s; dividing by $10^{-3}$ multiplies by 1000.` },
+          { kind: 'sub', label: String.raw`$i=C\,\frac{dv}{dt}$`, from: String.raw`i=\T{C-1}{C}\,\frac{dv}{dt}`, to: String.raw`i=\T{C-1}{20\cdot10^{-6}}\cdot10^{4}=20\cdot10^{-2}=0.2\text{ A}=200\text{ mA}`,
+            why: String.raw`µ $=10^{-6}$; $-6+4=-2$.` },
+          { kind: 'sub', label: 'Faraday with Lenz sign', from: String.raw`e=-\T{N-1}{N}\,\frac{\Delta\Phi}{\Delta t}`, to: String.raw`e=-\T{N-1}{50}\cdot\frac{0.04}{0.02}=-50\cdot2=-100\text{ V}`,
+            why: String.raw`20 ms $=0.02$ s. The minus sign (Lenz) means the EMF opposes the change in flux.` },
+        ] },
+        { type: 'guided', title: 'Three component laws, new numbers', problem: String.raw`(i) A 1 mH inductor's current ramps from 2 A to 6 A in 8 µs. (ii) A 50 µF capacitor's voltage rises at 2 V/ms. (iii) A 100-turn coil's flux changes by 0.01 Wb in 5 ms.`, steps: [
+          { prompt: String.raw`<b>Inductor slope.</b> $\dfrac{di}{dt}$ in A/s:`, ask: { kind: 'numeric', answer: 500000 }, hint: String.raw`Rise ÷ run: $\dfrac{6-2}{8\cdot10^{-6}}$.`, reveal: String.raw`$\dfrac{4}{8\cdot10^{-6}}=0.5\cdot10^{6}=5\cdot10^{5}$ A/s.` },
+          { prompt: String.raw`<b>Inductor voltage.</b> $v$ in V:`, ask: { kind: 'numeric', answer: 500 }, hint: String.raw`$v=L\,\dfrac{di}{dt}$ with $L=10^{-3}$ H.`, reveal: String.raw`$v=10^{-3}\cdot5\cdot10^{5}=500$ V.` },
+          { prompt: String.raw`<b>Capacitor current.</b> $i$ in mA:`, ask: { kind: 'numeric', answer: 100 }, hint: String.raw`2 V/ms $=2000$ V/s, then $i=C\,\dfrac{dv}{dt}$.`, reveal: String.raw`$i=50\cdot10^{-6}\cdot2000=0.1$ A $=100$ mA.` },
+          { prompt: String.raw`<b>Induced EMF.</b> $e$ in V, with sign:`, ask: { kind: 'numeric', answer: -200 }, hint: String.raw`$e=-N\,\dfrac{\Delta\Phi}{\Delta t}$ with $\Delta t=0.005$ s.`, reveal: String.raw`$e=-100\cdot\dfrac{0.01}{0.005}=-100\cdot2=-200$ V.` },
+        ] },
+      ],
+    },
+    {
+      id: 'worked-circuits',
+      title: 'Worked examples: resistors and KCL/KVL',
+      blocks: [
+        { type: 'text', html: String.raw`<p>Assignments P9 and P5 build on this lesson (Lecture 2 Kirchhoff).</p><h3>1. Series, parallel and power</h3><p>$R_1=6\ \Omega$, $R_2=3\ \Omega$. Find the series and parallel equivalents, and the power in each when the parallel pair sits across 6 V.</p>` },
+        { type: 'derive', title: String.raw`Worked example: $6\ \Omega$ and $3\ \Omega$`, given: String.raw`R_1=6\ \Omega,\quad R_2=3\ \Omega,\quad V=6\text{ V}`, colors: { Ra: 1, Rb: 2, V: 3 }, steps: [
+          { kind: 'sub', label: 'Series: add', from: String.raw`R_s=\T{Ra-1}{R_1}+\T{Rb-1}{R_2}`, to: String.raw`R_s=\T{Ra-1}{6}+\T{Rb-1}{3}=9\ \Omega`,
+            why: String.raw`The same current flows through both, so their voltages (and resistances) add.` },
+          { kind: 'sub', label: 'Parallel: product over sum', from: String.raw`R_p=\frac{\T{Ra-1}{R_1}\,\T{Rb-1}{R_2}}{\T{Ra-2}{R_1}+\T{Rb-2}{R_2}}`, to: String.raw`R_p=\frac{\T{Ra-1}{6}\cdot\T{Rb-1}{3}}{\T{Ra-2}{6}+\T{Rb-2}{3}}=\frac{18}{9}=2\ \Omega`,
+            why: String.raw`Smaller than $3\ \Omega$ ✓: a parallel pair is always smaller than its smallest resistor.` },
+          { kind: 'sub', label: String.raw`Power in $R_1$: $P=V^2/R$`, from: String.raw`P_1=\frac{\T{V-1}{V}^2}{\T{Ra-1}{R_1}}`, to: String.raw`P_1=\frac{\T{V-1}{6}^2}{\T{Ra-1}{6}}=\frac{36}{6}=6\text{ W}`,
+            why: String.raw`In parallel both resistors have the same 6 V across them, so this form needs no current.` },
+          { kind: 'sub', label: String.raw`Power in $R_2$`, from: String.raw`P_2=\frac{\T{V-1}{V}^2}{\T{Rb-1}{R_2}}`, to: String.raw`P_2=\frac{\T{V-1}{6}^2}{\T{Rb-1}{3}}=\frac{36}{3}=12\text{ W}`,
+            why: String.raw`In parallel the smaller resistor takes more power.` },
+        ] },
+        { type: 'guided', title: String.raw`$12\ \Omega$ and $4\ \Omega$ across 6 V`, problem: String.raw`$R_1=12\ \Omega$, $R_2=4\ \Omega$. Find $R_s$, $R_p$, and the power in each resistor when the parallel pair sits across 6 V.`, steps: [
+          { prompt: String.raw`<b>Series.</b> $R_s$ in Ω:`, ask: { kind: 'numeric', answer: 16 }, hint: String.raw`Series resistances add.`, reveal: String.raw`$R_s=12+4=16\ \Omega$.` },
+          { prompt: String.raw`<b>Parallel.</b> $R_p$ in Ω:`, ask: { kind: 'numeric', answer: 3 }, hint: String.raw`Product over sum: $\dfrac{12\cdot4}{12+4}$.`, reveal: String.raw`$R_p=48/16=3\ \Omega$, smaller than $4\ \Omega$ ✓.` },
+          { prompt: String.raw`<b>Power in $R_1$.</b> $P_1$ in W:`, ask: { kind: 'numeric', answer: 3 }, hint: String.raw`Same 6 V across both: $P=V^2/R$.`, reveal: String.raw`$P_1=36/12=3$ W.` },
+          { prompt: String.raw`<b>Power in $R_2$.</b> $P_2$ in W:`, ask: { kind: 'numeric', answer: 9 }, hint: String.raw`$P_2=V^2/R_2$.`, reveal: String.raw`$P_2=36/4=9$ W: the smaller resistor takes more power.` },
+        ] },
+        { type: 'text', html: String.raw`<h3>2. Two loops and a node: solve the currents</h3><p>The slide-31 circuit (figure in P5): $R_1=10\ \Omega$ between B and D, $R_2=5\ \Omega$ and $R_3=20\ \Omega$ in series from B to C, now with $V_1=30$ V and $V_2=10$ V. Equations: KCL at B: $I_1+I_2-I_3=0$ (1); loop 1: $V_1-R_1I_3=0$ (2); loop 2: $V_2-R_3I_2-R_2I_2-R_1I_3=0$ (3). Recipe: start with the equation that has one unknown, then use each answer in the next.</p>` },
+        { type: 'derive', title: String.raw`Worked example: $V_1=30$ V, $V_2=10$ V`, given: String.raw`V_1=30\text{ V},\quad V_2=10\text{ V},\quad R_1=10\ \Omega,\quad R_2=5\ \Omega,\quad R_3=20\ \Omega`, colors: { Ia: 1, Ib: 2, Ic: 3, k: 5, n: 8, b: 6 }, steps: [
+          { kind: 'sub', label: 'Values into (2)', from: String.raw`V_1-R_1\,\T{Ic-1}{I_3}=0`, to: String.raw`30-\T{k-1}{10}\,\T{Ic-1}{I_3}=0`,
+            why: String.raw`Loop 1 has only one unknown, $I_3$, so we start there.` },
+          { kind: 'both', label: String.raw`Both sides $+10\,I_3$`, to: String.raw`30=\T{k-1}{10}\,\T{Ic-1}{I_3}`,
+            arrows: { 'k-1': '+10·I3 on both sides', 'Ic-1': '' },
+            why: String.raw`Adding $10I_3$ to both sides cancels $-10I_3$ on the left and makes it positive on the right.` },
+          { kind: 'both', label: String.raw`Both sides $\div10$`, to: String.raw`\T{Ic-1}{I_3}=\frac{30}{\T{k-1}{10}}=3\text{ A}`,
+            arrows: { 'k-1': '÷ 10 on both sides' },
+            why: String.raw`Dividing by 10 frees $I_3$. Positive: it flows down through R1 as assumed.` },
+          { kind: 'sub', label: String.raw`Values and $I_3=3$ into (3)`, from: String.raw`V_2-R_3\,I_2-R_2\,I_2-R_1\,\T{Ic-1}{I_3}=0`, to: String.raw`10-20\,I_2-5\,I_2-10\cdot\T{Ic-1}{3}=0`,
+            why: String.raw`Now loop 2 has only one unknown left, $I_2$.` },
+          { kind: 'calc', label: 'Collect like terms', from: String.raw`\T{n-1}{10}-\T{b-1}{20\,I_2}-\T{b-2}{5\,I_2}\T{n-2}{-10\cdot3}=0`, to: String.raw`\T{n-1}{-20}-\T{b-1}{25\,I_2}=0`,
+            map: { 'n-2': ['n-1'], 'b-2': ['b-1'] },
+            why: String.raw`Numbers with numbers: $10-30=-20$. $I_2$-terms with $I_2$-terms: $-20I_2-5I_2=-25I_2$.` },
+          { kind: 'both', label: String.raw`Both sides $+20$`, from: String.raw`\T{n-1}{-20}-25\,\T{Ib-1}{I_2}=0`, to: String.raw`-25\,\T{Ib-1}{I_2}=\T{n-1}{20}`,
+            arrows: { 'n-1': '+20 on both sides' },
+            why: String.raw`Adding 20 to both sides cancels $-20$ on the left.` },
+          { kind: 'both', label: String.raw`Both sides $\div(-25)$`, from: String.raw`\T{k-2}{-25}\,\T{Ib-1}{I_2}=\T{n-1}{20}`, to: String.raw`\T{Ib-1}{I_2}=\frac{\T{n-1}{20}}{\T{k-2}{-25}}=-0.8\text{ A}`,
+            arrows: { 'k-2': '÷ (−25) on both sides' },
+            why: String.raw`Negative: the real current flows opposite to the assumed arrow, B → C. No need to redraw anything.` },
+          { kind: 'both', label: String.raw`KCL (1): both sides $+I_3$`, from: String.raw`\T{Ia-1}{I_1}+\T{Ib-1}{I_2}-\T{Ic-1}{I_3}=0`, to: String.raw`\T{Ia-1}{I_1}+\T{Ib-1}{I_2}=\T{Ic-1}{I_3}`,
+            arrows: { 'Ic-1': '+I3 on both sides' },
+            why: String.raw`In = out at node B.` },
+          { kind: 'both', label: String.raw`Both sides $-I_2$`, to: String.raw`\T{Ia-1}{I_1}=\T{Ic-1}{I_3}-\T{Ib-1}{I_2}`,
+            arrows: { 'Ib-1': '−I2 on both sides' },
+            why: String.raw`Subtracting $I_2$ from both sides leaves $I_1$ alone.` },
+          { kind: 'sub', label: String.raw`$I_3=3$, $I_2=-0.8$`, to: String.raw`\T{Ia-1}{I_1}=\T{Ic-1}{3}-(\T{Ib-1}{-0.8})=3+0.8=3.8\text{ A}`,
+            why: String.raw`Subtracting a negative number adds it.` },
+          { kind: 'check', label: 'Check loop 2', from: String.raw`V_2-R_3I_2-R_2I_2-R_1I_3=0`, to: String.raw`10-20(-0.8)-5(-0.8)-10\cdot3=10+16+4-30=0\ \checkmark`,
+            why: String.raw`All three answers together satisfy the loop equation.` },
+        ] },
+        { type: 'guided', title: String.raw`Same circuit, $V_1=50$ V, $V_2=40$ V`, problem: String.raw`Same slide-31 circuit and resistors ($R_1=10\ \Omega$, $R_2=5\ \Omega$, $R_3=20\ \Omega$), now $V_1=50$ V and $V_2=40$ V. Solve $I_3$, $I_2$, $I_1$ and $V_{R2}$, keeping the assumed directions.`, steps: [
+          { prompt: String.raw`<b>Start with loop 1.</b> $I_3$ in A:`, ask: { kind: 'numeric', answer: 5 }, hint: String.raw`(2): $50-10\,I_3=0$.`, reveal: String.raw`$10\,I_3=50$, so $I_3=5$ A.` },
+          { prompt: String.raw`<b>Loop 2.</b> $I_2$ in A (keep the sign):`, ask: { kind: 'numeric', answer: -0.4 }, hint: String.raw`(3) with $I_3=5$: $40-20I_2-5I_2-10\cdot5=0$, i.e. $-10-25I_2=0$.`, reveal: String.raw`$-25I_2=10$, so $I_2=-0.4$ A (real current B → C).` },
+          { prompt: String.raw`<b>Node B.</b> $I_1$ in A:`, ask: { kind: 'numeric', answer: 5.4 }, hint: String.raw`KCL rearranged: $I_1=I_3-I_2$.`, reveal: String.raw`$I_1=5-(-0.4)=5.4$ A.` },
+          { prompt: String.raw`<b>Ohm's law.</b> $V_{R2}$ in V (sign relative to the assumed $I_2$):`, ask: { kind: 'numeric', answer: -2 }, hint: String.raw`$V_{R2}=R_2I_2$; keep the sign of $I_2$.`, reveal: String.raw`$V_{R2}=5\cdot(-0.4)=-2$ V.` },
+          { prompt: String.raw`<b>Check loop 2.</b>`, show: String.raw`$40-20(-0.4)-5(-0.4)-10\cdot5=40+8+2-50=0$ ✓`, why: 'Always finish with a loop check: it catches sign slips.' },
+        ], finale: String.raw`P5 is this exact recipe with $V_1=100$ V, $V_2=20$ V.` },
       ],
     },
     {
@@ -328,10 +556,13 @@ export default {
   assignments: [
     {
       id: 'p1-buck-full', title: 'P1 · Buck, full', difficulty: 'core',
+      examples: ['worked-converters'],
       statement: String.raw`<p>A buck converter has $V_s=48$ V, $D=0.25$, load $R=6\ \Omega$. Find $V_o$, $I_o$, $I_L$, the average input current and check the power balance.</p><p>Habit for every problem: write the formula in symbols first, rearrange it in symbols, and only then put numbers in.</p>`,
       parts: [
         { label: '(a)', prompt: String.raw`Output voltage $V_o$ in V`, kind: 'numeric', answer: 12,
-          solution: [
+          hints: [String.raw`Which converter steps the voltage down, and what does $D$ do to it?`, String.raw`Buck ratio: $V_o=D\,V_s$.`, String.raw`$V_o=0.25\cdot48=\dots$`],
+          solution: String.raw`$V_o=DV_s=0.25\cdot48=12$ V.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>We write the buck ratio in symbols, then put the numbers in.</p>` },
             { type: 'derive', colors: { Vo: 1, Io: 2, D: 3, Vs: 4 }, steps: [
               { kind: 'sub', label: 'Buck ratio, then numbers', from: String.raw`\T{Vo-1}{V_o}=\T{D-1}{D}\,\T{Vs-1}{V_s}`, to: String.raw`\T{Vo-1}{V_o}=\T{D-1}{0.25}\cdot\T{Vs-1}{48}=12\text{ V}`,
@@ -339,7 +570,9 @@ export default {
             ] },
           ] },
         { label: '(b)', prompt: String.raw`Load current $I_o$ in A`, kind: 'numeric', answer: 2,
-          solution: [
+          hints: [String.raw`The load is a resistor with $V_o$ across it.`, String.raw`Ohm's law: $I_o=V_o/R$.`, String.raw`$I_o=12/6=\dots$`],
+          solution: String.raw`$I_o=V_o/R=12/6=2$ A.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>We use Ohm's law on the load with $V_o=12$ V from (a).</p>` },
             { type: 'derive', colors: { Vo: 1, Io: 2, R: 5 }, steps: [
               { kind: 'sub', label: "Ohm's law on the load", from: String.raw`\T{Io-1}{I_o}=\frac{\T{Vo-1}{V_o}}{\T{R-1}{R}}`, to: String.raw`\T{Io-1}{I_o}=\frac{\T{Vo-1}{12}}{\T{R-1}{6}}=2\text{ A}`,
@@ -347,7 +580,9 @@ export default {
             ] },
           ] },
         { label: '(c)', prompt: String.raw`Average inductor current $I_L$ in A`, kind: 'numeric', answer: 2,
-          solution: [
+          hints: [String.raw`Where does the average inductor current go in a buck converter?`, String.raw`Amp-second balance: the average capacitor current is zero, so $I_L=I_o$.`, String.raw`$I_L=I_o$ from (b).`],
+          solution: String.raw`$I_L=I_o=2$ A.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>We use the buck amp-second result: the average inductor current equals the load current.</p>` },
             { type: 'derive', colors: { Io: 2, IL: 6 }, steps: [
               { kind: 'sub', label: 'Buck amp-second result', from: String.raw`\T{IL-1}{I_L}=\T{Io-1}{I_o}`, to: String.raw`\T{IL-1}{I_L}=\T{Io-1}{2}\text{ A}`,
@@ -355,7 +590,9 @@ export default {
             ] },
           ] },
         { label: '(d)', prompt: String.raw`Average input current $I_s$ in A`, kind: 'numeric', answer: 0.5,
-          solution: [
+          hints: [String.raw`The source is connected to the inductor only while the switch is on.`, String.raw`$I_s=D\,I_L$.`, String.raw`$I_s=0.25\cdot2=\dots$`],
+          solution: String.raw`$I_s=DI_L=0.25\cdot2=0.5$ A.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>The source only delivers current during the on-fraction $D$ of each period, so we scale $I_L$ by $D$.</p>` },
             { type: 'derive', colors: { D: 3, IL: 6, Is: 7 }, steps: [
               { kind: 'sub', label: 'Source current = on-fraction of the inductor current', from: String.raw`\T{Is-1}{I_s}=\T{D-1}{D}\,\T{IL-1}{I_L}`, to: String.raw`\T{Is-1}{I_s}=\T{D-1}{0.25}\cdot\T{IL-1}{2}=0.5\text{ A}`,
@@ -363,7 +600,9 @@ export default {
             ] },
           ] },
         { label: '(e)', prompt: String.raw`Input power $P_{in}$ in W (it must equal $P_{out}$)`, kind: 'numeric', answer: 24,
-          solution: [
+          hints: [String.raw`Power is voltage times current, here on the input side.`, String.raw`$P_{in}=V_sI_s$; then compare with $P_{out}=V_oI_o$.`, String.raw`$P_{in}=48\cdot0.5=\dots$`],
+          solution: String.raw`$P_{in}=48\cdot0.5=24$ W $=P_{out}=12\cdot2$ ✓.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>We check that power in equals power out.</p>` },
             { type: 'derive', colors: { Vo: 1, Io: 2, Vs: 4, Is: 7 }, steps: [
               { kind: 'check', label: 'Power in = power out', from: String.raw`P_{in}=\T{Vs-1}{V_s}\,\T{Is-1}{I_s}\qquad P_{out}=\T{Vo-1}{V_o}\,\T{Io-1}{I_o}`,
@@ -375,10 +614,13 @@ export default {
     },
     {
       id: 'p2-boost-find-d', title: 'P2 · Boost, find D', difficulty: 'core',
+      examples: ['worked-converters'],
       statement: String.raw`<p>A boost converter must make 48 V from a 12 V battery. What duty cycle is needed?</p>`,
       parts: [
         { label: '(a)', prompt: String.raw`Duty cycle $D$ (as a fraction, e.g. 0.5)`, kind: 'numeric', answer: 0.75,
-          solution: [
+          hints: [String.raw`Which formula links $V_o$, $V_s$ and $D$ for a boost converter?`, String.raw`Boost ratio $V_o=\dfrac{V_s}{1-D}$. Solve it for $D$ in symbols before putting numbers in.`, String.raw`Multiply both sides by $(1-D)$ and divide by $V_o$: $1-D=\dfrac{V_s}{V_o}=\dfrac{12}{48}$.`],
+          solution: String.raw`$D=1-\frac{V_s}{V_o}=1-\frac{12}{48}=0.75$.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>We start from the boost ratio $V_o=\dfrac{V_s}{1-D}$. $D$ is stuck inside the bottom of a fraction. Plan: get the bracket out from underneath, then isolate $D$. We do it in symbols first, then put the numbers in.</p>` },
             { type: 'derive', symbolic: true, title: 'Boost ratio solved for $D$', colors: { Vs: 1, Vo: 2, D: 3, omd: 4, rat: 5, one: 6 }, steps: [
               { kind: 'both', label: String.raw`Both sides $\times(1-D)$`, from: String.raw`\T{Vo-1}{V_o}=\frac{\T{Vs-1}{V_s}}{\T{omd-1}{1-D}}`, to: String.raw`\T{Vo-1}{V_o}\,\T{omd-1}{(1-D)}=\T{Vs-1}{V_s}`,
@@ -414,10 +656,13 @@ export default {
     },
     {
       id: 'p3-boost-currents', title: 'P3 · Boost currents', difficulty: 'exam',
+      examples: ['worked-converters'],
       statement: String.raw`<p>Boost converter, $V_s=24$ V, $D=0.6$, $I_o=3$ A. Find $V_o$, $I_L$ and verify power.</p>`,
       parts: [
         { label: '(a)', prompt: String.raw`Output voltage $V_o$ in V`, kind: 'numeric', answer: 60,
-          solution: [
+          hints: [String.raw`A boost converter's output is above its input.`, String.raw`$V_o=\dfrac{V_s}{1-D}$.`, String.raw`$1-D=0.4$, so $V_o=24/0.4=\dots$`],
+          solution: String.raw`$V_o=24/0.4=60$ V.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>We put the numbers into the boost ratio.</p>` },
             { type: 'derive', colors: { Vs: 1, Vo: 2, D: 3 }, steps: [
               { kind: 'sub', label: 'Boost ratio, then numbers', from: String.raw`\T{Vo-1}{V_o}=\frac{\T{Vs-1}{V_s}}{1-\T{D-1}{D}}`, to: String.raw`\T{Vo-1}{V_o}=\frac{\T{Vs-1}{24}}{1-\T{D-1}{0.6}}=\frac{24}{0.4}=60\text{ V}`,
@@ -425,7 +670,9 @@ export default {
             ] },
           ] },
         { label: '(b)', prompt: String.raw`Average inductor current $I_L$ in A`, kind: 'numeric', answer: 7.5,
-          solution: [
+          hints: [String.raw`In a boost, which current is larger: the inductor current or the load current?`, String.raw`Boost amp-second result: $I_o=I_L(1-D)$. Solve it for $I_L$.`, String.raw`$I_L=\dfrac{I_o}{1-D}=\dfrac{3}{0.4}$.`],
+          solution: String.raw`$I_L=I_o/(1-D)=3/0.4=7.5$ A.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>The boost amp-second result is $I_o=I_L(1-D)$. We solve it for $I_L$ in symbols, then put the numbers in.</p>` },
             { type: 'derive', symbolic: true, title: 'Boost currents solved for $I_L$', colors: { Io: 1, IL: 2, omd: 4 }, steps: [
               { kind: 'both', label: String.raw`Both sides $\div(1-D)$`, from: String.raw`\T{Io-1}{I_o}=\T{IL-1}{I_L}\,\T{omd-1}{(1-D)}`, to: String.raw`\frac{\T{Io-1}{I_o}}{\T{omd-1}{1-D}}=\T{IL-1}{I_L}`,
@@ -449,7 +696,9 @@ export default {
             ] },
           ] },
         { label: '(c)', prompt: String.raw`Input power $P_{in}$ in W (it must equal $P_{out}$)`, kind: 'numeric', answer: 180,
-          solution: [
+          hints: [String.raw`In a boost the source current is the inductor current.`, String.raw`$P_{in}=V_sI_L$; then compare with $P_{out}=V_oI_o$.`, String.raw`$P_{in}=24\cdot7.5=\dots$`],
+          solution: String.raw`$P_{in}=24\cdot7.5=180$ W $=P_{out}=60\cdot3$ ✓.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>We check power in = power out. In a boost the input current is the inductor current.</p>` },
             { type: 'derive', colors: { Io: 1, IL: 2, Vs: 5, Vo: 6 }, steps: [
               { kind: 'check', label: 'Power in = power out', from: String.raw`P_{in}=\T{Vs-1}{V_s}\,\T{IL-1}{I_L}\qquad P_{out}=\T{Vo-1}{V_o}\,\T{Io-1}{I_o}`,
@@ -461,10 +710,13 @@ export default {
     },
     {
       id: 'p4-timing', title: 'P4 · Timing', difficulty: 'core',
+      examples: ['worked-converters'],
       statement: String.raw`<p>A converter switches at $f_s=100$ kHz with $D=0.4$. Find $T_s$, $t_{on}$, $t_{off}$.</p>`,
       parts: [
         { label: '(a)', prompt: String.raw`Switching period $T_s$ in µs`, kind: 'numeric', answer: 10,
-          solution: [
+          hints: [String.raw`Period and frequency are reciprocals.`, String.raw`$T_s=1/f_s$ with $f_s$ in Hz.`, String.raw`$T_s=\dfrac{1}{100\,000}$ s; then convert to µs (1 µs $=10^{-6}$ s).`],
+          solution: String.raw`$T_s=1/f_s=10$ µs.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>The period is one over the frequency.</p>` },
             { type: 'derive', colors: { Ts: 1, fs: 2 }, steps: [
               { kind: 'sub', label: 'Period = 1 / frequency', from: String.raw`\T{Ts-1}{T_s}=\frac{1}{\T{fs-1}{f_s}}`, to: String.raw`\T{Ts-1}{T_s}=\frac{1}{\T{fs-1}{100\,000\text{ Hz}}}=10^{-5}\text{ s}=10\ \mu\text{s}`,
@@ -472,7 +724,9 @@ export default {
             ] },
           ] },
         { label: '(b)', prompt: String.raw`On-time $t_{on}$ in µs`, kind: 'numeric', answer: 4,
-          solution: [
+          hints: [String.raw`$D$ is the fraction of each period that the switch is on.`, String.raw`$t_{on}=D\,T_s$.`, String.raw`$t_{on}=0.4\cdot10$ µs.`],
+          solution: String.raw`$t_{on}=DT_s=4$ µs.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>The on-time is the fraction $D$ of the period.</p>` },
             { type: 'derive', colors: { Ts: 1, D: 3 }, steps: [
               { kind: 'sub', label: String.raw`On-time = $D$ × period`, from: String.raw`t_{on}=\T{D-1}{D}\,\T{Ts-1}{T_s}`, to: String.raw`t_{on}=\T{D-1}{0.4}\cdot\T{Ts-1}{10}=4\ \mu\text{s}`,
@@ -480,7 +734,9 @@ export default {
             ] },
           ] },
         { label: '(c)', prompt: String.raw`Off-time $t_{off}$ in µs`, kind: 'numeric', answer: 6,
-          solution: [
+          hints: [String.raw`The off-time is what is left of the period.`, String.raw`$t_{off}=(1-D)\,T_s$, or $T_s-t_{on}$.`, String.raw`$t_{off}=0.6\cdot10$ µs.`],
+          solution: String.raw`$t_{off}=(1-D)T_s=6$ µs.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>The off-time is the rest of the period.</p>` },
             { type: 'derive', colors: { Ts: 1, D: 3 }, steps: [
               { kind: 'sub', label: 'Off-time = the rest', from: String.raw`t_{off}=(1-\T{D-1}{D})\,\T{Ts-1}{T_s}`, to: String.raw`t_{off}=(1-\T{D-1}{0.4})\cdot\T{Ts-1}{10}=0.6\cdot10=6\ \mu\text{s}`,
@@ -491,11 +747,14 @@ export default {
     },
     {
       id: 'p5-kcl-kvl', title: 'P5 · KCL/KVL "food for thought"', difficulty: 'exam',
+      examples: ['worked-circuits'],
       statement: String.raw`<p>Same circuit as slide 31 (the Lecture 2 Kirchhoff example) but with $V_1=100$ V and $V_2=20$ V. Solve all currents and resistor voltages. Keep the assumed current directions from the figure.</p><p>The equations from the L2 example are unchanged; only the source values change: KCL at B: $I_1+I_2-I_3=0$ (1); loop 1: $V_1-R_1I_3=0$ (2); loop 2: $V_2-R_3I_2-R_2I_2-R_1I_3=0$ (3).</p>`,
       blocks: [{ type: 'figure', svg: P5_SVG, caption: String.raw`Slide 31 with the new source values. At node B: $I_1$ and $I_2$ flow in, $I_3$ flows out down through R1.` }],
       parts: [
         { label: '(a)', prompt: String.raw`$I_3$ in A`, kind: 'numeric', answer: 10,
-          solution: [
+          hints: [String.raw`Which of the three equations has only one unknown?`, String.raw`Loop 1, equation (2): $V_1-R_1I_3=0$.`, String.raw`$100-10\,I_3=0$, so $10\,I_3=100$.`],
+          solution: String.raw`$I_3=V_1/R_1=10$ A.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>Loop 1, equation (2), has only one unknown, so we solve it first.</p>` },
             { type: 'derive', colors: { Ia: 1, Ib: 2, Ic: 3, k: 5, n: 8 }, steps: [
               { kind: 'sub', label: 'Values into (2)', from: String.raw`V_1-R_1\,\T{Ic-1}{I_3}=0`, to: String.raw`100-\T{k-1}{10}\,\T{Ic-1}{I_3}=0`,
@@ -509,7 +768,9 @@ export default {
             ] },
           ] },
         { label: '(b)', prompt: String.raw`$I_2$ in A (keep the sign)`, kind: 'numeric', answer: -3.2,
-          solution: [
+          hints: [String.raw`Now $I_3$ is known. Which equation then has $I_2$ as its only unknown?`, String.raw`Loop 2, equation (3), with $I_3=10$ A put in. Collect the $I_2$ terms.`, String.raw`$20-20I_2-5I_2-10\cdot10=0$, i.e. $-80-25I_2=0$.`],
+          solution: String.raw`$-80-25I_2=0$, so $I_2=-3.2$ A.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>We put the new values and $I_3=10$ A into loop 2, equation (3), and solve for $I_2$.</p>` },
             { type: 'derive', colors: { Ia: 1, Ib: 2, Ic: 3, k: 5, n: 8 }, steps: [
               { kind: 'sub', label: String.raw`Values and $I_3=10$ into (3)`, from: String.raw`V_2-R_3\,\T{Ib-1}{I_2}-R_2\,\T{Ib-2}{I_2}-R_1\,\T{Ic-1}{I_3}=0`, to: String.raw`20-20\,\T{Ib-1}{I_2}-5\,\T{Ib-2}{I_2}-10\cdot\T{Ic-1}{10}=0`,
@@ -526,7 +787,9 @@ export default {
             ] },
           ] },
         { label: '(c)', prompt: String.raw`$I_1$ in A`, kind: 'numeric', answer: 13.2,
-          solution: [
+          hints: [String.raw`Use the node equation.`, String.raw`KCL (1): $I_1+I_2-I_3=0$, so $I_1=I_3-I_2$.`, String.raw`$I_1=10-(-3.2)$.`],
+          solution: String.raw`$I_1=I_3-I_2=13.2$ A.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>We rearrange the KCL equation (1) for $I_1$, then substitute $I_3$ and $I_2$.</p>` },
             { type: 'derive', colors: { Ia: 1, Ib: 2, Ic: 3 }, steps: [
               { kind: 'both', label: String.raw`Both sides $+I_3$`, from: String.raw`\T{Ia-1}{I_1}+\T{Ib-1}{I_2}-\T{Ic-1}{I_3}=0`, to: String.raw`\T{Ia-1}{I_1}+\T{Ib-1}{I_2}=\T{Ic-1}{I_3}`,
@@ -540,21 +803,51 @@ export default {
             ] },
           ] },
         { label: '(d)', prompt: String.raw`$V_{R1}$ in V`, kind: 'numeric', answer: 100,
-          solution: String.raw`<p>Ohm's law on R1 with $I_3$: $V_{R1}=R_1I_3=10\cdot10=100$ V (it equals $V_1$, as loop 1 says).</p>` },
+          hints: [String.raw`Which current flows through R1?`, String.raw`Ohm's law: $V_{R1}=R_1I_3$.`, String.raw`$V_{R1}=10\cdot10$.`],
+          solution: String.raw`<p>Ohm's law on R1 with $I_3$: $V_{R1}=R_1I_3=10\cdot10=100$ V (it equals $V_1$, as loop 1 says).</p>`,
+          walkthrough: [
+            { type: 'text', html: String.raw`<p>We use Ohm's law on R1. The current through R1 is $I_3$ from (a).</p>` },
+            { type: 'derive', colors: { Ic: 3 }, steps: [
+              { kind: 'sub', label: String.raw`Ohm's law with $I_3=10$ A`, from: String.raw`V_{R1}=R_1\,\T{Ic-1}{I_3}`, to: String.raw`V_{R1}=10\cdot\T{Ic-1}{10}=100\text{ V}`,
+                why: String.raw`$R_1=10\ \Omega$. The result equals $V_1$, exactly as loop 1 says: R1 sits directly across V1.` },
+            ] },
+          ] },
         { label: '(e)', prompt: String.raw`$V_{R2}$ in V (sign relative to the assumed $I_2$ direction)`, kind: 'numeric', answer: -16,
-          solution: String.raw`<p>Ohm's law on R2 with $I_2$: $V_{R2}=R_2I_2=5\cdot(-3.2)=-16$ V.</p>` },
+          hints: [String.raw`Which current flows through R2? Keep its sign.`, String.raw`Ohm's law: $V_{R2}=R_2I_2$ with $I_2=-3.2$ A.`, String.raw`$V_{R2}=5\cdot(-3.2)$.`],
+          solution: String.raw`<p>Ohm's law on R2 with $I_2$: $V_{R2}=R_2I_2=5\cdot(-3.2)=-16$ V.</p>`,
+          walkthrough: [
+            { type: 'text', html: String.raw`<p>We use Ohm's law on R2. The current through R2 is $I_2$ from (b), with its sign.</p>` },
+            { type: 'derive', colors: { Ib: 2 }, steps: [
+              { kind: 'sub', label: String.raw`Ohm's law with $I_2=-3.2$ A`, from: String.raw`V_{R2}=R_2\,\T{Ib-1}{I_2}`, to: String.raw`V_{R2}=5\cdot(\T{Ib-1}{-3.2})=-16\text{ V}`,
+                why: String.raw`$R_2=5\ \Omega$. Keep the minus sign: it says the real voltage has the opposite polarity to the one that goes with the assumed $I_2$ arrow.` },
+            ] },
+          ] },
         { label: '(f)', prompt: String.raw`$V_{R3}$ in V (sign relative to the assumed $I_2$ direction)`, kind: 'numeric', answer: -64,
-          solution: String.raw`<p>Ohm's law on R3 with $I_2$: $V_{R3}=R_3I_2=20\cdot(-3.2)=-64$ V. Check loop 2: $20-(-64)-(-16)-100=0$ ✓.</p>` },
+          hints: [String.raw`R3 is in series with R2, so it carries the same current.`, String.raw`Ohm's law: $V_{R3}=R_3I_2$.`, String.raw`$V_{R3}=20\cdot(-3.2)$.`],
+          solution: String.raw`<p>Ohm's law on R3 with $I_2$: $V_{R3}=R_3I_2=20\cdot(-3.2)=-64$ V. Check loop 2: $20-(-64)-(-16)-100=0$ ✓.</p>`,
+          walkthrough: [
+            { type: 'text', html: String.raw`<p>We use Ohm's law on R3, which carries the same $I_2$ as R2, then check loop 2.</p>` },
+            { type: 'derive', colors: { Ib: 2, a: 4, b: 5 }, steps: [
+              { kind: 'sub', label: String.raw`Ohm's law with $I_2=-3.2$ A`, from: String.raw`V_{R3}=R_3\,\T{Ib-1}{I_2}`, to: String.raw`V_{R3}=20\cdot(\T{Ib-1}{-3.2})=-64\text{ V}`,
+                why: String.raw`$R_3=20\ \Omega$. R3 is in series with R2, so the same current flows through it.` },
+              { kind: 'check', label: 'Check loop 2', from: String.raw`V_2-\T{a-x}{V_{R3}}-\T{b-x}{V_{R2}}-V_{R1}=0\qquad\qquad V_{R3}=\T{a-1}{-64},\quad V_{R2}=\T{b-1}{-16}`, to: String.raw`20-(\T{a-1}{-64})-(\T{b-1}{-16})-100=20+64+16-100=0\ \checkmark`,
+                arrows: { 'a-1': '', 'b-1': '' },
+                why: String.raw`Going round loop 2 the voltages must add up to zero. Subtracting a negative number adds it.` },
+            ] },
+          ] },
         { label: '(g)', kind: 'writeup', prompt: String.raw`Food for thought: compare with the original example ($V_1=20$ V, $V_2=100$ V, which gave $I_3=2$ A, $I_2=3.2$ A, $I_1=-1.2$ A). What changed, and what do the signs tell you?`,
           solution: String.raw`<p>The equations are the same; only the source values swap. Now $I_2=-3.2$ A is negative: the real current flows B → C, into the + terminal of V2, so V2 is being charged (in the original it was V1 that was charged, since $I_1$ was negative). $I_1=13.2$ A is now positive. The resistor voltages $V_{R2}=-16$ V and $V_{R3}=-64$ V have the same 16 V and 64 V magnitudes as the original but reversed polarity. You never need to guess directions correctly: a negative result just reverses the arrow.</p>` },
       ],
     },
     {
       id: 'p6-rc-transient', title: 'P6 · RC transient', difficulty: 'exam',
+      examples: ['worked-transients'],
       statement: String.raw`<p>$R=10\ \text{k}\Omega$, $C=100\ \mu\text{F}$, $V_s=12$ V, capacitor initially empty. Find $\tau$, $i(0)$, $v_C$ at 2 s, and the time to reach 9 V.</p>`,
       parts: [
         { label: '(a)', prompt: String.raw`Time constant $\tau$ in s`, kind: 'numeric', answer: 1,
-          solution: [
+          hints: [String.raw`Which time constant belongs to an RC circuit?`, String.raw`$\tau=RC$. Write k and µ as powers of ten.`, String.raw`$\tau=10\cdot10^{3}\cdot100\cdot10^{-6}$.`],
+          solution: String.raw`$\tau=RC=1$ s.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>We use $\tau=RC$, writing the prefixes as powers of ten.</p>` },
             { type: 'derive', colors: { R: 1, C: 2 }, steps: [
               { kind: 'sub', label: 'Prefixes as powers of ten', from: String.raw`\tau=\T{R-1}{R}\,\T{C-1}{C}`, to: String.raw`\tau=\T{R-1}{\underbrace{10\cdot10^{3}}_{10\text{ k}\Omega}}\cdot\T{C-1}{\underbrace{100\cdot10^{-6}}_{100\ \mu\text{F}}}`,
@@ -566,7 +859,9 @@ export default {
             ] },
           ] },
         { label: '(b)', prompt: String.raw`Initial current $i(0)$ in mA`, kind: 'numeric', answer: 1.2,
-          solution: [
+          hints: [String.raw`At $t=0$ an empty capacitor behaves like a wire.`, String.raw`$i(0)=V_s/R$.`, String.raw`$i(0)=12/10\,000$ A; then convert to mA.`],
+          solution: String.raw`$i(0)=V_s/R=1.2$ mA.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>We substitute $t=0$ into the charging current $i=\frac{V_s}{R}e^{-t/\tau}$.</p>` },
             { type: 'derive', colors: { Vs: 3, R: 1, t: 4 }, steps: [
               { kind: 'sub', label: String.raw`Substitute $t=0$`, from: String.raw`i=\frac{\T{Vs-1}{V_s}}{\T{R-1}{R}}\,e^{-\T{t-1}{t}/\tau}`, to: String.raw`i(0)=\frac{\T{Vs-1}{12}}{\T{R-1}{10\,000}}\,e^{-\T{t-1}{0}/1}=0.0012\cdot1=1.2\text{ mA}`,
@@ -574,7 +869,9 @@ export default {
             ] },
           ] },
         { label: '(c)', prompt: String.raw`$v_C$ at $t=2$ s, in V`, kind: 'numeric', answer: '12*(1-exp(-2))', tol: 0.005,
-          solution: [
+          hints: [String.raw`Use the charging curve of the capacitor voltage.`, String.raw`$v_C=V_s(1-e^{-t/\tau})$ with $\tau=1$ s.`, String.raw`$v_C(2)=12(1-e^{-2})$.`],
+          solution: String.raw`$v_C(2)=12(1-e^{-2})\approx10.38$ V.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>We substitute $t=2$ s into $v_C=V_s(1-e^{-t/\tau})$.</p>` },
             { type: 'derive', colors: { Vs: 3, t: 4, tau: 5 }, steps: [
               { kind: 'sub', label: String.raw`Substitute $t=2$ s, $\tau=1$ s`, from: String.raw`v_C=\T{Vs-1}{V_s}\,(1-e^{-\T{t-1}{t}/\T{tau-1}{\tau}})`, to: String.raw`v_C(2)=\T{Vs-1}{12}\,(1-e^{-\T{t-1}{2}/\T{tau-1}{1}})=12\,(1-0.135)=12\cdot0.865=10.38\text{ V}`,
@@ -582,7 +879,9 @@ export default {
             ] },
           ] },
         { label: '(d)', prompt: String.raw`Time to reach $v_C=9$ V, in s`, kind: 'numeric', answer: '-log(0.25)', tol: 0.005,
-          solution: [
+          hints: [String.raw`Set $v_C=9$ V in the charging curve and solve for $t$.`, String.raw`Get $e^{-t/\tau}$ alone first, then take ln of both sides.`, String.raw`$9=12(1-e^{-t})$ gives $e^{-t}=1-\frac{9}{12}=0.25$.`],
+          solution: String.raw`$t=-\ln0.25\approx1.39$ s.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>We set $v_C=9$ in $v_C=12(1-e^{-t})$ (with $\tau=1$ s, $t/\tau=t$). $t$ is trapped inside the exponential, so first we get the exponential alone, then undo it with ln.</p>` },
             { type: 'derive', colors: { vc: 1, e: 2, n: 8, k: 5, mt: 3, v: 6, t: 4 }, steps: [
               { kind: 'sub', label: String.raw`Set $v_C=9$`, from: String.raw`\T{vc-1}{v_C}=12\,(1-\T{e-1}{e^{-t}})`, to: String.raw`\T{vc-1}{9}=12\,(1-\T{e-1}{e^{-t}})`,
@@ -613,10 +912,13 @@ export default {
     },
     {
       id: 'p7-rl-transient', title: 'P7 · RL transient', difficulty: 'exam',
+      examples: ['worked-transients'],
       statement: String.raw`<p>$L=50$ mH, $R=10\ \Omega$, $V_s=20$ V. Find $\tau$, the final current, and $i$ and $v_L$ at $t=5$ ms.</p>`,
       parts: [
         { label: '(a)', prompt: String.raw`Time constant $\tau$ in ms`, kind: 'numeric', answer: 5,
-          solution: [
+          hints: [String.raw`Which time constant belongs to an RL circuit?`, String.raw`$\tau=L/R$ with $L$ in henry.`, String.raw`$\tau=0.05/10$ s.`],
+          solution: String.raw`$\tau=L/R=5$ ms.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>We use $\tau=L/R$ with $L$ in henry.</p>` },
             { type: 'derive', colors: { L: 1, R: 2 }, steps: [
               { kind: 'sub', label: String.raw`$\tau=L/R$, then numbers`, from: String.raw`\tau=\frac{\T{L-1}{L}}{\T{R-1}{R}}`, to: String.raw`\tau=\frac{\T{L-1}{0.05\text{ H}}}{\T{R-1}{10\ \Omega}}=0.005\text{ s}=5\text{ ms}`,
@@ -624,7 +926,9 @@ export default {
             ] },
           ] },
         { label: '(b)', prompt: String.raw`Final current $i(\infty)$ in A`, kind: 'numeric', answer: 2,
-          solution: [
+          hints: [String.raw`What does an inductor look like in DC steady state?`, String.raw`Inductor = wire, so $i(\infty)=V_s/R$.`, String.raw`$i(\infty)=20/10$.`],
+          solution: String.raw`$i(\infty)=V_s/R=2$ A.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>In DC steady state the inductor is a wire, so only $R$ limits the current.</p>` },
             { type: 'derive', colors: { Vs: 3, R: 2 }, steps: [
               { kind: 'sub', label: 'End value: inductor = wire', from: String.raw`i(\infty)=\frac{\T{Vs-1}{V_s}}{\T{R-1}{R}}`, to: String.raw`i(\infty)=\frac{\T{Vs-1}{20}}{\T{R-1}{10}}=2\text{ A}`,
@@ -632,7 +936,9 @@ export default {
             ] },
           ] },
         { label: '(c)', prompt: String.raw`Current $i$ at $t=5$ ms, in A`, kind: 'numeric', answer: '2*(1-exp(-1))', tol: 0.005,
-          solution: [
+          hints: [String.raw`Compare $t$ with $\tau$.`, String.raw`$i=\dfrac{V_s}{R}(1-e^{-t/\tau})$ with $t/\tau=1$.`, String.raw`$i=2(1-e^{-1})$.`],
+          solution: String.raw`$i=2(1-e^{-1})\approx1.26$ A.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>$t=5$ ms $=\tau$, so $t/\tau=1$. We substitute into the rising current.</p>` },
             { type: 'derive', colors: { fin: 1, t: 4 }, steps: [
               { kind: 'sub', label: String.raw`Substitute $t/\tau=1$`, from: String.raw`i=\T{fin-1}{\frac{V_s}{R}}\,(1-e^{-\T{t-1}{t/\tau}})`, to: String.raw`i=\T{fin-1}{2}\,(1-e^{-\T{t-1}{1}})=2\cdot0.632=1.26\text{ A}`,
@@ -640,7 +946,9 @@ export default {
             ] },
           ] },
         { label: '(d)', prompt: String.raw`Inductor voltage $v_L$ at $t=5$ ms, in V`, kind: 'numeric', answer: '20*exp(-1)', tol: 0.005,
-          solution: [
+          hints: [String.raw`The inductor voltage starts at $V_s$ and decays.`, String.raw`$v_L=V_s\,e^{-t/\tau}$ with $t/\tau=1$.`, String.raw`$v_L=20\,e^{-1}$.`],
+          solution: String.raw`$v_L=20e^{-1}\approx7.36$ V.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>We substitute $t/\tau=1$ into the decaying inductor voltage, then check KVL.</p>` },
             { type: 'derive', colors: { Vs: 3, t: 4, i: 1, vL: 2 }, steps: [
               { kind: 'sub', label: String.raw`Substitute $t/\tau=1$`, from: String.raw`v_L=\T{Vs-1}{V_s}\,e^{-\T{t-1}{t/\tau}}`, to: String.raw`v_L=\T{Vs-1}{20}\,e^{-\T{t-1}{1}}=20\cdot0.368=7.36\text{ V}`,
@@ -654,10 +962,13 @@ export default {
     },
     {
       id: 'p8-component-laws', title: 'P8 · Component laws', difficulty: 'core',
+      examples: ['worked-component-laws'],
       statement: String.raw`<p>(a) A 2 mH inductor's current ramps from 1 A to 3 A in 20 µs: inductor voltage? (b) A 10 µF capacitor's voltage rises at 5 V/ms: current? (c) A 200-turn coil's flux changes by 0.02 Wb in 10 ms: induced EMF?</p>`,
       parts: [
         { label: '(a)', prompt: String.raw`Inductor voltage $v$ in V`, kind: 'numeric', answer: 200,
-          solution: [
+          hints: [String.raw`An inductor's voltage depends on how fast its current changes.`, String.raw`$v=L\,\dfrac{di}{dt}$; for a straight ramp $\dfrac{di}{dt}=\dfrac{\Delta i}{\Delta t}$.`, String.raw`$\dfrac{di}{dt}=\dfrac{3-1}{20\cdot10^{-6}}=10^{5}$ A/s.`],
+          solution: String.raw`$v=L\,\Delta i/\Delta t=200$ V.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>For a straight ramp the slope is rise ÷ run. Then we use $v=L\,di/dt$.</p>` },
             { type: 'derive', colors: { i: 1, dt: 2, L: 3, d: 4 }, steps: [
               { kind: 'calc', label: 'Slope: rise ÷ run', from: String.raw`\frac{di}{dt}=\frac{\T{i-1}{3}-\T{i-2}{1}}{\T{dt-1}{20\cdot10^{-6}}}`, to: String.raw`\frac{di}{dt}=\frac{\T{i-1}{2}}{\T{dt-1}{2\cdot10^{-5}}}=10^{5}\text{ A/s}`,
@@ -668,7 +979,9 @@ export default {
             ] },
           ] },
         { label: '(b)', prompt: String.raw`Capacitor current $i$ in mA`, kind: 'numeric', answer: 50,
-          solution: [
+          hints: [String.raw`A capacitor's current depends on how fast its voltage changes.`, String.raw`$i=C\,\dfrac{dv}{dt}$ with $\dfrac{dv}{dt}$ in V/s.`, String.raw`5 V/ms $=5000$ V/s.`],
+          solution: String.raw`$i=C\,dv/dt=50$ mA.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>Units first: per millisecond → per second. Then $i=C\,dv/dt$.</p>` },
             { type: 'derive', colors: { ms: 1, C: 3, d: 4 }, steps: [
               { kind: 'calc', label: 'Per millisecond → per second', from: String.raw`\frac{dv}{dt}=\frac{5\text{ V}}{\T{ms-1}{1\text{ ms}}}`, to: String.raw`\frac{dv}{dt}=\frac{5\text{ V}}{\T{ms-1}{10^{-3}\text{ s}}}=5000\text{ V/s}`,
@@ -678,7 +991,9 @@ export default {
             ] },
           ] },
         { label: '(c)', prompt: String.raw`Induced EMF $e$ in V (with sign)`, kind: 'numeric', answer: -400,
-          solution: [
+          hints: [String.raw`Faraday's law, with Lenz's sign.`, String.raw`$e=-N\,\dfrac{\Delta\Phi}{\Delta t}$ with $\Delta t$ in s.`, String.raw`$e=-200\cdot\dfrac{0.02}{0.01}$.`],
+          solution: String.raw`$e=-N\Delta\Phi/\Delta t=-400$ V.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>We use Faraday's law with Lenz's minus sign.</p>` },
             { type: 'derive', colors: { N: 1, dP: 2, dt: 3 }, steps: [
               { kind: 'sub', label: 'Faraday', from: String.raw`e=-\T{N-1}{N}\,\frac{\T{dP-1}{\Delta\Phi}}{\T{dt-1}{\Delta t}}`, to: String.raw`e=-\T{N-1}{200}\cdot\frac{\T{dP-1}{0.02}}{\T{dt-1}{0.01}}=-200\cdot2=-400\text{ V}`,
@@ -689,12 +1004,23 @@ export default {
     },
     {
       id: 'p9-resistors', title: 'P9 · Resistors', difficulty: 'core',
+      examples: ['worked-circuits'],
       statement: String.raw`<p>For $R_1=4.7\ \Omega$, $R_2=1.2\ \Omega$: series and parallel equivalents, and the power in each when the parallel pair sits across 12 V.</p>`,
       parts: [
         { label: '(a)', prompt: String.raw`Series equivalent $R_s$ in Ω`, kind: 'numeric', answer: 5.9,
-          solution: String.raw`<p>Series resistances add: $R_s=R_1+R_2=4.7+1.2=5.9\ \Omega$.</p>` },
+          hints: [String.raw`In series the same current flows through both resistors.`, String.raw`Series resistances add: $R_s=R_1+R_2$.`, String.raw`$R_s=4.7+1.2$.`],
+          solution: String.raw`<p>Series resistances add: $R_s=R_1+R_2=4.7+1.2=5.9\ \Omega$.</p>`,
+          walkthrough: [
+            { type: 'text', html: String.raw`<p>In series the same current flows through both resistors, so their resistances add.</p>` },
+            { type: 'derive', colors: { Ra: 1, Rb: 2 }, steps: [
+              { kind: 'sub', label: 'Series: add', from: String.raw`R_s=\T{Ra-1}{R_1}+\T{Rb-1}{R_2}`, to: String.raw`R_s=\T{Ra-1}{4.7}+\T{Rb-1}{1.2}=5.9\ \Omega`,
+                why: String.raw`Larger than either resistor ✓: a series combination is always larger than its largest resistor.` },
+            ] },
+          ] },
         { label: '(b)', prompt: String.raw`Parallel equivalent $R_p$ in Ω`, kind: 'numeric', answer: '4.7*1.2/5.9', tol: 0.005,
-          solution: [
+          hints: [String.raw`Two resistors in parallel: product over sum.`, String.raw`$R_p=\dfrac{R_1R_2}{R_1+R_2}$.`, String.raw`$R_p=\dfrac{4.7\cdot1.2}{5.9}$.`],
+          solution: String.raw`$R_p=5.64/5.9\approx0.956\ \Omega$.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>For two resistors in parallel we use product over sum.</p>` },
             { type: 'derive', colors: { Ra: 1, Rb: 2 }, steps: [
               { kind: 'sub', label: 'Product over sum', from: String.raw`R_p=\frac{\T{Ra-1}{R_1}\,\T{Rb-1}{R_2}}{\T{Ra-2}{R_1}+\T{Rb-2}{R_2}}`, to: String.raw`R_p=\frac{\T{Ra-1}{4.7}\cdot\T{Rb-1}{1.2}}{\T{Ra-2}{4.7}+\T{Rb-2}{1.2}}=\frac{5.64}{5.9}=0.956\ \Omega`,
@@ -702,7 +1028,9 @@ export default {
             ] },
           ] },
         { label: '(c)', prompt: String.raw`Power $P_1$ in $R_1$ across 12 V, in W`, kind: 'numeric', answer: '144/4.7', tol: 0.005,
-          solution: [
+          hints: [String.raw`In parallel, what is the same for both resistors?`, String.raw`Both have 12 V across them, so use $P=V^2/R$.`, String.raw`$P_1=\dfrac{12^2}{4.7}$.`],
+          solution: String.raw`$P_1=144/4.7\approx30.6$ W.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>In parallel both resistors have the same voltage, so we use $P=V^2/R$.</p>` },
             { type: 'derive', colors: { V: 3, Ra: 1 }, steps: [
               { kind: 'sub', label: String.raw`$P=V^2/R$`, from: String.raw`P_1=\frac{\T{V-1}{V}^2}{\T{Ra-1}{R_1}}`, to: String.raw`P_1=\frac{\T{V-1}{12}^2}{\T{Ra-1}{4.7}}=\frac{144}{4.7}=30.6\text{ W}`,
@@ -710,7 +1038,9 @@ export default {
             ] },
           ] },
         { label: '(d)', prompt: String.raw`Power $P_2$ in $R_2$ across 12 V, in W`, kind: 'numeric', answer: 120,
-          solution: [
+          hints: [String.raw`Same voltage as in (c), different resistor.`, String.raw`$P=V^2/R$ with $R_2$.`, String.raw`$P_2=\dfrac{12^2}{1.2}$.`],
+          solution: String.raw`$P_2=144/1.2=120$ W.`,
+          walkthrough: [
             { type: 'text', html: String.raw`<p>Same voltage, so again $P=V^2/R$.</p>` },
             { type: 'derive', colors: { V: 3, Rb: 2 }, steps: [
               { kind: 'sub', label: String.raw`$P=V^2/R$`, from: String.raw`P_2=\frac{\T{V-1}{V}^2}{\T{Rb-1}{R_2}}`, to: String.raw`P_2=\frac{\T{V-1}{12}^2}{\T{Rb-1}{1.2}}=\frac{144}{1.2}=120\text{ W}`,
@@ -721,6 +1051,7 @@ export default {
     },
     {
       id: 'p10-concept', title: 'P10 · Concept', difficulty: 'exam',
+      examples: ['worked-converters'],
       statement: String.raw`<p>Explain why a buck converter needs the diode, and why its output can never exceed the input.</p>`,
       parts: [
         { label: '(a)', kind: 'writeup', prompt: String.raw`Why does a buck converter need the diode?`,
@@ -731,6 +1062,7 @@ export default {
     },
     {
       id: 'theory', title: 'Short theory questions', difficulty: 'exam',
+      examples: ['worked-converters'],
       statement: String.raw`<p>Answer in 2–4 sentences, out loud or on paper, then compare. A good exam answer names the mechanism and the consequence.</p>`,
       parts: [
         { label: 'T1', kind: 'writeup', prompt: String.raw`Why does a switch-mode converter waste far less power than a linear regulator or resistive divider?`,
@@ -757,3 +1089,4 @@ export default {
     },
   ],
 };
+

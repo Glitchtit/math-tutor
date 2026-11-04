@@ -313,7 +313,8 @@ export function validateModule(m) {
       if (!blocks.some((b) => b.type === 'steps' || b.type === 'derive')) issues.push(`${aw}: none of its example lessons contains a worked example (steps or derive block)`);
       if (!blocks.some((b) => b.type === 'guided')) issues.push(`${aw}: none of its example lessons contains a guided exercise`);
     }
-    if ((a.parts || []).some((p) => p.kind === 'writeup') && !a.solution) issues.push(`${aw}: a writeup part needs a model "solution"`);
+    // a writeup part's model answer may live on the part itself or in the assignment's Live Script solution
+    if ((a.parts || []).some((p) => p.kind === 'writeup' && !p.solution) && !a.solution) issues.push(`${aw}: a writeup part needs a model "solution"`);
   }
   const guided = [...(m.lessons || []), ...(m.matlab || [])].flatMap((l) => l.blocks || []).filter((b) => b.type === 'guided').length;
   if ((m.assignments || []).length && guided < 2) issues.push(`${w}: needs at least 2 guided exercises before its assignments`);
