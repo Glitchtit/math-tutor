@@ -13,6 +13,7 @@ import { Matlab } from '../js/matlab/interp.js';
 import { runMatlabChecks } from '../js/matlab/checks.js';
 import { checkPart } from '../js/check.js';
 import { parse } from '../js/matlab/parser.js';
+import { TAG_MACROS, KATEX_TRUST, KINDS, TAG_ID, tagIds, resolveSteps } from '../js/derive-core.js';
 
 // expression-valued widget config keys and the variables they use
 const EXPR_KEYS = {
@@ -107,6 +108,42 @@ function checkLiveBlocks(blocks, where, issues) {
   });
 }
 
+function deriveTex(src, where, issues) {
+  // tag ids (e.g. "sin-1") are names, not LaTeX commands: drop them before the lost-backslash check
+  const lost = LOST_BACKSLASH.exec(String(src).replace(/\\T\{[^}]*\}/g, '\\T{}').replace(/\\(text|mathrm|operatorname|textrm|mathit)\{[^}]*\}/g, ' '));
+  if (lost) issues.push(`${where}: "${lost[2]}" without a backslash in "${String(src).slice(0, 80)}" — use String.raw.`);
+  try { katex.renderToString(String(src), { throwOnError: true, strict: 'ignore', displayMode: true, trust: KATEX_TRUST, macros: { ...TAG_MACROS } }); } catch (e) {
+    issues.push(`${where}: LaTeX error in "${String(src).slice(0, 80)}": ${e.message.replace(/^KaTeX parse error: /, '')}`);
+  }
+}
+
+function validateDerive(b, next, w, issues) {
+  mathIn(b.title, w, issues);
+  if (b.given) deriveTex(b.given, `${w} given`, issues);
+  let steps;
+  try { steps = resolveSteps(b); } catch (e) { issues.push(`${w}: ${e.message}`); return; }
+  if (!steps.length) issues.push(`${w}: derive block has no steps`);
+  steps.forEach((st, i) => {
+    const sw = `${w} step ${i + 1}`;
+    if (!KINDS.includes(st.kind)) issues.push(`${sw}: unknown step kind "${st.kind}"`);
+    mathIn(st.label, sw, issues); mathIn(st.why, sw, issues);
+    deriveTex(st.from, `${sw} from`, issues); deriveTex(st.to, `${sw} to`, issues);
+    const ids = { from: tagIds(st.from), to: tagIds(st.to) };
+    for (const [line, list] of Object.entries(ids)) {
+      const dup = list.find((id, j) => list.indexOf(id) !== j);
+      if (dup) issues.push(`${sw}: duplicate tag "${dup}" in ${line} line`);
+      const bad = list.find((id) => !TAG_ID.test(id));
+      if (bad) issues.push(`${sw}: tag id "${bad}" should look like prefix-n`);
+    }
+    for (const k of Object.keys(st.arrows || {})) if (!ids.from.includes(k)) issues.push(`${w}: arrows key "${k}" not in step ${i + 1} from line`);
+    for (const [k, ts] of Object.entries(st.map || {})) {
+      if (!ids.from.includes(k)) issues.push(`${sw}: map key "${k}" not in from line`);
+      for (const t of [].concat(ts)) if (!ids.to.includes(t)) issues.push(`${sw}: map target "${t}" not in to line`);
+    }
+  });
+  if (b.symbolic && !(next && next.type === 'derive' && next.given)) issues.push(`${w}: symbolic derivation needs a numbers companion (a derive block with "given") right after it`);
+}
+
 export function validateBlocks(blocks, where, issues) {
   (blocks || []).forEach((b, i) => {
     const w = `${where} block[${i}](${b.type})`;
@@ -136,13 +173,15 @@ export function validateBlocks(blocks, where, issues) {
       }
       case 'livescript': checkLiveBlocks(b.blocks || [], w, issues); break;
       case 'answer': validatePart(b.part, w, issues); break;
+      case 'derive': validateDerive(b, blocks[i + 1], w, issues); break;
       default: issues.push(`${w}: unknown block type`);
     }
   });
 }
 
 function validatePart(p, w, issues) {
-  mathIn(p.prompt, w, issues); mathIn(p.hint, w, issues); mathIn(p.solution, w, issues); mathIn(p.feedback, w, issues);
+  mathIn(p.prompt, w, issues); mathIn(p.hint, w, issues); mathIn(p.feedback, w, issues);
+  if (Array.isArray(p.solution)) validateBlocks(p.solution, `${w} solution`, issues); else mathIn(p.solution, w, issues);
   (p.choices || []).forEach((c) => mathIn(c, w, issues));
   if (p.kind === 'numeric') {
     const r = checkPart(p, typeof p.answer === 'number' ? String(p.answer) : String(p.answer));

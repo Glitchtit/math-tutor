@@ -70,3 +70,38 @@ test('route: a numerator above the target forces another side and the path avoid
   assert.notEqual(r.side, 'top');
   assert.ok(cubicPoints(r.d).every((p) => !inside(p, numerator)));
 });
+
+// ---- validator support ----
+import { validateBlocks } from './validate-content.mjs';
+const issuesOf = (blocks) => { const out = []; validateBlocks(blocks, 'T', out); return out; };
+const D = (steps, extra = {}) => ({ type: 'derive', steps, ...extra });
+
+test('validator: a well-formed derive block has no issues', () => {
+  assert.deepEqual(issuesOf([D([{ kind: 'both', label: R`Both sides $\div U$`, from: R`\T{P-1}{P}=\T{U-1}{U}\,\T{I-1}{I}`, to: R`\T{I-1}{I}=\frac{\T{P-1}{P}}{\T{U-1}{U}}`, arrows: { 'U-1': '÷U' }, why: R`<p>Divide by $U$.</p>` }])]), []);
+});
+
+test('validator: derive authoring errors are reported with the step', () => {
+  const dup = issuesOf([D([{ kind: 'calc', from: R`\T{a-1}{x}+\T{a-1}{y}`, to: 'z' }])]);
+  assert.ok(dup.some((s) => /duplicate tag "a-1"/.test(s) && /step 1/.test(s)), dup.join('\n'));
+  const arrow = issuesOf([D([{ kind: 'calc', from: 'x', to: 'y' }, { kind: 'calc', to: R`\T{b-1}{y}`, arrows: { 'x-1': '' } }])]);
+  assert.ok(arrow.some((s) => /arrows key "x-1" not in step 2/.test(s)), arrow.join('\n'));
+  const map = issuesOf([D([{ kind: 'expand', from: R`\T{a-1}{x}`, to: R`\T{a-1}{x}`, map: { 'a-1': ['a-1', 'a-2'] } }])]);
+  assert.ok(map.some((s) => /map target "a-2"/.test(s)), map.join('\n'));
+  const latex = issuesOf([D([{ kind: 'calc', from: 'x', to: R`\frac{1}{` }])]);
+  assert.ok(latex.some((s) => /LaTeX error/.test(s)), latex.join('\n'));
+  const kind = issuesOf([D([{ kind: 'magic', from: 'x', to: 'y' }])]);
+  assert.ok(kind.some((s) => /unknown step kind "magic"/.test(s)), kind.join('\n'));
+  const nofrom = issuesOf([D([{ kind: 'calc', to: 'y' }])]);
+  assert.ok(nofrom.some((s) => /step 1 has no from/.test(s)), nofrom.join('\n'));
+});
+
+test('validator: symbolic derive blocks need a numbers companion right after', () => {
+  const sym = D([{ kind: 'both', from: 'P=UI', to: R`I=\frac{P}{U}` }], { symbolic: true });
+  assert.ok(issuesOf([sym]).some((s) => /needs a numbers companion/.test(s)));
+  assert.deepEqual(issuesOf([sym, D([{ kind: 'sub', from: 'P=UI', to: '60=12I' }], { given: R`P=60\text{ W}` })]), []);
+});
+
+test('validator: part solutions may be block arrays', () => {
+  assert.deepEqual(issuesOf([{ type: 'answer', part: { kind: 'writeup', prompt: 'x', solution: [{ type: 'text', html: '$x$' }] } }]), []);
+  assert.ok(issuesOf([{ type: 'answer', part: { kind: 'writeup', prompt: 'x', solution: [{ type: 'text', html: '$x' }] } }]).length > 0);
+});
