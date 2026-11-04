@@ -30,18 +30,25 @@ $$\int_a^\infty f(x)\,\mathrm d x = \lim_{t\to\infty} \int_a^t f(x)\,\mathrm d x
 The integral <b>converges</b> if the limit exists as a finite number, otherwise it <b>diverges</b>. Similarly $\int_{-\infty}^b f(x)\,\mathrm d x = \lim_{s\to-\infty}\int_s^b f(x)\,\mathrm d x$. Over the whole line we split at any point $c$:
 $$\int_{-\infty}^{\infty} f(x)\,\mathrm d x = \int_{-\infty}^{c} f(x)\,\mathrm d x + \int_{c}^{\infty} f(x)\,\mathrm d x ,$$
 and the integral converges only if <b>both</b> halves converge.</p>` },
-        { type: 'steps', title: String.raw`Example: $\displaystyle\int_0^\infty x e^{-x}\,\mathrm d x$`, steps: [
-          String.raw`We replace the infinite limit by $t$ and integrate by parts with $u = x$, $\mathrm d v = e^{-x}\,\mathrm d x$, so $\mathrm d u = \mathrm d x$, $v = -e^{-x}$:
-$$\int_0^t x e^{-x}\,\mathrm d x = \Big[-x e^{-x}\Big]_0^t + \int_0^t e^{-x}\,\mathrm d x = -t e^{-t} + 1 - e^{-t}.$$`,
-          String.raw`We let $t \to \infty$. Since $e^{-t} \to 0$ and $t e^{-t} = t/e^{t} \to 0$ (l'Hospital: $1/e^t \to 0$),
-$$\int_0^\infty x e^{-x}\,\mathrm d x = \lim_{t\to\infty}\big(1 - t e^{-t} - e^{-t}\big) = 1 .$$`,
-          String.raw`The integral converges and its value is $1$.`,
+        { type: 'derive', title: String.raw`Example: $\displaystyle\int_0^\infty x e^{-x}\,\mathrm d x$`, steps: [
+          { kind: 'start', label: String.raw`Replace $\infty$ by $t$`, from: String.raw`\int_0^{\T{inf-1}{\infty}} x e^{-x}\,\mathrm d x`, to: String.raw`\lim_{t\to\infty}\int_0^{\T{inf-1}{t}} x e^{-x}\,\mathrm d x`, arrows: { 'inf-1': 'becomes t' },
+            why: String.raw`An integral up to $\infty$ is defined as a limit: integrate up to a finite $t$, then let $t$ grow.` },
+          { kind: 'calculus', label: String.raw`By parts: $u = x$, $\mathrm d v = e^{-x}\,\mathrm d x$`, from: String.raw`\int_0^t \T{u-1}{x}\,\T{v-1}{e^{-x}}\,\mathrm d x`, to: String.raw`\Big[-\T{u-1}{x}\,\T{v-1}{e^{-x}}\Big]_0^t + \int_0^t \T{v-2}{e^{-x}}\,\mathrm d x`, map: { 'v-1': ['v-1', 'v-2'] }, arrows: { 'v-1': 'v = −e^{−x}' },
+            why: String.raw`With $\mathrm d u = \mathrm d x$ and $v = -e^{-x}$, $\int u\,\mathrm d v = uv - \int v\,\mathrm d u$. The two minus signs in $-\int(-e^{-x})\,\mathrm d x$ give $+\int e^{-x}\,\mathrm d x$.` },
+          { kind: 'calc', label: 'Insert the limits $0$ and $t$', to: String.raw`\int_0^t x e^{-x}\,\mathrm d x = \T{a-1}{-t e^{-t}} + 1 - \T{b-1}{e^{-t}}`,
+            why: String.raw`$\big[-xe^{-x}\big]_0^t = -te^{-t} - 0$ and $\int_0^t e^{-x}\,\mathrm d x = \big[-e^{-x}\big]_0^t = 1 - e^{-t}$.` },
+          { kind: 'result', label: String.raw`Let $t \to \infty$`, to: String.raw`\int_0^\infty x e^{-x}\,\mathrm d x = \lim_{t\to\infty}\big(1 - t e^{-t} - e^{-t}\big) = 1`,
+            why: String.raw`$e^{-t} \to 0$, and $t e^{-t} = t/e^{t} \to 0$ (l'Hospital: $1/e^t \to 0$), so both crossed-out terms vanish. The integral converges and its value is $1$.` },
         ] },
-        { type: 'steps', title: String.raw`Example: $\displaystyle\int_{-\infty}^{\infty} \frac{\mathrm d x}{1+x^2}$`, steps: [
-          String.raw`We split at $c = 0$ and treat each half as a limit. For the right half,
-$$\int_0^\infty \frac{\mathrm d x}{1+x^2} = \lim_{t\to\infty} \arctan t - \arctan 0 = \frac{\pi}{2}.$$`,
-          String.raw`For the left half, $\displaystyle\int_{-\infty}^0 \frac{\mathrm d x}{1+x^2} = \arctan 0 - \lim_{s\to-\infty}\arctan s = \frac{\pi}{2}$.`,
-          String.raw`Both halves converge, so the integral converges and equals $\pi/2 + \pi/2 = \pi$.`,
+        { type: 'derive', title: String.raw`Example: $\displaystyle\int_{-\infty}^{\infty} \frac{\mathrm d x}{1+x^2}$`, steps: [
+          { kind: 'start', label: String.raw`Split at $c = 0$`, from: String.raw`\int_{-\infty}^{\infty} \frac{\mathrm d x}{1+x^2}`, to: String.raw`\T{L-1}{\int_{-\infty}^{0} \frac{\mathrm d x}{1+x^2}} + \T{R-1}{\int_{0}^{\infty} \frac{\mathrm d x}{1+x^2}}`,
+            why: 'Both limits are infinite, so we split at $c = 0$ and treat each half as a limit of its own.' },
+          { kind: 'calculus', label: String.raw`Right half: antiderivative $\arctan x$`, from: String.raw`\int_0^\infty \frac{\mathrm d x}{1+x^2}`, to: String.raw`\lim_{t\to\infty} \arctan t - \arctan 0 = \frac{\pi}{2} - 0 = \frac{\pi}{2}`,
+            why: String.raw`$\arctan t$ approaches $\frac{\pi}{2}$ as $t \to \infty$, and $\arctan 0 = 0$.` },
+          { kind: 'calculus', label: 'Left half: the same antiderivative', from: String.raw`\int_{-\infty}^0 \frac{\mathrm d x}{1+x^2}`, to: String.raw`\arctan 0 - \lim_{s\to-\infty}\arctan s = 0 - \Big(-\frac{\pi}{2}\Big) = \frac{\pi}{2}`,
+            why: String.raw`$\arctan s \to -\frac{\pi}{2}$ as $s \to -\infty$; subtracting a negative number adds it.` },
+          { kind: 'result', label: 'Add the halves', from: String.raw`\int_{-\infty}^{\infty} \frac{\mathrm d x}{1+x^2} = \T{L-1}{\int_{-\infty}^{0} \frac{\mathrm d x}{1+x^2}} + \T{R-1}{\int_{0}^{\infty} \frac{\mathrm d x}{1+x^2}}`, to: String.raw`\int_{-\infty}^{\infty} \frac{\mathrm d x}{1+x^2} = \T{L-1}{\frac{\pi}{2}} + \T{R-1}{\frac{\pi}{2}} = \pi`,
+            why: String.raw`Both halves converge, so the integral converges and equals $\pi/2 + \pi/2 = \pi$.` },
         ] },
         { type: 'callout', kind: 'warn', title: 'Do not take one symmetric limit', html: String.raw`<p>$\lim_{t\to\infty}\int_{-t}^{t} x\,\mathrm d x = 0$, but $\int_{-\infty}^{\infty} x\,\mathrm d x$ <b>diverges</b>, because $\int_0^\infty x\,\mathrm d x$ already diverges. The two halves must converge separately.</p>` },
         { type: 'quiz', question: String.raw`What is $\displaystyle\int_1^\infty \frac{\mathrm d x}{x^3}$?`, choices: [String.raw`$\tfrac13$`, String.raw`$\tfrac12$`, String.raw`$1$`, 'It diverges'], answer: 1, explain: String.raw`$\int_1^t x^{-3}\,\mathrm d x = \big[-\tfrac{1}{2x^2}\big]_1^t = \tfrac12 - \tfrac{1}{2t^2} \to \tfrac12$.` },
@@ -66,21 +73,52 @@ and similarly at the upper endpoint. If the singularity is at an interior point 
           [String.raw`$\displaystyle\int_0^1 \frac{\mathrm d x}{x^p}$`, String.raw`$p < 1$`, String.raw`$\dfrac{1}{1-p}$`],
           [String.raw`$\displaystyle\int_0^\infty \frac{\mathrm d x}{x^p}$`, 'never', String.raw`one end always diverges`],
         ] },
+        { type: 'derive', symbolic: true, title: String.raw`Where $\frac{1}{p-1}$ comes from: $\displaystyle\int_1^\infty \frac{\mathrm d x}{x^p}$ for $p > 1$`, steps: [
+          { kind: 'start', label: String.raw`Replace $\infty$ by $t$`, from: String.raw`\int_1^{\T{inf-1}{\infty}} \frac{\mathrm d x}{x^p}`, to: String.raw`\lim_{t\to\infty}\int_1^{\T{inf-1}{t}} x^{-p}\,\mathrm d x`, arrows: { 'inf-1': 'becomes t' },
+            why: String.raw`The integral is the limit of integrals over $[1, t]$. Writing $1/x^p$ as $x^{-p}$ prepares the power rule.` },
+          { kind: 'calculus', label: 'Power rule ($p \\ne 1$)', to: String.raw`\lim_{t\to\infty}\Big[\frac{x^{1-p}}{1-p}\Big]_1^t`,
+            why: String.raw`Raise the exponent by one and divide by the new exponent. This needs $1 - p \ne 0$; for $p = 1$ the antiderivative is $\ln x$ instead.` },
+          { kind: 'calc', label: 'Insert the limits $1$ and $t$', to: String.raw`\lim_{t\to\infty}\frac{\T{a-1}{t^{1-p}} - 1}{1-p}`,
+            why: String.raw`$1^{1-p} = 1$ for every $p$.` },
+          { kind: 'calc', label: String.raw`Let $t \to \infty$ (using $p > 1$)`, to: String.raw`\frac{- 1}{1-p}`,
+            why: String.raw`For $p > 1$ the exponent $1 - p$ is negative, so $t^{1-p} = 1/t^{p-1} \to 0$. For $p < 1$ it would grow without bound instead.` },
+          { kind: 'result', label: String.raw`Top and bottom $\times(-1)$`, to: String.raw`\int_1^\infty \frac{\mathrm d x}{x^p} = \frac{1}{p-1}`,
+            why: String.raw`Multiplying numerator and denominator by $-1$ does not change the fraction and gives a positive-looking form: $-(1-p) = p - 1$.` },
+        ] },
+        { type: 'derive', title: String.raw`With numbers: $p = 3$`, given: String.raw`\T{p-0}{p} = 3`, steps: [
+          { kind: 'sub', label: String.raw`Put $p = 3$ into the formula`, from: String.raw`\int_1^\infty \frac{\mathrm d x}{x^{\T{p-x}{p}}} = \frac{1}{\T{p-y}{p}-1}\qquad\qquad p = \T{p-1}{3}`, to: String.raw`\int_1^\infty \frac{\mathrm d x}{x^{\T{p-1}{3}}} = \frac{1}{\T{p-2}{3}-1}`, map: { 'p-1': ['p-1', 'p-2'] }, arrows: { 'p-1': 'p = 3' },
+            why: String.raw`$p = 3 > 1$, so the formula applies. The number replaces $p$ in both places.` },
+          { kind: 'calc', label: String.raw`$3 - 1 = 2$`, to: String.raw`\int_1^\infty \frac{\mathrm d x}{x^{3}} = \frac{1}{2}`, why: 'The integral converges to one half.' },
+          { kind: 'check', label: 'Compute the limit directly', from: String.raw`\int_1^t x^{-3}\,\mathrm d x = \Big[-\frac{1}{2x^2}\Big]_1^t`, to: String.raw`\int_1^t x^{-3}\,\mathrm d x = \frac12 - \frac{1}{2t^2} \;\xrightarrow[t\to\infty]{}\; \frac12\ \checkmark`,
+            why: String.raw`The term $\frac{1}{2t^2}$ vanishes as $t \to \infty$, leaving the same $\frac12$ (this is also the quiz answer in the first lesson).` },
+        ] },
         { type: 'callout', kind: 'key', html: String.raw`<p>The two p-integrals are mirror images: at infinity the integrand must decay <b>faster</b> than $1/x$; at $0$ it may blow up only <b>slower</b> than $1/x$. The borderline $p = 1$ diverges at both ends ($\ln t \to \pm\infty$).</p>` },
-        { type: 'steps', title: String.raw`Example: $\displaystyle\int_0^3 \frac{\mathrm d x}{(x-1)^{2/3}}$`, steps: [
-          String.raw`The integrand is unbounded at the interior point $x = 1$, so we split the integral there: $\int_0^3 = \int_0^1 + \int_1^3$. An antiderivative is $F(x) = 3(x-1)^{1/3}$ (the real cube root, defined for negative arguments as well).`,
-          String.raw`We take the left part as a limit from below:
-$$\int_0^1 \frac{\mathrm d x}{(x-1)^{2/3}} = \lim_{t\to 1^-}\Big[3(x-1)^{1/3}\Big]_0^t = 0 - 3(-1) = 3 .$$`,
-          String.raw`We take the right part as a limit from above:
-$$\int_1^3 \frac{\mathrm d x}{(x-1)^{2/3}} = \lim_{s\to 1^+}\Big[3(x-1)^{1/3}\Big]_s^3 = 3\sqrt[3]{2} .$$`,
-          String.raw`Both parts converge, so the integral equals $3 + 3\sqrt[3]{2} \approx 6.780$.`,
+        { type: 'derive', title: String.raw`Example: $\displaystyle\int_0^3 \frac{\mathrm d x}{(x-1)^{2/3}}$`, steps: [
+          { kind: 'start', label: String.raw`Split at the singularity $x = 1$`, from: String.raw`\int_0^3 \frac{\mathrm d x}{(x-1)^{2/3}}`, to: String.raw`\T{L-1}{\int_0^1 \frac{\mathrm d x}{(x-1)^{2/3}}} + \T{R-1}{\int_1^3 \frac{\mathrm d x}{(x-1)^{2/3}}}`,
+            why: String.raw`The integrand is unbounded at the interior point $x = 1$, so we split the integral there. An antiderivative is $F(x) = 3(x-1)^{1/3}$ (the real cube root, defined for negative arguments as well).` },
+          { kind: 'calculus', label: String.raw`Left part: limit from below`, from: String.raw`\int_0^1 \frac{\mathrm d x}{(x-1)^{2/3}}`, to: String.raw`\lim_{t\to 1^-}\Big[3(x-1)^{1/3}\Big]_0^t = \lim_{t\to 1^-}\big(\T{a-1}{3(t-1)^{1/3}} - 3(-1)\big)`,
+            why: String.raw`We stop at $t < 1$ before the singularity. At $x = 0$: $(0 - 1)^{1/3} = -1$.` },
+          { kind: 'calc', label: String.raw`Let $t \to 1^-$`, to: String.raw`\int_0^1 \frac{\mathrm d x}{(x-1)^{2/3}} = 0 + 3 = 3`,
+            why: String.raw`$(t-1)^{1/3} \to 0$, so that term vanishes. The left part converges.` },
+          { kind: 'calculus', label: String.raw`Right part: limit from above`, from: String.raw`\int_1^3 \frac{\mathrm d x}{(x-1)^{2/3}}`, to: String.raw`\lim_{s\to 1^+}\Big[3(x-1)^{1/3}\Big]_s^3 = \lim_{s\to 1^+}\big(3\sqrt[3]{2} - \T{b-1}{3(s-1)^{1/3}}\big)`,
+            why: String.raw`Now we start at $s > 1$. At $x = 3$: $3(3-1)^{1/3} = 3\sqrt[3]{2}$.` },
+          { kind: 'calc', label: String.raw`Let $s \to 1^+$`, to: String.raw`\int_1^3 \frac{\mathrm d x}{(x-1)^{2/3}} = 3\sqrt[3]{2}`,
+            why: String.raw`$(s-1)^{1/3} \to 0$, so the right part converges too.` },
+          { kind: 'result', label: 'Add the parts', from: String.raw`\int_0^3 \frac{\mathrm d x}{(x-1)^{2/3}} = \T{L-1}{\int_0^1 \frac{\mathrm d x}{(x-1)^{2/3}}} + \T{R-1}{\int_1^3 \frac{\mathrm d x}{(x-1)^{2/3}}}`, to: String.raw`\int_0^3 \frac{\mathrm d x}{(x-1)^{2/3}} = \T{L-1}{3} + \T{R-1}{3\sqrt[3]{2}} \approx 6.780`,
+            why: String.raw`Both parts converge, so the integral equals $3 + 3\sqrt[3]{2} \approx 6.780$.` },
         ] },
         { type: 'callout', kind: 'warn', title: 'Hidden singularities', html: String.raw`<p>Blindly applying the Fundamental Theorem to $\int_{-1}^{1} x^{-2}\,\mathrm d x$ gives $\big[-1/x\big]_{-1}^{1} = -2$ — a negative number for a positive integrand. The FTC needs a continuous integrand; here $x = 0$ is a singularity and $\int_0^1 x^{-2}\,\mathrm d x$ diverges, so the whole integral diverges. Always look for zeros of denominators and logarithms of zero inside $[a, b]$.</p>` },
-        { type: 'steps', title: String.raw`Example: $\displaystyle\int_0^1 \ln x\,\mathrm d x$`, steps: [
-          String.raw`$\ln x \to -\infty$ as $x\to 0^+$, so we integrate from $t$ to $1$. By parts with $u = \ln x$, $\mathrm d v = \mathrm d x$:
-$$\int_t^1 \ln x\,\mathrm d x = \Big[x\ln x - x\Big]_t^1 = -1 - t\ln t + t .$$`,
-          String.raw`We need the limit $t\ln t$ as $t \to 0^+$, a $0\cdot\infty$ form. Writing it as $\dfrac{\ln t}{1/t}$ and using l'Hospital: $\dfrac{1/t}{-1/t^2} = -t \to 0$.`,
-          String.raw`Hence $\displaystyle\int_0^1 \ln x\,\mathrm d x = -1$.`,
+        { type: 'derive', title: String.raw`Example: $\displaystyle\int_0^1 \ln x\,\mathrm d x$`, steps: [
+          { kind: 'start', label: String.raw`Replace $0$ by $t$`, from: String.raw`\int_{\T{z-1}{0}}^1 \ln x\,\mathrm d x`, to: String.raw`\lim_{t\to 0^+}\int_{\T{z-1}{t}}^1 \ln x\,\mathrm d x`, arrows: { 'z-1': 'becomes t' },
+            why: String.raw`$\ln x \to -\infty$ as $x\to 0^+$, so we integrate from $t$ to $1$ and let $t$ approach $0$.` },
+          { kind: 'calculus', label: String.raw`By parts: $u = \ln x$, $\mathrm d v = \mathrm d x$`, from: String.raw`\int_t^1 \ln x\,\mathrm d x`, to: String.raw`\Big[x\ln x - x\Big]_t^1`,
+            why: String.raw`$\mathrm d u = \frac1x\,\mathrm d x$, $v = x$, so $\int \ln x\,\mathrm d x = x\ln x - \int x\cdot\frac1x\,\mathrm d x = x\ln x - x$.` },
+          { kind: 'calc', label: 'Insert the limits $t$ and $1$', to: String.raw`(1\cdot\ln 1 - 1) - (t\ln t - t) = -1 \T{a-1}{- t\ln t} \T{b-1}{+ t}`,
+            why: String.raw`$\ln 1 = 0$. The minus in front of the second bracket flips both signs inside it.` },
+          { kind: 'calculus', label: String.raw`l'Hospital for $t\ln t$`, from: String.raw`\lim_{t\to0^+} t\ln t = \lim_{t\to0^+}\frac{\ln t}{1/t}`, to: String.raw`\lim_{t\to0^+}\frac{1/t}{-1/t^2} = \lim_{t\to0^+}(-t) = 0`,
+            why: String.raw`$t\ln t$ is a $0\cdot\infty$ form. Written as $\dfrac{\ln t}{1/t}$ it is $\frac{\infty}{\infty}$, so we may differentiate top and bottom.` },
+          { kind: 'result', label: String.raw`Let $t \to 0^+$`, from: String.raw`\lim_{t\to0^+}\big(-1 \T{a-1}{- t\ln t} \T{b-1}{+ t}\big)`, to: String.raw`\int_0^1 \ln x\,\mathrm d x = -1`,
+            why: String.raw`Both $t\ln t$ and $t$ tend to $0$, so only $-1$ is left.` },
         ] },
         { type: 'quiz', question: String.raw`Which of these converge? (Select all.)`, choices: [String.raw`$\int_0^1 x^{-0.9}\,\mathrm d x$`, String.raw`$\int_1^\infty x^{-0.9}\,\mathrm d x$`, String.raw`$\int_0^1 x^{-1.1}\,\mathrm d x$`, String.raw`$\int_1^\infty x^{-1.1}\,\mathrm d x$`], answer: [0, 3], explain: String.raw`On $[0,1]$ we need $p < 1$ ($p = 0.9$ works, value $10$); on $[1,\infty)$ we need $p > 1$ ($p = 1.1$ works, value $10$).` },
       ],
@@ -100,16 +138,23 @@ $$\int_t^1 \ln x\,\mathrm d x = \Big[x\ln x - x\Big]_t^1 = -1 - t\ln t + t .$$`,
           readout: String.raw`$\int_1^t e^{-x}\,dx = {{exp(-1) - exp(-t)}}$ bounds the shaded area for every $t$; the bound tends to $e^{-1} = {{exp(-1)}}$.`,
         } },
         { type: 'callout', kind: 'thm', title: 'Comparison test', html: String.raw`<p>Let $0 \le f(x) \le g(x)$ for $x \ge a$.</p><ul><li>If $\int_a^\infty g(x)\,\mathrm d x$ converges, so does $\int_a^\infty f(x)\,\mathrm d x$ (the smaller area is trapped).</li><li>If $\int_a^\infty f(x)\,\mathrm d x$ diverges, so does $\int_a^\infty g(x)\,\mathrm d x$ (the larger area is pushed to $\infty$).</li></ul><p>The same holds for type II integrals. <b>Limit comparison:</b> if $f, g > 0$ and $f(x)/g(x) \to L$ with $0 < L < \infty$, then both integrals converge or both diverge.</p>` },
-        { type: 'steps', title: String.raw`Example: does $\displaystyle\int_1^\infty \frac{2 + \sin x}{\sqrt{x}}\,\mathrm d x$ converge?`, steps: [
-          String.raw`We look for a simple lower bound, because the integrand behaves like $1/\sqrt x$, whose integral diverges. Since $\sin x \ge -1$, the numerator is at least $1$:
-$$\frac{2+\sin x}{\sqrt x} \ge \frac{1}{\sqrt x} > 0 \qquad (x \ge 1).$$`,
-          String.raw`$\int_1^\infty x^{-1/2}\,\mathrm d x$ is a p-integral with $p = \tfrac12 \le 1$, so it diverges.`,
-          String.raw`By the comparison test the larger integral $\int_1^\infty \frac{2+\sin x}{\sqrt x}\,\mathrm d x$ diverges as well.`,
+        { type: 'derive', title: String.raw`Example: does $\displaystyle\int_1^\infty \frac{2 + \sin x}{\sqrt{x}}\,\mathrm d x$ converge?`, steps: [
+          { kind: 'both', label: 'Both sides $+2$', from: String.raw`\sin x \ge -1`, to: String.raw`2 + \sin x \ge 1`,
+            why: String.raw`The integrand behaves like $1/\sqrt x$, whose integral diverges, so we look for a simple lower bound. Since $\sin x \ge -1$, adding $2$ to both sides shows the numerator is at least $1$.` },
+          { kind: 'both', label: String.raw`Both sides $\div\sqrt x$`, to: String.raw`\frac{2+\sin x}{\sqrt x} \ge \frac{1}{\sqrt x} > 0 \qquad (x \ge 1)`,
+            why: String.raw`$\sqrt x > 0$, and dividing by a positive number keeps the direction of $\ge$.` },
+          { kind: 'calculus', label: String.raw`p-integral with $p = \tfrac12$`, from: String.raw`\int_1^\infty x^{-1/2}\,\mathrm d x`, to: String.raw`\lim_{t\to\infty}\big(2\sqrt t - 2\big) = \infty`,
+            why: String.raw`$p = \tfrac12 \le 1$, so the smaller integral diverges.` },
+          { kind: 'result', label: 'Comparison test', to: String.raw`\int_1^\infty \frac{2+\sin x}{\sqrt x}\,\mathrm d x\ \text{ diverges}`,
+            why: String.raw`The larger integral is pushed to $\infty$ by the smaller one, so it diverges as well.` },
         ] },
-        { type: 'steps', title: String.raw`Example (limit comparison): $\displaystyle\int_1^\infty \frac{x+3}{x^3+x}\,\mathrm d x$`, steps: [
-          String.raw`For large $x$ the integrand behaves like $x/x^3 = 1/x^2$. We compare with $g(x) = 1/x^2$:
-$$\lim_{x\to\infty}\frac{(x+3)/(x^3+x)}{1/x^2} = \lim_{x\to\infty}\frac{x^3+3x^2}{x^3+x} = 1 .$$`,
-          String.raw`The limit is finite and positive and $\int_1^\infty x^{-2}\,\mathrm d x$ converges ($p = 2 > 1$), so the given integral converges.`,
+        { type: 'derive', title: String.raw`Example (limit comparison): $\displaystyle\int_1^\infty \frac{x+3}{x^3+x}\,\mathrm d x$`, steps: [
+          { kind: 'calc', label: String.raw`Dividing by $1/x^2$ is multiplying by $x^2$`, from: String.raw`\frac{f(x)}{g(x)} = \frac{(x+3)/(x^3+x)}{\T{g-1}{1/x^2}}`, to: String.raw`\frac{f(x)}{g(x)} = \frac{(x+3)\,\T{g-1}{x^2}}{x^3+x}`, arrows: { 'g-1': '÷ 1/x² = × x²' },
+            why: String.raw`For large $x$ the integrand behaves like $x/x^3 = 1/x^2$, so we compare with $g(x) = 1/x^2$.` },
+          { kind: 'expand', label: String.raw`Multiply out $(x+3)x^2$`, to: String.raw`\frac{f(x)}{g(x)} = \frac{x^3+3x^2}{x^3+x}`, why: String.raw`$x\cdot x^2 = x^3$ and $3\cdot x^2 = 3x^2$.` },
+          { kind: 'calc', label: String.raw`Top and bottom $\div x^3$`, to: String.raw`\frac{f(x)}{g(x)} = \frac{1+\T{a-1}{3/x}}{1+\T{b-1}{1/x^2}}`, why: 'Dividing numerator and denominator by the same thing leaves the fraction unchanged and shows what happens for large $x$.' },
+          { kind: 'result', label: String.raw`Let $x \to \infty$`, to: String.raw`\lim_{x\to\infty}\frac{f(x)}{g(x)} = 1`,
+            why: String.raw`$3/x$ and $1/x^2$ vanish. The limit is finite and positive and $\int_1^\infty x^{-2}\,\mathrm d x$ converges ($p = 2 > 1$), so the given integral converges.` },
         ] },
         { type: 'callout', kind: 'warn', html: String.raw`<p>A comparison must point the right way. $\frac{1}{x^2+1} \le \frac{1}{x}$ is true but useless: being below a divergent integral proves nothing. Use $\frac{1}{x^2+1} \le \frac{1}{x^2}$ instead.</p>` },
         { type: 'quiz', question: String.raw`$\displaystyle\int_0^1 \frac{e^x}{x}\,\mathrm d x$ …`, choices: [String.raw`converges, because $e^x/x \le e/x$`, String.raw`diverges, because $e^x/x \ge 1/x$ and $\int_0^1 \frac{\mathrm d x}{x}$ diverges`, String.raw`converges, because $e^x$ is bounded on $[0,1]$`, 'cannot be decided by comparison'], answer: 1, explain: String.raw`For $0 < x \le 1$, $e^x \ge 1$, so $e^x/x \ge 1/x$. The p-integral with $p = 1$ diverges at $0$, so the larger one diverges. The first option compares with a divergent integral from above, which proves nothing.` },
@@ -133,17 +178,29 @@ $$\int_{-\infty}^{\infty} f(x)\,\mathrm d x = 1 .$$
 If $f = c\,g$ with a known shape $g$, the <b>normalising constant</b> is $c = 1\big/\int g$. The <b>mean</b> (expected value) is
 $$\mu = E[X] = \int_{-\infty}^{\infty} x f(x)\,\mathrm d x ,$$
 and it <b>exists only if this improper integral converges</b> (in the sense of both halves converging separately).</p>` },
-        { type: 'steps', title: String.raw`Example: $f(x) = \dfrac{c}{(1+x)^3}$ for $x \ge 0$ (and $0$ otherwise)`, steps: [
-          String.raw`We find $c$ from the normalisation condition. With $u = 1 + x$:
-$$\int_0^\infty \frac{\mathrm d x}{(1+x)^3} = \lim_{t\to\infty}\Big[-\frac{1}{2(1+x)^2}\Big]_0^t = \frac12, \qquad\text{so}\quad c = 2 .$$`,
-          String.raw`We compute the mean. Writing $x = (1+x) - 1$ splits the integrand into two p-type terms:
-$$\mu = \int_0^\infty \frac{2x}{(1+x)^3}\,\mathrm d x = 2\int_0^\infty \Big(\frac{1}{(1+x)^2} - \frac{1}{(1+x)^3}\Big)\mathrm d x = 2\Big(1 - \frac12\Big) = 1 .$$`,
-          String.raw`The mean exists and equals $1$. Note why: $x f(x) \sim 2/x^2$ for large $x$, a convergent tail.`,
+        { type: 'derive', title: String.raw`Example: $f(x) = \dfrac{c}{(1+x)^3}$ for $x \ge 0$ (and $0$ otherwise)`, steps: [
+          { kind: 'factor', label: String.raw`Take $c$ out of the integral`, from: String.raw`\int_0^\infty \frac{\T{c-1}{c}}{(1+x)^3}\,\mathrm d x = 1`, to: String.raw`\T{c-1}{c}\int_0^\infty \frac{\mathrm d x}{(1+x)^3} = 1`, arrows: { 'c-1': 'constant out' },
+            why: 'We find $c$ from the normalisation condition: the total area must be $1$. A constant factor can be taken outside the integral.' },
+          { kind: 'calculus', label: String.raw`Antiderivative with $u = 1 + x$`, from: String.raw`\int_0^\infty \frac{\mathrm d x}{(1+x)^3}`, to: String.raw`\lim_{t\to\infty}\Big[-\frac{1}{2(1+x)^2}\Big]_0^t = \lim_{t\to\infty}\Big(\T{a-1}{-\frac{1}{2(1+t)^2}} + \frac12\Big)`,
+            why: String.raw`$\int u^{-3}\,\mathrm d u = -\frac{1}{2u^2}$. At $x = 0$ the bracket is $-\frac12$, and subtracting it adds $\frac12$.` },
+          { kind: 'calc', label: String.raw`Let $t \to \infty$`, to: String.raw`\int_0^\infty \frac{\mathrm d x}{(1+x)^3} = \frac12`, why: 'The crossed-out term has a growing denominator and tends to $0$.' },
+          { kind: 'both', label: String.raw`Both sides $\div\tfrac12$`, from: String.raw`\T{c-1}{c}\cdot\T{h-1}{\frac12} = 1`, to: String.raw`\T{c-1}{c} = \frac{1}{\T{h-1}{1/2}} = 2`, arrows: { 'h-1': '÷ ½ on both sides' },
+            why: String.raw`Dividing both sides by $\frac12$ frees $c$; dividing by $\frac12$ is multiplying by $2$.` },
+          { kind: 'sub', label: String.raw`Mean: write $x = (1+x) - 1$`, from: String.raw`\mu = \int_0^\infty \frac{2\,\T{x-1}{x}}{(1+x)^3}\,\mathrm d x`, to: String.raw`\mu = \int_0^\infty \frac{2\,\T{x-1}{\big((1+x) - 1\big)}}{(1+x)^3}\,\mathrm d x`,
+            why: String.raw`Adding and subtracting $1$ changes nothing, but it lets the numerator cancel against the denominator.` },
+          { kind: 'expand', label: 'Split the fraction', to: String.raw`\mu = 2\int_0^\infty \Big(\frac{1}{(1+x)^2} - \frac{1}{(1+x)^3}\Big)\mathrm d x`,
+            why: String.raw`$\frac{1+x}{(1+x)^3} = \frac{1}{(1+x)^2}$. Both terms are p-type integrals with convergent tails.` },
+          { kind: 'result', label: 'Integrate each term', to: String.raw`\mu = 2\Big(1 - \frac12\Big) = 1`,
+            why: String.raw`$\int_0^\infty (1+x)^{-2}\,\mathrm d x = 1$ and we found $\int_0^\infty (1+x)^{-3}\,\mathrm d x = \frac12$ above. The mean exists and equals $1$; note why: $x f(x) \sim 2/x^2$ for large $x$, a convergent tail.` },
         ] },
-        { type: 'steps', title: String.raw`A density without a mean: $f(x) = \dfrac{1}{x^2}$ for $x \ge 1$`, steps: [
-          String.raw`We check normalisation: $\int_1^\infty x^{-2}\,\mathrm d x = 1$, so $f$ is a density.`,
-          String.raw`The mean would be $\int_1^\infty x\cdot x^{-2}\,\mathrm d x = \int_1^\infty \frac{\mathrm d x}{x} = \lim_{t\to\infty}\ln t = \infty$.`,
-          String.raw`The integral diverges, so <b>the mean does not exist</b>. The tail $f(x) \sim x^{-2}$ is thin enough for the total probability to be finite, but $x f(x) \sim x^{-1}$ is not thin enough for the mean. Heavy-tailed distributions like this (and the Cauchy distribution) appear in physics and finance.`,
+        { type: 'derive', title: String.raw`A density without a mean: $f(x) = \dfrac{1}{x^2}$ for $x \ge 1$`, steps: [
+          { kind: 'calculus', label: 'Check normalisation', from: String.raw`\int_1^\infty x^{-2}\,\mathrm d x`, to: String.raw`\lim_{t\to\infty}\Big(1 - \T{a-1}{\frac1t}\Big) = 1`,
+            why: String.raw`$\big[-\frac1x\big]_1^t = 1 - \frac1t$, and $\frac1t \to 0$. The total area is $1$, so $f$ is a density.` },
+          { kind: 'cancel', label: String.raw`$x\cdot x^{-2} = x^{-1}$`, from: String.raw`\mu = \int_1^\infty \T{x-1}{x}\cdot x^{-2}\,\mathrm d x`, to: String.raw`\mu = \int_1^\infty \frac{\mathrm d x}{x}`,
+            why: String.raw`The mean would be $\int x f(x)\,\mathrm d x$. One factor $x$ cancels one power in $x^{-2}$.` },
+          { kind: 'calculus', label: String.raw`Antiderivative $\ln x$`, to: String.raw`\mu = \lim_{t\to\infty}\ln t = \infty`, why: String.raw`$\ln 1 = 0$ and $\ln t$ grows without bound.` },
+          { kind: 'result', label: 'Conclusion', to: String.raw`\mu\ \text{does not exist}`,
+            why: String.raw`The integral diverges. The tail $f(x) \sim x^{-2}$ is thin enough for the total probability to be finite, but $x f(x) \sim x^{-1}$ is not thin enough for the mean. Heavy-tailed distributions like this (and the Cauchy distribution) appear in physics and finance.` },
         ] },
         { type: 'quiz', question: String.raw`For which $\alpha$ does the density $f(x) = (\alpha - 1)x^{-\alpha}$, $x \ge 1$, have a finite mean?`, choices: [String.raw`$\alpha > 1$`, String.raw`$\alpha > 2$`, String.raw`$\alpha > 3$`, String.raw`for no $\alpha$`], answer: 1, explain: String.raw`The mean needs $\int_1^\infty x^{1-\alpha}\,\mathrm d x$ to converge, i.e. $\alpha - 1 > 1$. (For $\alpha > 1$ the function is a density, but the mean needs $\alpha > 2$.)` },
       ],
@@ -207,11 +264,43 @@ title('ln(x)/x^{1/3} is unbounded near 0 but integrable')` },
       difficulty: 'core',
       statement: String.raw`<p>Evaluate each integral or decide that it diverges.</p>`,
       parts: [
-        { label: '(a)', prompt: String.raw`$\displaystyle\int_2^\infty \frac{3}{x^4}\,\mathrm d x$`, kind: 'numeric', answer: '1/8', hint: String.raw`Antiderivative $-x^{-3}$; then let the upper limit tend to infinity.`, solution: String.raw`$\int_2^t 3x^{-4}\,\mathrm d x = \big[-x^{-3}\big]_2^t = \tfrac18 - t^{-3} \to \tfrac18$.` },
-        { label: '(b)', prompt: String.raw`$\displaystyle\int_0^\infty e^{-3x}\,\mathrm d x$`, kind: 'numeric', answer: '1/3', solution: String.raw`$\int_0^t e^{-3x}\,\mathrm d x = \tfrac13\big(1 - e^{-3t}\big) \to \tfrac13$.` },
-        { label: '(c)', prompt: String.raw`$\displaystyle\int_{-\infty}^0 x e^{x}\,\mathrm d x$`, kind: 'numeric', answer: '-1', hint: String.raw`By parts: $\int x e^x\,\mathrm d x = (x-1)e^x$. Then $s e^{s} \to 0$ as $s \to -\infty$.`, solution: String.raw`$\int_s^0 x e^x\,\mathrm d x = \big[(x-1)e^x\big]_s^0 = -1 - (s-1)e^{s}$. As $s \to -\infty$, $(s-1)e^s \to 0$ (exponential beats polynomial), so the value is $-1$.` },
-        { label: '(d)', prompt: String.raw`$\displaystyle\int_1^\infty \frac{\mathrm d x}{x^{0.99}}$`, kind: 'choice', choices: ['converges to $100$', 'converges to $1/0.99$', 'diverges'], answer: 2, solution: String.raw`p-integral at infinity with $p = 0.99 \le 1$: $\int_1^t x^{-0.99}\,\mathrm d x = 100(t^{0.01} - 1) \to \infty$. Diverges — slowly, but it diverges.` },
-        { label: '(e)', prompt: String.raw`$\displaystyle\int_{-\infty}^{\infty} \frac{x}{1+x^2}\,\mathrm d x$`, kind: 'choice', choices: ['$0$, because the integrand is odd', String.raw`$\pi$`, 'diverges'], answer: 2, solution: String.raw`Split at $0$: $\int_0^t \frac{x}{1+x^2}\,\mathrm d x = \tfrac12\ln(1+t^2) \to \infty$. One half diverges, so the integral diverges. Symmetry cancels only when both halves converge.` },
+        { label: '(a)', prompt: String.raw`$\displaystyle\int_2^\infty \frac{3}{x^4}\,\mathrm d x$`, kind: 'numeric', answer: '1/8', hint: String.raw`Antiderivative $-x^{-3}$; then let the upper limit tend to infinity.`, solution: [
+          { type: 'text', html: String.raw`<p>We integrate up to a finite $t$, then let $t \to \infty$.</p>` },
+          { type: 'derive', steps: [
+            { kind: 'calculus', label: String.raw`Antiderivative of $3x^{-4}$`, from: String.raw`\int_2^t 3x^{-4}\,\mathrm d x`, to: String.raw`\Big[-x^{-3}\Big]_2^t`, why: String.raw`$3\cdot\frac{x^{-3}}{-3} = -x^{-3}$.` },
+            { kind: 'calc', label: 'Insert the limits $2$ and $t$', to: String.raw`-t^{-3} + 2^{-3} = \frac18 - \T{a-1}{t^{-3}}`, why: String.raw`$2^{-3} = \frac18$; subtracting $-\frac18$ adds it.` },
+            { kind: 'result', label: String.raw`Let $t \to \infty$`, to: String.raw`\int_2^\infty \frac{3}{x^4}\,\mathrm d x = \frac18`, why: String.raw`$t^{-3} = 1/t^3 \to 0$.` },
+          ] },
+        ] },
+        { label: '(b)', prompt: String.raw`$\displaystyle\int_0^\infty e^{-3x}\,\mathrm d x$`, kind: 'numeric', answer: '1/3', solution: [
+          { type: 'text', html: String.raw`<p>We integrate up to $t$, then let $t \to \infty$.</p>` },
+          { type: 'derive', steps: [
+            { kind: 'calculus', label: String.raw`Antiderivative $-\tfrac13 e^{-3x}$`, from: String.raw`\int_0^t e^{-3x}\,\mathrm d x`, to: String.raw`\Big[-\tfrac13 e^{-3x}\Big]_0^t = \tfrac13\big(1 - \T{a-1}{e^{-3t}}\big)`, why: String.raw`At $x = 0$ the bracket is $-\frac13$; subtracting it adds $\frac13$.` },
+            { kind: 'result', label: String.raw`Let $t \to \infty$`, to: String.raw`\int_0^\infty e^{-3x}\,\mathrm d x = \tfrac13`, why: String.raw`$e^{-3t} \to 0$.` },
+          ] },
+        ] },
+        { label: '(c)', prompt: String.raw`$\displaystyle\int_{-\infty}^0 x e^{x}\,\mathrm d x$`, kind: 'numeric', answer: '-1', hint: String.raw`By parts: $\int x e^x\,\mathrm d x = (x-1)e^x$. Then $s e^{s} \to 0$ as $s \to -\infty$.`, solution: [
+          { type: 'text', html: String.raw`<p>We integrate from a finite $s$ to $0$ by parts, then let $s \to -\infty$.</p>` },
+          { type: 'derive', steps: [
+            { kind: 'calculus', label: String.raw`By parts: antiderivative $(x-1)e^x$`, from: String.raw`\int_s^0 x e^x\,\mathrm d x`, to: String.raw`\Big[(x-1)e^x\Big]_s^0`, why: String.raw`Check: $\frac{\mathrm d}{\mathrm d x}(x-1)e^x = e^x + (x-1)e^x = xe^x$.` },
+            { kind: 'calc', label: 'Insert the limits $s$ and $0$', to: String.raw`(0-1)e^0 - (s-1)e^s = -1 - \T{a-1}{(s-1)e^{s}}`, why: String.raw`$e^0 = 1$.` },
+            { kind: 'result', label: String.raw`Let $s \to -\infty$`, to: String.raw`\int_{-\infty}^0 x e^x\,\mathrm d x = -1`, why: String.raw`$(s-1)e^s \to 0$: the exponential beats the polynomial.` },
+          ] },
+        ] },
+        { label: '(d)', prompt: String.raw`$\displaystyle\int_1^\infty \frac{\mathrm d x}{x^{0.99}}$`, kind: 'choice', choices: ['converges to $100$', 'converges to $1/0.99$', 'diverges'], answer: 2, solution: [
+          { type: 'text', html: String.raw`<p>This is a p-integral at infinity with $p = 0.99 \le 1$. We compute the partial integral to see it grow.</p>` },
+          { type: 'derive', steps: [
+            { kind: 'calculus', label: 'Power rule', from: String.raw`\int_1^t x^{-0.99}\,\mathrm d x`, to: String.raw`\Big[\frac{x^{0.01}}{0.01}\Big]_1^t = 100\big(t^{0.01} - 1\big)`, why: String.raw`$-0.99 + 1 = 0.01$, and dividing by $0.01$ is multiplying by $100$.` },
+            { kind: 'result', label: String.raw`Let $t \to \infty$`, to: String.raw`\lim_{t\to\infty} 100\big(t^{0.01} - 1\big) = \infty`, why: String.raw`Any positive power of $t$ grows without bound. Diverges — slowly, but it diverges.` },
+          ] },
+        ] },
+        { label: '(e)', prompt: String.raw`$\displaystyle\int_{-\infty}^{\infty} \frac{x}{1+x^2}\,\mathrm d x$`, kind: 'choice', choices: ['$0$, because the integrand is odd', String.raw`$\pi$`, 'diverges'], answer: 2, solution: [
+          { type: 'text', html: String.raw`<p>We split at $0$ and test the right half.</p>` },
+          { type: 'derive', steps: [
+            { kind: 'calculus', label: String.raw`Antiderivative with $u = 1 + x^2$`, from: String.raw`\int_0^t \frac{x}{1+x^2}\,\mathrm d x`, to: String.raw`\tfrac12\ln(1+t^2)`, why: String.raw`$\mathrm d u = 2x\,\mathrm d x$, so the integral is $\frac12\int\frac{\mathrm d u}{u} = \frac12\ln u$; at $x = 0$, $\ln 1 = 0$.` },
+            { kind: 'result', label: String.raw`Let $t \to \infty$`, to: String.raw`\lim_{t\to\infty}\tfrac12\ln(1+t^2) = \infty`, why: 'One half diverges, so the integral diverges. Symmetry cancels only when both halves converge.' },
+          ] },
+        ] },
       ],
     },
     {
@@ -220,11 +309,42 @@ title('ln(x)/x^{1/3} is unbounded near 0 but integrable')` },
       difficulty: 'core',
       statement: String.raw`<p>Evaluate each integral or decide that it diverges. Locate the singularity first.</p>`,
       parts: [
-        { label: '(a)', prompt: String.raw`$\displaystyle\int_0^4 \frac{\mathrm d x}{\sqrt x}$`, kind: 'numeric', answer: '4', solution: String.raw`$\int_t^4 x^{-1/2}\,\mathrm d x = 4 - 2\sqrt t \to 4$ as $t \to 0^+$.` },
-        { label: '(b)', prompt: String.raw`$\displaystyle\int_0^8 \frac{\mathrm d x}{\sqrt[3]{x}}$`, kind: 'numeric', answer: '6', solution: String.raw`$\int_t^8 x^{-1/3}\,\mathrm d x = \tfrac32\big(8^{2/3} - t^{2/3}\big) = \tfrac32(4 - t^{2/3}) \to 6$.` },
-        { label: '(c)', prompt: String.raw`$\displaystyle\int_1^3 \frac{\mathrm d x}{\sqrt{x-1}}$`, kind: 'numeric', answer: '2*sqrt(2)', solution: String.raw`$\int_t^3 (x-1)^{-1/2}\,\mathrm d x = 2\sqrt2 - 2\sqrt{t-1} \to 2\sqrt2$ as $t \to 1^+$.` },
-        { label: '(d)', prompt: String.raw`$\displaystyle\int_0^3 \frac{\mathrm d x}{(x-2)^2}$`, kind: 'choice', choices: [String.raw`$-\tfrac32$`, String.raw`$\tfrac32$`, 'diverges'], answer: 2, hint: 'Is the integrand continuous on $[0, 3]$?', solution: String.raw`$x = 2$ is an interior singularity. $\int_0^t (x-2)^{-2}\,\mathrm d x = -\frac{1}{t-2} - \frac12 \to \infty$ as $t\to 2^-$, so the integral diverges. The value $-\tfrac32$ comes from ignoring the singularity.` },
-        { label: '(e)', prompt: String.raw`$\displaystyle\int_0^{\pi/2} \tan x\,\mathrm d x$`, kind: 'choice', choices: ['$1$', String.raw`$\ln 2$`, 'diverges'], answer: 2, solution: String.raw`$\int_0^t \tan x\,\mathrm d x = -\ln\cos t \to \infty$ as $t \to \pi/2^-$. Diverges.` },
+        { label: '(a)', prompt: String.raw`$\displaystyle\int_0^4 \frac{\mathrm d x}{\sqrt x}$`, kind: 'numeric', answer: '4', solution: [
+          { type: 'text', html: String.raw`<p>The singularity is at $x = 0$; we start at $t > 0$ and let $t \to 0^+$.</p>` },
+          { type: 'derive', steps: [
+            { kind: 'calculus', label: String.raw`Antiderivative $2\sqrt x$`, from: String.raw`\int_t^4 x^{-1/2}\,\mathrm d x`, to: String.raw`\Big[2\sqrt x\Big]_t^4 = 4 - \T{a-1}{2\sqrt t}`, why: String.raw`$\frac{x^{1/2}}{1/2} = 2\sqrt x$, and $2\sqrt 4 = 4$.` },
+            { kind: 'result', label: String.raw`Let $t \to 0^+$`, to: String.raw`\int_0^4 \frac{\mathrm d x}{\sqrt x} = 4`, why: String.raw`$2\sqrt t \to 0$.` },
+          ] },
+        ] },
+        { label: '(b)', prompt: String.raw`$\displaystyle\int_0^8 \frac{\mathrm d x}{\sqrt[3]{x}}$`, kind: 'numeric', answer: '6', solution: [
+          { type: 'text', html: String.raw`<p>The singularity is at $x = 0$; we start at $t > 0$ and let $t \to 0^+$.</p>` },
+          { type: 'derive', steps: [
+            { kind: 'calculus', label: 'Power rule', from: String.raw`\int_t^8 x^{-1/3}\,\mathrm d x`, to: String.raw`\Big[\tfrac32 x^{2/3}\Big]_t^8 = \tfrac32\big(8^{2/3} - t^{2/3}\big)`, why: String.raw`$-\frac13 + 1 = \frac23$, and dividing by $\frac23$ is multiplying by $\frac32$.` },
+            { kind: 'calc', label: String.raw`$8^{2/3} = 4$`, to: String.raw`\tfrac32\big(4 - \T{a-1}{t^{2/3}}\big)`, why: String.raw`$\sqrt[3]{8} = 2$ and $2^2 = 4$.` },
+            { kind: 'result', label: String.raw`Let $t \to 0^+$`, to: String.raw`\int_0^8 \frac{\mathrm d x}{\sqrt[3]{x}} = \tfrac32\cdot 4 = 6`, why: String.raw`$t^{2/3} \to 0$.` },
+          ] },
+        ] },
+        { label: '(c)', prompt: String.raw`$\displaystyle\int_1^3 \frac{\mathrm d x}{\sqrt{x-1}}$`, kind: 'numeric', answer: '2*sqrt(2)', solution: [
+          { type: 'text', html: String.raw`<p>The singularity is at $x = 1$; we start at $t > 1$ and let $t \to 1^+$.</p>` },
+          { type: 'derive', steps: [
+            { kind: 'calculus', label: String.raw`Antiderivative $2\sqrt{x-1}$`, from: String.raw`\int_t^3 (x-1)^{-1/2}\,\mathrm d x`, to: String.raw`\Big[2\sqrt{x-1}\Big]_t^3 = 2\sqrt2 - \T{a-1}{2\sqrt{t-1}}`, why: String.raw`Same power rule as for $x^{-1/2}$, shifted by $1$.` },
+            { kind: 'result', label: String.raw`Let $t \to 1^+$`, to: String.raw`\int_1^3 \frac{\mathrm d x}{\sqrt{x-1}} = 2\sqrt2`, why: String.raw`$\sqrt{t-1} \to 0$.` },
+          ] },
+        ] },
+        { label: '(d)', prompt: String.raw`$\displaystyle\int_0^3 \frac{\mathrm d x}{(x-2)^2}$`, kind: 'choice', choices: [String.raw`$-\tfrac32$`, String.raw`$\tfrac32$`, 'diverges'], answer: 2, hint: 'Is the integrand continuous on $[0, 3]$?', solution: [
+          { type: 'text', html: String.raw`<p>$x = 2$ is an interior singularity, so we test the left part $\int_0^2$ as a limit.</p>` },
+          { type: 'derive', steps: [
+            { kind: 'calculus', label: String.raw`Antiderivative $-\frac{1}{x-2}$`, from: String.raw`\int_0^t (x-2)^{-2}\,\mathrm d x`, to: String.raw`\Big[-\frac{1}{x-2}\Big]_0^t = -\frac{1}{t-2} - \frac12`, why: String.raw`At $x = 0$: $-\frac{1}{-2} = \frac12$, and subtracting it gives $-\frac12$.` },
+            { kind: 'result', label: String.raw`Let $t \to 2^-$`, to: String.raw`-\frac{1}{t-2} - \frac12 \to +\infty\quad\Rightarrow\quad\text{diverges}`, why: String.raw`$t - 2$ is a small negative number, so $-\frac{1}{t-2}$ is large and positive. The value $-\tfrac32$ comes from ignoring the singularity.` },
+          ] },
+        ] },
+        { label: '(e)', prompt: String.raw`$\displaystyle\int_0^{\pi/2} \tan x\,\mathrm d x$`, kind: 'choice', choices: ['$1$', String.raw`$\ln 2$`, 'diverges'], answer: 2, solution: [
+          { type: 'text', html: String.raw`<p>The singularity is at $x = \pi/2$; we stop at $t < \pi/2$.</p>` },
+          { type: 'derive', steps: [
+            { kind: 'calculus', label: String.raw`Antiderivative $-\ln\cos x$`, from: String.raw`\int_0^t \tan x\,\mathrm d x`, to: String.raw`\Big[-\ln\cos x\Big]_0^t = -\ln\cos t`, why: String.raw`$\ln\cos 0 = \ln 1 = 0$.` },
+            { kind: 'result', label: String.raw`Let $t \to \pi/2^-$`, to: String.raw`-\ln\cos t \to \infty\quad\Rightarrow\quad\text{diverges}`, why: String.raw`$\cos t \to 0^+$, so $\ln\cos t \to -\infty$.` },
+          ] },
+        ] },
       ],
     },
     {
@@ -238,7 +358,16 @@ title('ln(x)/x^{1/3} is unbounded near 0 but integrable')` },
         { label: '(c)', prompt: String.raw`$\displaystyle\int_1^\infty \frac{x}{x^3+1}\,\mathrm d x$`, kind: 'choice', choices: ['converges', 'diverges'], answer: 0, solution: String.raw`$\frac{x}{x^3+1} \le \frac{x}{x^3} = \frac{1}{x^2}$, a convergent p-integral.` },
         { label: '(d)', prompt: String.raw`$\displaystyle\int_0^1 \frac{\mathrm d x}{x + \sqrt x}$`, kind: 'choice', choices: ['converges', 'diverges'], answer: 0, solution: String.raw`$\frac{1}{x+\sqrt x} \le \frac{1}{\sqrt x}$ on $(0,1]$ and $\int_0^1 x^{-1/2}\,\mathrm d x = 2$ converges. (Exact value: substitute $u = \sqrt x$ to get $2\ln 2$.)` },
         { label: '(e)', prompt: String.raw`$\displaystyle\int_1^\infty \frac{\sqrt{x}+1}{x^2-x/2}\,\mathrm d x$`, kind: 'choice', choices: ['converges', 'diverges'], answer: 0, solution: String.raw`Limit comparison with $x^{-3/2}$: $\frac{(\sqrt x + 1)/(x^2 - x/2)}{x^{-3/2}} = \frac{x^2 + x^{3/2}}{x^2 - x/2} \to 1$, and $\int_1^\infty x^{-3/2}\,\mathrm d x$ converges ($p = \tfrac32$).` },
-        { label: '(f)', prompt: String.raw`Using $\displaystyle\int_0^1 \frac{\mathrm d x}{x+\sqrt x}$ from (d), substitute $u = \sqrt x$ and give the exact value.`, kind: 'numeric', answer: '2*log(2)', solution: String.raw`$x = u^2$, $\mathrm d x = 2u\,\mathrm d u$: $\int_0^1 \frac{2u\,\mathrm d u}{u^2 + u} = \int_0^1 \frac{2\,\mathrm d u}{u+1} = 2\ln 2$. The substitution removes the singularity.` },
+        { label: '(f)', prompt: String.raw`Using $\displaystyle\int_0^1 \frac{\mathrm d x}{x+\sqrt x}$ from (d), substitute $u = \sqrt x$ and give the exact value.`, kind: 'numeric', answer: '2*log(2)', solution: [
+          { type: 'text', html: String.raw`<p>We substitute $u = \sqrt x$, i.e. $x = u^2$, $\mathrm d x = 2u\,\mathrm d u$; the limits $0$ and $1$ stay $0$ and $1$.</p>` },
+          { type: 'derive', steps: [
+            { kind: 'sub', label: String.raw`Substitute $x = u^2$`, from: String.raw`\int_0^1 \frac{\T{dx-1}{\mathrm d x}}{\T{x-1}{x} + \T{r-1}{\sqrt x}}`, to: String.raw`\int_0^1 \frac{\T{dx-1}{2u\,\mathrm d u}}{\T{x-1}{u^2} + \T{r-1}{u}}`, arrows: { 'dx-1': 'dx = 2u du', 'x-1': 'x = u²', 'r-1': '√x = u' },
+              why: 'Every piece containing $x$ is replaced by its expression in $u$.' },
+            { kind: 'factor', label: String.raw`Factor $u$ out of the denominator`, to: String.raw`\int_0^1 \frac{2\,\T{u-1}{u}\,\mathrm d u}{\T{u-2}{u}(u+1)}`, why: String.raw`$u^2 + u = u(u + 1)$.` },
+            { kind: 'cancel', label: String.raw`Cancel $u$`, to: String.raw`\int_0^1 \frac{2\,\mathrm d u}{u+1}`, why: String.raw`The common factor $u$ cancels. The integrand is now bounded: the substitution removes the singularity.` },
+            { kind: 'result', label: 'Integrate', to: String.raw`\Big[2\ln(u+1)\Big]_0^1 = 2\ln 2`, why: String.raw`$\ln 1 = 0$.` },
+          ] },
+        ] },
       ],
     },
     {
@@ -248,8 +377,22 @@ title('ln(x)/x^{1/3} is unbounded near 0 but integrable')` },
       hw: 'HW2-style',
       statement: String.raw`<p>Let $f(x) = \dfrac{c}{(1+|x|)^2}$ for all $x \in \mathbb R$.</p>`,
       parts: [
-        { label: '(a)', prompt: String.raw`Find the constant $c$ that makes $f$ a probability density.`, kind: 'numeric', answer: '1/2', hint: String.raw`The function is even: $\int_{-\infty}^{\infty} = 2\int_0^\infty$.`, solution: String.raw`$\int_0^\infty (1+x)^{-2}\,\mathrm d x = \lim_{t\to\infty}\big(1 - \tfrac{1}{1+t}\big) = 1$, so the total integral is $2c = 1$ and $c = \tfrac12$.` },
-        { label: '(b)', prompt: String.raw`Compute $P(-1 \le X \le 1) = \int_{-1}^{1} f(x)\,\mathrm d x$.`, kind: 'numeric', answer: '1/2', solution: String.raw`$2\cdot\tfrac12\int_0^1 (1+x)^{-2}\,\mathrm d x = 1 - \tfrac12 = \tfrac12$.` },
+        { label: '(a)', prompt: String.raw`Find the constant $c$ that makes $f$ a probability density.`, kind: 'numeric', answer: '1/2', hint: String.raw`The function is even: $\int_{-\infty}^{\infty} = 2\int_0^\infty$.`, solution: [
+          { type: 'text', html: String.raw`<p>The function is even, so the total integral is twice the right half. We compute the right half as a limit and solve for $c$.</p>` },
+          { type: 'derive', steps: [
+            { kind: 'start', label: 'Use symmetry', from: String.raw`\int_{-\infty}^{\infty} \frac{c}{(1+|x|)^2}\,\mathrm d x = 1`, to: String.raw`2c\int_0^\infty \frac{\mathrm d x}{(1+x)^2} = 1`, why: String.raw`For $x \ge 0$, $|x| = x$; the left half equals the right half.` },
+            { kind: 'calculus', label: 'Right half as a limit', from: String.raw`\int_0^\infty \frac{\mathrm d x}{(1+x)^2}`, to: String.raw`\lim_{t\to\infty}\Big[-\frac{1}{1+x}\Big]_0^t = \lim_{t\to\infty}\Big(1 - \T{a-1}{\frac{1}{1+t}}\Big)`, why: String.raw`At $x = 0$ the bracket is $-1$; subtracting it adds $1$.` },
+            { kind: 'calc', label: String.raw`Let $t \to \infty$`, to: String.raw`\int_0^\infty \frac{\mathrm d x}{(1+x)^2} = 1`, why: String.raw`$\frac{1}{1+t} \to 0$.` },
+            { kind: 'result', label: String.raw`Both sides $\div 2$`, from: String.raw`\T{t-1}{2}\,c\cdot 1 = 1`, to: String.raw`c = \frac{1}{\T{t-1}{2}}`, arrows: { 't-1': '÷ 2 on both sides' }, why: String.raw`The total integral is $2c = 1$, so $c = \tfrac12$.` },
+          ] },
+        ] },
+        { label: '(b)', prompt: String.raw`Compute $P(-1 \le X \le 1) = \int_{-1}^{1} f(x)\,\mathrm d x$.`, kind: 'numeric', answer: '1/2', solution: [
+          { type: 'text', html: String.raw`<p>We use symmetry again with $c = \tfrac12$.</p>` },
+          { type: 'derive', steps: [
+            { kind: 'start', label: 'Use symmetry', from: String.raw`\int_{-1}^{1} f(x)\,\mathrm d x`, to: String.raw`2\cdot\tfrac12\int_0^1 (1+x)^{-2}\,\mathrm d x`, why: 'The integrand is even, so the integral over $[-1, 1]$ is twice the integral over $[0, 1]$.' },
+            { kind: 'result', label: 'Integrate', to: String.raw`\Big[-\frac{1}{1+x}\Big]_0^1 = -\frac12 + 1 = \frac12`, why: String.raw`$2\cdot\frac12 = 1$; no limit is needed on a bounded interval with a bounded integrand.` },
+          ] },
+        ] },
         { label: '(c)', prompt: String.raw`Does the mean $E[X]$ exist?`, kind: 'choice', choices: ['Yes, it is $0$ by symmetry', String.raw`Yes, it is $\tfrac12$`, 'No: the integral diverges'], answer: 2, solution: String.raw`$\int_0^\infty \frac{x/2}{(1+x)^2}\,\mathrm d x$ diverges because $\frac{x}{(1+x)^2} \sim \frac1x$ (limit comparison with $1/x$). One half diverges, so the mean does not exist; symmetry does not rescue it.` },
         { label: '(d)', prompt: String.raw`Write a Live Script solution for (a) and (c) with explicit limits, and a numerical check of (a) with <code>integral</code>. Explain why $\lim_{t\to\infty}\int_{-t}^{t} x f(x)\,\mathrm d x = 0$ does not give a mean.`, kind: 'writeup' },
       ],
@@ -275,12 +418,57 @@ title('ln(x)/x^{1/3} is unbounded near 0 but integrable')` },
       hw: 'HW2-style',
       statement: String.raw`<p>This set mixes the techniques of the whole part: integration by parts, substitution, partial fractions, completing the square and improper limits. Give exact values (MATLAB syntax, e.g. <code>log(3)/2</code>); a numerical check with <code>integral</code> is a good habit, but justify convergence by hand.</p>`,
       parts: [
-        { label: '(a)', prompt: String.raw`$\displaystyle\int_0^\infty x e^{-2x}\,\mathrm d x$ (parts)`, kind: 'numeric', answer: '1/4', hint: String.raw`$u = x$, $\mathrm d v = e^{-2x}\,\mathrm d x$.`, solution: String.raw`$\int_0^t x e^{-2x}\,\mathrm d x = \big[-\tfrac x2 e^{-2x}\big]_0^t + \tfrac12\int_0^t e^{-2x}\,\mathrm d x = -\tfrac t2 e^{-2t} + \tfrac14(1 - e^{-2t}) \to \tfrac14$.` },
-        { label: '(b)', prompt: String.raw`$\displaystyle\int_e^\infty \frac{\mathrm d x}{x(\ln x)^3}$ (substitution)`, kind: 'numeric', answer: '1/2', hint: String.raw`$u = \ln x$.`, solution: String.raw`With $u = \ln x$, $\mathrm d u = \mathrm d x/x$, the limits become $1$ and $\infty$: $\int_1^\infty u^{-3}\,\mathrm d u = \tfrac12$.` },
-        { label: '(c)', prompt: String.raw`$\displaystyle\int_2^\infty \frac{\mathrm d x}{x^2-1}$ (partial fractions)`, kind: 'numeric', answer: 'log(3)/2', hint: String.raw`$\frac{1}{x^2-1} = \frac12\Big(\frac{1}{x-1} - \frac{1}{x+1}\Big)$. Combine the logarithms before taking the limit.`, solution: String.raw`$\int_2^t \frac{\mathrm d x}{x^2-1} = \frac12\Big[\ln\frac{x-1}{x+1}\Big]_2^t = \frac12\ln\frac{t-1}{t+1} - \frac12\ln\frac13 \to 0 + \frac12\ln 3$. Taking the limits of $\ln(t-1)$ and $\ln(t+1)$ separately would give $\infty - \infty$.` },
-        { label: '(d)', prompt: String.raw`$\displaystyle\int_0^\infty \frac{\mathrm d x}{x^2+2x+5}$ (completing the square)`, kind: 'numeric', answer: '(pi/2 - atan(1/2))/2', solution: String.raw`$x^2 + 2x + 5 = (x+1)^2 + 4$, so an antiderivative is $\tfrac12\arctan\tfrac{x+1}{2}$. The value is $\tfrac12\big(\tfrac\pi2 - \arctan\tfrac12\big) \approx 0.5536$.` },
-        { label: '(e)', prompt: String.raw`$\displaystyle\int_0^1 \frac{\ln x}{\sqrt[3]{x}}\,\mathrm d x$ (parts + a limit at $0$)`, kind: 'numeric', answer: '-9/4', hint: String.raw`$u = \ln x$, $\mathrm d v = x^{-1/3}\,\mathrm d x$, $v = \tfrac32 x^{2/3}$. You will need $\lim_{t\to0^+} t^{2/3}\ln t$.`, solution: String.raw`$\int_t^1 x^{-1/3}\ln x\,\mathrm d x = \big[\tfrac32 x^{2/3}\ln x\big]_t^1 - \tfrac32\int_t^1 x^{-1/3}\,\mathrm d x = -\tfrac32 t^{2/3}\ln t - \tfrac94(1 - t^{2/3})$. By l'Hospital $t^{2/3}\ln t = \frac{\ln t}{t^{-2/3}} \to \frac{1/t}{-\frac23 t^{-5/3}} = -\tfrac32 t^{2/3} \to 0$, so the value is $-\tfrac94$.` },
-        { label: '(f)', prompt: String.raw`$\displaystyle\int_1^\infty \frac{\mathrm d x}{x(x+1)}$ (partial fractions)`, kind: 'numeric', answer: 'log(2)', solution: String.raw`$\frac{1}{x(x+1)} = \frac1x - \frac{1}{x+1}$, so $\int_1^t = \Big[\ln\frac{x}{x+1}\Big]_1^t = \ln\frac{t}{t+1} + \ln 2 \to \ln 2$.` },
+        { label: '(a)', prompt: String.raw`$\displaystyle\int_0^\infty x e^{-2x}\,\mathrm d x$ (parts)`, kind: 'numeric', answer: '1/4', hint: String.raw`$u = x$, $\mathrm d v = e^{-2x}\,\mathrm d x$.`, solution: [
+          { type: 'text', html: String.raw`<p>We integrate by parts up to $t$ with $u = x$, $\mathrm d v = e^{-2x}\,\mathrm d x$, then let $t \to \infty$.</p>` },
+          { type: 'derive', steps: [
+            { kind: 'calculus', label: String.raw`By parts: $v = -\tfrac12 e^{-2x}$`, from: String.raw`\int_0^t x e^{-2x}\,\mathrm d x`, to: String.raw`\Big[-\tfrac x2 e^{-2x}\Big]_0^t + \tfrac12\int_0^t e^{-2x}\,\mathrm d x`, why: String.raw`$uv - \int v\,\mathrm d u$ with $\mathrm d u = \mathrm d x$; the two minus signs give $+\frac12\int e^{-2x}\,\mathrm d x$.` },
+            { kind: 'calc', label: 'Insert the limits', to: String.raw`\T{a-1}{-\tfrac t2 e^{-2t}} + \tfrac14\big(1 - \T{b-1}{e^{-2t}}\big)`, why: String.raw`$\frac12\int_0^t e^{-2x}\,\mathrm d x = \frac12\cdot\frac12\big(1 - e^{-2t}\big)$.` },
+            { kind: 'result', label: String.raw`Let $t \to \infty$`, to: String.raw`\int_0^\infty x e^{-2x}\,\mathrm d x = \tfrac14`, why: String.raw`$e^{-2t} \to 0$ and $t e^{-2t} \to 0$ (exponential beats polynomial).` },
+          ] },
+        ] },
+        { label: '(b)', prompt: String.raw`$\displaystyle\int_e^\infty \frac{\mathrm d x}{x(\ln x)^3}$ (substitution)`, kind: 'numeric', answer: '1/2', hint: String.raw`$u = \ln x$.`, solution: [
+          { type: 'text', html: String.raw`<p>We substitute $u = \ln x$, $\mathrm d u = \mathrm d x/x$; the limits $e$ and $\infty$ become $1$ and $\infty$.</p>` },
+          { type: 'derive', steps: [
+            { kind: 'sub', label: String.raw`Substitute $u = \ln x$`, from: String.raw`\int_{\T{lo-1}{e}}^{\infty} \frac{1}{(\T{u-1}{\ln x})^3}\,\T{du-1}{\frac{\mathrm d x}{x}}`, to: String.raw`\int_{\T{lo-1}{1}}^{\infty} \frac{1}{\T{u-1}{u}^3}\,\T{du-1}{\mathrm d u}`, arrows: { 'u-1': 'ln x = u', 'lo-1': 'ln e = 1', 'du-1': 'dx/x = du' },
+              why: String.raw`$\frac{1}{x(\ln x)^3}\,\mathrm d x$ is split as $\frac{1}{(\ln x)^3}\cdot\frac{\mathrm d x}{x}$ so each piece has a partner in $u$. As $x \to \infty$, $\ln x \to \infty$ too.` },
+            { kind: 'calculus', label: 'Integrate up to $t$', to: String.raw`\lim_{t\to\infty}\Big[-\frac{1}{2u^2}\Big]_1^t = \lim_{t\to\infty}\Big(\frac12 - \T{a-1}{\frac{1}{2t^2}}\Big)`, why: String.raw`$\int u^{-3}\,\mathrm d u = -\frac{1}{2u^2}$.` },
+            { kind: 'result', label: String.raw`Let $t \to \infty$`, to: String.raw`\int_e^\infty \frac{\mathrm d x}{x(\ln x)^3} = \frac12`, why: String.raw`$\frac{1}{2t^2} \to 0$.` },
+          ] },
+        ] },
+        { label: '(c)', prompt: String.raw`$\displaystyle\int_2^\infty \frac{\mathrm d x}{x^2-1}$ (partial fractions)`, kind: 'numeric', answer: 'log(3)/2', hint: String.raw`$\frac{1}{x^2-1} = \frac12\Big(\frac{1}{x-1} - \frac{1}{x+1}\Big)$. Combine the logarithms before taking the limit.`, solution: [
+          { type: 'text', html: String.raw`<p>We split into partial fractions, combine the logarithms, and only then let $t \to \infty$.</p>` },
+          { type: 'derive', steps: [
+            { kind: 'calculus', label: 'Partial fractions, then integrate', from: String.raw`\int_2^t \frac{\mathrm d x}{x^2-1}`, to: String.raw`\frac12\Big[\ln(x-1) - \ln(x+1)\Big]_2^t`, why: String.raw`$\frac{1}{x^2-1} = \frac12\Big(\frac{1}{x-1} - \frac{1}{x+1}\Big)$, and each term integrates to a logarithm (both arguments are positive for $x \ge 2$).` },
+            { kind: 'factor', label: 'Combine the logarithms', to: String.raw`\frac12\Big[\ln\frac{x-1}{x+1}\Big]_2^t`, why: String.raw`$\ln a - \ln b = \ln\frac ab$.` },
+            { kind: 'calc', label: 'Insert the limits $2$ and $t$', to: String.raw`\frac12\T{a-1}{\ln\frac{t-1}{t+1}} - \frac12\ln\frac13`, why: String.raw`At $x = 2$: $\frac{2-1}{2+1} = \frac13$.` },
+            { kind: 'result', label: String.raw`Let $t \to \infty$`, to: String.raw`\int_2^\infty \frac{\mathrm d x}{x^2-1} = 0 + \frac12\ln 3`, why: String.raw`$\frac{t-1}{t+1} \to 1$ and $\ln 1 = 0$; $-\frac12\ln\frac13 = \frac12\ln 3$. Taking the limits of $\ln(t-1)$ and $\ln(t+1)$ separately would give $\infty - \infty$.` },
+          ] },
+        ] },
+        { label: '(d)', prompt: String.raw`$\displaystyle\int_0^\infty \frac{\mathrm d x}{x^2+2x+5}$ (completing the square)`, kind: 'numeric', answer: '(pi/2 - atan(1/2))/2', solution: [
+          { type: 'text', html: String.raw`<p>We complete the square, use the arctangent antiderivative, and let $t \to \infty$.</p>` },
+          { type: 'derive', steps: [
+            { kind: 'factor', label: 'Complete the square', from: String.raw`\int_0^\infty \frac{\mathrm d x}{x^2+2x+5}`, to: String.raw`\int_0^\infty \frac{\mathrm d x}{(x+1)^2+4}`, why: String.raw`$x^2 + 2x + 5 = (x^2 + 2x + 1) + 4 = (x+1)^2 + 4$.` },
+            { kind: 'calculus', label: String.raw`Antiderivative $\tfrac12\arctan\tfrac{x+1}{2}$`, to: String.raw`\lim_{t\to\infty}\Big[\tfrac12\arctan\tfrac{x+1}{2}\Big]_0^t`, why: String.raw`$\int \frac{\mathrm d u}{u^2 + a^2} = \frac1a\arctan\frac ua$ with $u = x + 1$, $a = 2$.` },
+            { kind: 'result', label: String.raw`Let $t \to \infty$`, to: String.raw`\int_0^\infty \frac{\mathrm d x}{x^2+2x+5} = \tfrac12\Big(\tfrac\pi2 - \arctan\tfrac12\Big) \approx 0.5536`, why: String.raw`$\arctan\frac{t+1}{2} \to \frac\pi2$; at $x = 0$ the bracket is $\frac12\arctan\frac12$.` },
+          ] },
+        ] },
+        { label: '(e)', prompt: String.raw`$\displaystyle\int_0^1 \frac{\ln x}{\sqrt[3]{x}}\,\mathrm d x$ (parts + a limit at $0$)`, kind: 'numeric', answer: '-9/4', hint: String.raw`$u = \ln x$, $\mathrm d v = x^{-1/3}\,\mathrm d x$, $v = \tfrac32 x^{2/3}$. You will need $\lim_{t\to0^+} t^{2/3}\ln t$.`, solution: [
+          { type: 'text', html: String.raw`<p>The integrand is unbounded at $0$, so we integrate from $t$ by parts ($u = \ln x$, $v = \tfrac32 x^{2/3}$) and then let $t \to 0^+$.</p>` },
+          { type: 'derive', steps: [
+            { kind: 'calculus', label: 'By parts', from: String.raw`\int_t^1 x^{-1/3}\ln x\,\mathrm d x`, to: String.raw`\Big[\tfrac32 x^{2/3}\ln x\Big]_t^1 - \tfrac32\int_t^1 x^{-1/3}\,\mathrm d x`, why: String.raw`$\int v\,\mathrm d u = \int \tfrac32 x^{2/3}\cdot\frac1x\,\mathrm d x = \tfrac32\int x^{-1/3}\,\mathrm d x$.` },
+            { kind: 'calc', label: 'Insert the limits', to: String.raw`\T{a-1}{-\tfrac32 t^{2/3}\ln t} - \tfrac94\big(1 - \T{b-1}{t^{2/3}}\big)`, why: String.raw`$\ln 1 = 0$, and $\tfrac32\int_t^1 x^{-1/3}\,\mathrm d x = \tfrac32\cdot\tfrac32\big(1 - t^{2/3}\big)$.` },
+            { kind: 'calculus', label: String.raw`l'Hospital for $t^{2/3}\ln t$`, from: String.raw`t^{2/3}\ln t = \frac{\ln t}{t^{-2/3}}`, to: String.raw`\frac{1/t}{-\frac23 t^{-5/3}} = -\tfrac32 t^{2/3} \to 0`, why: String.raw`A $0\cdot\infty$ form rewritten as $\frac{\infty}{\infty}$; differentiate top and bottom.` },
+            { kind: 'result', label: String.raw`Let $t \to 0^+$`, from: String.raw`\T{a-1}{-\tfrac32 t^{2/3}\ln t} - \tfrac94\big(1 - \T{b-1}{t^{2/3}}\big)`, to: String.raw`\int_0^1 \frac{\ln x}{\sqrt[3]{x}}\,\mathrm d x = -\tfrac94`, why: String.raw`Both crossed-out terms tend to $0$.` },
+          ] },
+        ] },
+        { label: '(f)', prompt: String.raw`$\displaystyle\int_1^\infty \frac{\mathrm d x}{x(x+1)}$ (partial fractions)`, kind: 'numeric', answer: 'log(2)', solution: [
+          { type: 'text', html: String.raw`<p>We split into partial fractions, integrate to $t$, and let $t \to \infty$.</p>` },
+          { type: 'derive', steps: [
+            { kind: 'expand', label: 'Partial fractions', from: String.raw`\int_1^t \frac{\mathrm d x}{x(x+1)}`, to: String.raw`\int_1^t \Big(\frac1x - \frac{1}{x+1}\Big)\mathrm d x`, why: String.raw`Cover-up: at $x = 0$ the coefficient is $\frac{1}{0+1} = 1$; at $x = -1$ it is $\frac{1}{-1} = -1$.` },
+            { kind: 'calculus', label: 'Integrate and combine the logarithms', to: String.raw`\Big[\ln\frac{x}{x+1}\Big]_1^t = \T{a-1}{\ln\frac{t}{t+1}} + \ln 2`, why: String.raw`At $x = 1$: $-\ln\frac12 = \ln 2$.` },
+            { kind: 'result', label: String.raw`Let $t \to \infty$`, to: String.raw`\int_1^\infty \frac{\mathrm d x}{x(x+1)} = \ln 2`, why: String.raw`$\frac{t}{t+1} \to 1$ and $\ln 1 = 0$.` },
+          ] },
+        ] },
         { label: '(g)', prompt: String.raw`Write up (e) as a Live Script answer: explicit limit, the l'Hospital step, and an <code>integral</code> check.`, kind: 'writeup' },
       ],
       writeup: true,

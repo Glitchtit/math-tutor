@@ -138,7 +138,7 @@ time (Next step reveals and animates); Play slides the terms along the arrows.
   picks the colour, so all `Vs-*` share one colour through the whole block. Tag every term that moves,
   is cancelled, or is substituted. Untagged parts (`=`, `+`, constants) simply fade between lines.
 * **Moves and cancels** are computed: a tag in `from` moves to every tag with the same id in `to`
-  (or to the ids listed in `map`). A tag with no destination is drawn crossed out, unless a tagged
+  (or to the ids listed in `map`). A tag with no destination is drawn crossed out (in `calc`/`calculus` steps it is faded instead, because it was evaluated, not cancelled), unless a tagged
   term *inside* it moves (a bracket that dissolves). A step may set its own `from` to re-tag the same
   expression, e.g. to tag the inside of a bracket before expanding it.
 * **Arrows** are drawn only for keys in `arrows` (value = label, `''` = no label). Draw them for
