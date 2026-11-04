@@ -215,15 +215,20 @@ where the function is defined. Antiderivatives use `upToConstant: true`.
 Learners must never meet a problem type they have not first seen fully worked and then practised
 with support. Each problem type follows **I do → we do → you do**:
 
-1. **I do — worked example** (`steps`): every line of algebra is written out, one transformation per
-   step, each with a `why` in plain words naming the rule used. Nothing is "obvious". If a step uses
+1. **I do — worked example** (`derive`, or `steps` for reasoning that does not restructure a formula):
+   every line of algebra is written out, one transformation per step, each with a `why` in plain words
+   naming the rule used. Whenever the worked example manipulates formulas, use `derive` so the student
+   *sees* each term move (arrows, colours, strike-outs). Nothing is "obvious". If a step uses
    a prerequisite skill (fractions, exponent laws, trig identities, completing the square, chain rule…),
    put a `refresher` right before the example.
 2. **We do — guided exercise** (`guided`): the same type with different numbers. The student answers the
    small steps (choose u, compute du, rewrite the integral, integrate, substitute back, evaluate) one at a
    time, with a hint per step and "Show me this step".
 3. **You do — assignment**: the same type again, now unaided, but with `examples` linking back to 1–2,
-   a hint ladder (`hints`: nudge → method → first step) and a full `walkthrough`.
+   a hint ladder (`hints`: nudge → method → first step) and a full `walkthrough`. A walkthrough is either
+   `[{ do, why }, ...]` or, when it restructures formulas (the usual case), lesson blocks:
+   `walkthrough: [{ type: 'text', html }, { type: 'derive', steps: [...] }]`. When a part has a
+   walkthrough, its `solution` is not shown, so put the full working in the walkthrough.
 
 Rules of thumb: introduce one new idea at a time; use concrete numbers before general formulas; define
 every symbol the first time; assignments within a module go from "same as the example with new numbers"

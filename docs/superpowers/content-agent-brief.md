@@ -63,3 +63,24 @@ never write "move across" without the operation that makes it true.
 For each module: number of `derive` blocks added, `steps` blocks converted / kept (and why kept),
 solutions converted / kept as strings, numbers companions added, and the `validate-content` result.
 Then: any renderer/validator problems you hit, and anything you were unsure about. Keep it short.
+
+## Addendum (round 2, after merging the hand-holding rewrite)
+
+`main` gained a **hand-holding standard** (read "The hand-holding standard" in CONTENT.md; it is
+enforced by the validator): I do (worked example) → we do (`guided` exercise) → you do (assignment
+with `examples`, a `hints` ladder of ≥2 levels and a `walkthrough`). Worked steps in the `steps`
+block are now `{ do, why }` objects. The calculus modules on `main` were rewritten to this standard.
+
+- **Keep everything the hand-holding rewrite added**: guided exercises, refreshers, hint ladders,
+  example links, the I do → we do → you do order. Do not remove or weaken any of it.
+- **Calculus conversion**: a `steps` block whose `{do, why}` lines restructure formulas becomes a
+  `derive` block (each `do` → one step's `to`, each `why` → that step's `why`; split any `do` that
+  makes two moves). Keep the block's title/problem as a `text` block or the derive `title`. A
+  `walkthrough` whose steps restructure formulas becomes the block form
+  `[{ type: 'text', html }, { type: 'derive', steps: [...] }]`. Refresher steps and guided exercises
+  stay as they are. Add `symbolic: true` + a numbers companion where a formula with parameters is
+  derived (same rule as before).
+- Part `solution` strings are hidden when a walkthrough exists; leave them unchanged.
+- A module that has assignments needs ≥ 2 `guided` exercises in its lessons, and every assignment
+  needs `examples` naming lessons that contain a worked example (`steps` or `derive`) and a `guided`.
+- The scratchpad is shared between agents: name any helper script uniquely (include your module ids).
