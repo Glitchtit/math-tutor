@@ -1,5 +1,49 @@
 // Power Electronics — Mini Exam 1 practice. Ported from docs/superpowers/pe1-artifact.html.
 
+// Slide-31 circuit from the L2 example, with the source values of P5 (V1 = 100 V, V2 = 20 V).
+const P5_SVG = String.raw`<svg viewBox="0 0 460 215" role="img" aria-label="Circuit: V1 100 V on the left between nodes A and D; R1 10 ohm vertical between B and D; R2 5 ohm and R3 20 ohm in series along the top from B to C; V2 20 V on the right between C and D.">
+  <path class="sch" d="M60 40 H230 M262 40 H300 M332 40 H400 M60 40 V88 M60 132 V180 H400 V132 M400 88 V40"/>
+  <path class="sch" d="M230 40 l4 -8 l4 16 l4 -16 l4 16 l4 -16 l4 16 l4 -8 M300 40 l4 -8 l4 16 l4 -16 l4 16 l4 -16 l4 16 l4 -8"/>
+  <circle class="sch" cx="60" cy="110" r="22"/><text class="sch-t" x="54" y="104">+</text><text class="sch-t" x="55" y="126">−</text>
+  <circle class="sch" cx="400" cy="110" r="22"/><text class="sch-t" x="394" y="104">+</text><text class="sch-t" x="395" y="126">−</text>
+  <text class="sch-t" x="0" y="104">V1</text><text class="sch-t" x="0" y="122">100V</text><text class="sch-t" x="428" y="108">V2</text><text class="sch-t" x="428" y="124">20V</text>
+  <path class="sch" d="M180 40 V80 l-8 4 l16 8 l-16 8 l16 8 l-16 8 l16 8 l-8 4 V180"/>
+  <text class="sch-t" x="194" y="115">R1 10Ω</text>
+  <text class="sch-t" x="226" y="22">R2 5Ω</text><text class="sch-t" x="296" y="22">R3 20Ω</text>
+  <text class="sch-t" x="52" y="30">A</text><text class="sch-t" x="176" y="30">B</text><text class="sch-t" x="396" y="30">C</text><text class="sch-t" x="176" y="200">D</text>
+  <path class="sa" style="stroke-width:2.2;fill:none" d="M110 54 H150"/><polygon class="fa" points="150,49 160,54 150,59"/><text class="ca" x="118" y="72" style="font-size:14px">I1</text>
+  <path class="sb" style="stroke-width:2.2;fill:none" d="M260 54 H210"/><polygon class="fb" points="210,49 200,54 210,59"/><text class="cb" x="226" y="72" style="font-size:14px">I2</text>
+  <path class="sg" style="stroke-width:2.2;fill:none" d="M162 70 V100"/><polygon class="fg" points="157,100 162,110 167,100"/><text class="cg" x="138" y="92" style="font-size:14px">I3</text>
+  <path class="ax" d="M100 140 a 22 18 0 1 1 30 10"/><text class="svgtxt" x="104" y="170">loop 1</text>
+  <path class="ax" d="M280 140 a 28 20 0 1 0 -36 10"/><text class="svgtxt" x="268" y="170">loop 2</text>
+</svg>`;
+
+const DIODE_IV_SVG = String.raw`<svg viewBox="0 0 520 240" role="img" aria-label="Diode IV curves: ideal diode as an L-shape along the negative voltage axis and up the current axis; practical diode with knee at 0.7 volts, small leakage and breakdown at negative voltage.">
+  <path class="ax" d="M20 150 H500 M260 230 V15"/>
+  <text class="svgtxt" x="488" y="168">V</text><text class="svgtxt" x="268" y="22">I</text>
+  <path class="sb" style="fill:none;stroke-width:2.5" d="M30 150 H260 V25"/>
+  <path class="sa" style="fill:none;stroke-width:2.5" d="M70 230 C 78 175, 82 156, 95 154 L 250 152 C 300 151, 310 148, 318 120 C 324 90, 328 60, 334 25"/>
+  <path class="grid" d="M318 150 V120 M70 150 V230"/>
+  <text class="svgtxt-i" x="300" y="168">0.7 V (knee)</text>
+  <text class="svgtxt-i" x="40" y="140">breakdown</text>
+  <text class="svgtxt-i" x="120" y="170">reverse leakage (µA)</text>
+  <text class="cb" x="200" y="40" style="font-size:13px">ideal</text>
+  <text class="ca" x="345" y="50" style="font-size:13px">practical Si</text>
+  <text class="svgtxt" x="350" y="200">forward bias →</text><text class="svgtxt" x="110" y="200">← reverse bias</text>
+</svg>`;
+
+// Arrowheads were class "sch-af" in the artifact (undefined there too); filled with the ink colour here.
+const SYMBOLS_SVG = String.raw`<svg viewBox="0 0 540 330" role="img" aria-label="Device symbols: diode, Schottky diode, SCR, NPN BJT, N-channel MOSFET, IGBT, with terminal labels.">
+  <g transform="translate(20,20)"><path class="sch" d="M0 40 H40 M60 40 H100 M60 25 V55"/><polygon class="sch" points="40,25 40,55 60,40"/><text class="sch-t" x="0" y="30">A</text><text class="sch-t" x="90" y="30">K</text><text class="sch-m" x="20" y="90">Diode</text></g>
+  <g transform="translate(200,20)"><path class="sch" d="M0 40 H40 M60 40 H100 M66 30 V25 H60 V55 H54 V50"/><polygon class="sch" points="40,25 40,55 60,40"/><text class="sch-t" x="0" y="30">A</text><text class="sch-t" x="90" y="30">K</text><text class="sch-m" x="10" y="90">Schottky</text></g>
+  <g transform="translate(380,20)"><path class="sch" d="M0 40 H40 M60 40 H110 M60 25 V55 M58 50 L80 72 H100"/><polygon class="sch" points="40,25 40,55 60,40"/><text class="sch-t" x="0" y="30">A</text><text class="sch-t" x="100" y="30">K</text><text class="sch-t" x="104" y="76">G</text><text class="sch-m" x="20" y="100">SCR</text></g>
+  <g transform="translate(20,170)"><path class="sch" d="M0 60 H40 M40 30 V90 M40 48 L80 20 V5 M40 72 L80 100 V115"/><polygon style="fill:var(--ink)" points="80,100 66,99 72,89"/><text class="sch-t" x="0" y="52">B</text><text class="sch-t" x="88" y="12">C</text><text class="sch-t" x="88" y="118">E</text><text class="sch-m" x="20" y="148">NPN BJT</text></g>
+  <g transform="translate(200,170)"><path class="sch" d="M0 80 H34 M34 40 V80 M44 34 V48 M44 54 V66 M44 72 V86 M44 40 H80 V5 M44 60 H80 V115 M44 79 H80"/><polygon style="fill:var(--ink)" points="46,60 58,55 58,65"/><text class="sch-t" x="0" y="72">G</text><text class="sch-t" x="88" y="12">D</text><text class="sch-t" x="88" y="118">S</text><text class="sch-m" x="0" y="148">N-ch MOSFET</text></g>
+  <g transform="translate(380,170)"><path class="sch" d="M0 60 H32 M32 35 V85 M42 30 V90 M42 48 L80 22 V5 M42 72 L80 98 V115"/><polygon style="fill:var(--ink)" points="80,98 66,98 71,87"/><text class="sch-t" x="0" y="52">G</text><text class="sch-t" x="88" y="12">C</text><text class="sch-t" x="88" y="118">E</text><text class="sch-m" x="30" y="148">IGBT</text></g>
+</svg>`;
+
+const pefig = (fig, caption) => ({ type: 'widget', name: 'pefig', config: { fig, caption } });
+
 export default {
   id: 'pe-practice',
   number: 8,
@@ -7,7 +51,709 @@ export default {
   title: 'Mini Exam 1 practice',
   summary: 'Worked problems, fill in the blanks, drawing practice, theory questions and a negative-marking quiz.',
   intro: String.raw`<p>Worked problems, fill in the blanks, drawing practice, theory questions and a negative-marking quiz.</p>`,
-  lessons: [],
+  lessons: [
+    {
+      id: 'how-to-practise',
+      title: 'How to practise',
+      blocks: [
+        { type: 'text', html: String.raw`<p>The mini exam mixes fill in the blanks and multiple choice (both with negative marking), drawing circuits and waveforms, short theory answers and calculations. A formula sheet is provided. Each lesson here practises one of those parts; the worked problems are under Assignments. The full exam strategy is in the exam module.</p>` },
+        { type: 'callout', kind: 'exam', title: 'Negative marking: rule of thumb', html: String.raw`<p>Leave it blank if you truly have no idea. Guess once you can rule out at least one option, unless the penalty is −1 (then only with two ruled out, and even that only breaks even). For fill-in blanks there is no option list, so leave it blank unless you are fairly sure of the term.</p><p>Expected gain = P(right) × 1 − P(wrong) × penalty. Example, 3 options left at −0.5: $\frac13\cdot1-\frac23\cdot0.5=0$. The penalty is not stated on the slide: check Moodle.</p>` },
+        { type: 'callout', kind: 'exam', title: 'Using the formula sheet', html: String.raw`<ul><li>You do not need to memorise formulas. You need to know <em>which</em> one applies, how to rearrange it, and the conditions behind it (steady state, small ripple, ideal components).</li><li>In a calculation, write the formula in symbols, rearrange in symbols, then insert numbers with units. Partial credit usually follows the written steps.</li><li>Convert prefixes first: k = $10^3$, m = $10^{-3}$, µ = $10^{-6}$, n = $10^{-9}$.</li><li>Finish with a check: power in = power out for ideal converters; $V_o<V_s$ for buck, $V_o>V_s$ for boost; $0\le D\le1$.</li></ul>` },
+      ],
+    },
+    {
+      id: 'fill-in-the-blanks',
+      title: 'Fill in the blanks',
+      blocks: [
+        { type: 'text', html: String.raw`<p>Type the missing word or number. Spelling is checked loosely (case and spaces are ignored). Numbers accept small rounding differences. In the exam these are negatively marked, so exact terms matter: rectifier, depletion layer, threshold voltage, volt-second balance.</p>` },
+        { type: 'text', html: String.raw`<h3>Lecture 1: introduction</h3>` },
+        { type: 'blanks', items: [
+          { html: String.raw`A converter that turns AC into DC is called a [[]].`, answers: ['rectifier'] },
+          { html: String.raw`A converter that turns DC into AC is called an [[]].`, answers: ['inverter'] },
+          { html: String.raw`An AC → AC converter that changes frequency directly is a [[]].`, answers: ['cycloconverter|cyclo-converter'] },
+          { html: String.raw`Power electronics is the application of electronic circuits to convert, control and [[]] the flow of electrical power.`, answers: ['manage'] },
+          { html: String.raw`The first high-power AC → DC converter (1902) was the [[]].`, answers: ['mercury arc rectifier|mercury arc|mercury-arc rectifier'] },
+          { html: String.raw`The only active component in a power converter is the [[]].`, answers: ['transistor|transistors|switch'] },
+        ] },
+        { type: 'text', html: String.raw`<h3>Lecture 2: components, transients and Kirchhoff</h3>` },
+        { type: 'blanks', items: [
+          { html: String.raw`A capacitor stores energy in an [[]] field.`, answers: ['electric'] },
+          { html: String.raw`An inductor stores energy in a [[]] field.`, answers: ['magnetic'] },
+          { html: String.raw`A capacitor blocks [[]] current; an inductor blocks AC.`, answers: ['dc|direct current'] },
+          { html: String.raw`Lenz's law determines the [[]] of the induced EMF.`, answers: ['direction'] },
+          { html: String.raw`The time constant of an RL circuit is τ = [[]].`, answers: ['l/r'] },
+          { html: String.raw`After one time constant a charging capacitor has reached [[]] % of its final voltage.`, answers: [{ num: 63.2, tol: 0.01 }] },
+          { html: String.raw`$R=1\ \text{k}\Omega$ and $C=1$ mF give τ = [[]] s.`, answers: [{ num: 1, tol: 0.01 }] },
+          { html: String.raw`A bridge circuit with 4 nodes needs [[]] independent KCL equations.`, answers: [{ num: 3, tol: 0.01 }] },
+          { html: String.raw`A circuit with 6 branches and 4 nodes needs [[]] independent KVL equations.`, answers: [{ num: 3, tol: 0.01 }] },
+          { html: String.raw`If $R_1/R_3=R_2/R_4$, the current in the bridge resistor is zero and the bridge is [[]].`, answers: ['balanced'] },
+        ] },
+        { type: 'text', html: String.raw`<h3>Lecture 3: semiconductor devices</h3>` },
+        { type: 'blanks', items: [
+          { html: String.raw`Doping silicon with phosphorus (group 5) gives [[]]-type material.`, answers: ['n|n-type|ntype'] },
+          { html: String.raw`In P-type silicon the majority charge carriers are [[]].`, answers: ['holes|hole'] },
+          { html: String.raw`Diffusion at a PN junction creates a charge-free zone called the [[]].`, answers: ['depletion layer|depletion region|depletion'] },
+          { html: String.raw`The knee voltage of a silicon diode is about [[]] V.`, answers: [{ num: 0.7, tol: 0.02 }] },
+          { html: String.raw`Large reverse current at the breakdown voltage is called [[]] breakdown.`, answers: ['avalanche|avalanche breakdown'] },
+          { html: String.raw`A Schottky diode replaces the P-type layer with a [[]].`, answers: ['metal'] },
+          { html: String.raw`The wide middle layer of a PIN diode is the [[]] layer.`, answers: ['intrinsic|lightly doped|lightly-doped|n-'] },
+          { html: String.raw`The SCR has a [[]] layer structure.`, answers: ['pnpn|p-n-p-n|four|4'] },
+          { html: String.raw`A latched SCR is turned off by [[]] biasing the anode–cathode.`, answers: ['reverse|reverse bias|reverse-biasing|reverse biasing'] },
+          { html: String.raw`An enhancement MOSFET turns on when $V_{GS}$ exceeds the [[]] voltage.`, answers: ['threshold|vth|threshold voltage'] },
+          { html: String.raw`A positive gate voltage on an N-channel MOSFET creates an [[]] layer under the oxide.`, answers: ['inversion|inversion layer|n channel|n-channel'] },
+          { html: String.raw`The IGBT's three terminals are gate, collector and [[]].`, answers: ['emitter'] },
+          { html: String.raw`The two main wide-bandgap materials are GaN and [[]].`, answers: ['sic|silicon carbide'] },
+          { html: String.raw`GaN conducts through a 2DEG: a two-dimensional electron [[]].`, answers: ['gas'] },
+        ] },
+        { type: 'text', html: String.raw`<h3>Lecture 4: DC-DC converters</h3>` },
+        { type: 'blanks', items: [
+          { html: String.raw`Volt-second balance: in steady state the average [[]] voltage over one period is zero.`, answers: ['inductor'] },
+          { html: String.raw`Amp-second balance: in steady state the average [[]] current over one period is zero.`, answers: ['capacitor'] },
+          { html: String.raw`In the off-state of a buck converter, the [[]] conducts the inductor current.`, answers: ['diode'] },
+          { html: String.raw`A buck converter with $V_s=48$ V and $D=0.25$ gives $V_o=$ [[]] V.`, answers: [{ num: 12, tol: 0.01 }] },
+          { html: String.raw`A boost converter with $V_s=12$ V and $D=0.6$ gives $V_o=$ [[]] V.`, answers: [{ num: 30, tol: 0.01 }] },
+          { html: String.raw`At $f_s=50$ kHz the switching period is [[]] µs.`, answers: [{ num: 20, tol: 0.01 }] },
+          { html: String.raw`To boost 6 V to 24 V the duty cycle must be [[]].`, answers: [{ num: 0.75, tol: 0.01 }] },
+        ] },
+      ],
+    },
+    {
+      id: 'drawing-practice',
+      title: 'Drawing practice: circuits and waveforms',
+      blocks: [
+        { type: 'text', html: String.raw`<p>Draw each one on paper first, then open the reference and compare it with the checklist. Graders look for the items in the checklist, not artistic quality.</p>` },
+        { type: 'callout', kind: 'exam', title: 'Waveform rules that earn the marks', html: String.raw`<p>Stack the plots vertically on the same time axis. Mark $0$, $DT_s$, $T_s$ (and $2T_s$). Label every level with its expression ($V_s-V_o$, $-V_o$, $I_L$). Draw at least two periods. Straight ramps where the voltage across L is constant ($v=L\frac{di}{dt}$ with constant $v$ means constant slope).</p>` },
+        { type: 'reveal', prompt: String.raw`<p><b>D1 · Circuit.</b> Draw the buck converter: source, switch, diode, inductor, capacitor, load. Then draw its on-state and off-state equivalent circuits.</p>`,
+          checklist: [
+            String.raw`Switch in series with the source.`,
+            String.raw`Diode from ground to the switch node, cathode at the switch node (pointing up).`,
+            String.raw`L in series towards the output.`,
+            String.raw`C and load in parallel at the output.`,
+            String.raw`Polarity of $V_s$ and $V_o$ marked.`,
+            String.raw`On-state: switch shorted, diode removed.`,
+            String.raw`Off-state: switch removed, diode shorted.`,
+          ],
+          blocks: [pefig('drBuck', 'Full circuit.'), pefig('drBuckOn', 'On: current path highlighted.'), pefig('drBuckOff', 'Off: freewheeling through the diode.')] },
+        { type: 'reveal', prompt: String.raw`<p><b>D2 · Waveforms.</b> Draw the buck converter's switch signal, $v_L$, $i_L$ and $i_C$ over two periods (take $D=0.4$).</p>`,
+          checklist: [
+            String.raw`$v_L$ is a rectangle: $V_s-V_o$ (positive) during on, $-V_o$ during off.`,
+            String.raw`$i_L$ is a triangle around $I_L$: rises during on, falls during off, peak at $DT_s$.`,
+            String.raw`Ripple $\Delta i_L$ marked.`,
+            String.raw`$i_C=i_L-I_o$: the same triangle shifted down to be centred on 0.`,
+            String.raw`The positive and negative areas of $v_L$ are equal.`,
+          ],
+          blocks: [pefig('wfBuck', 'Buck waveforms: switch, inductor voltage, inductor current, capacitor current over two periods.')] },
+        { type: 'reveal', prompt: String.raw`<p><b>D3 · Circuit.</b> Draw the boost converter and its on-state and off-state equivalent circuits.</p>`,
+          checklist: [
+            String.raw`L in series with the source.`,
+            String.raw`Switch from the inductor's far end to ground.`,
+            String.raw`Diode in series towards the output (anode at the switch node).`,
+            String.raw`C and load at the output.`,
+            String.raw`On-state: two separate loops (Vs–L–S, and C–load).`,
+            String.raw`Off-state: one loop Vs–L–D–output.`,
+          ],
+          blocks: [pefig('drBoost', 'Full circuit.'), pefig('drBoostOn', 'On: two loops.'), pefig('drBoostOff', 'Off: source and L push through D.')] },
+        { type: 'reveal', prompt: String.raw`<p><b>D4 · Waveforms.</b> Draw the boost converter's switch signal, $v_L$, $i_L$ and $i_C$ over two periods (take $D=0.4$).</p>`,
+          checklist: [
+            String.raw`$v_L=V_s$ during on, $V_s-V_o$ (negative, since $V_o>V_s$) during off.`,
+            String.raw`$i_L$ is a triangle around $I_L$.`,
+            String.raw`$i_C$ is <em>flat</em> at $-I_o$ during on (C alone feeds the load).`,
+            String.raw`$i_C$ then jumps up to $I_L-I_o$ and ramps down with $i_L$ during off.`,
+          ],
+          blocks: [
+            pefig('wfBoost', 'Boost waveforms: switch, inductor voltage, inductor current, capacitor current over two periods.'),
+            { type: 'callout', kind: 'warn', title: 'The boost $i_C$ jump', html: String.raw`<p>The jump in $i_C$ at the start of the off-interval is the most common thing students miss. During on, the diode blocks and C alone feeds the load ($i_C=-I_o$, flat). When the switch opens, the inductor current suddenly flows into the output node, so $i_C$ jumps to $I_L-I_o$.</p>` },
+          ] },
+        { type: 'reveal', prompt: String.raw`<p><b>D5 · Waveforms.</b> Sketch the RC charging circuit's $v_C(t)$ and $i(t)$, and the RL circuit's $i(t)$ and $v_L(t)$. Mark τ.</p>`,
+          checklist: [
+            String.raw`RC: $v_C$ rises from 0 towards $V_s$, 63 % at τ.`,
+            String.raw`RC: $i$ starts at $V_s/R$ and decays to 0 (37 % at τ).`,
+            String.raw`RL: $i$ rises from 0 towards $V_s/R$.`,
+            String.raw`RL: $v_L$ starts at $V_s$ and decays.`,
+            String.raw`Curves are steepest at $t=0$ and flatten; "complete" after about 5τ.`,
+            String.raw`Axis labels with values.`,
+          ],
+          blocks: [pefig('drRC', String.raw`RC: blue $v_C/V_s$, magenta $iR/V_s$.`), pefig('drRL', String.raw`RL: blue $iR/V_s$, magenta $v_L/V_s$.`)] },
+        { type: 'reveal', prompt: String.raw`<p><b>D6 · Curve.</b> Draw the IV characteristic of an ideal diode and of a practical silicon PN diode.</p>`,
+          checklist: [
+            String.raw`Axes: $V$ horizontal, $I$ vertical.`,
+            String.raw`Ideal: zero current for all negative voltage, vertical line at $V=0$ (zero drop when on).`,
+            String.raw`Practical: nearly zero current until the knee (0.7 V Si, 0.3 V Ge), then a steep rise.`,
+            String.raw`Practical: small reverse leakage (µA) in the reverse region.`,
+            String.raw`Practical: sudden large reverse current at the breakdown voltage (avalanche).`,
+          ],
+          blocks: [{ type: 'figure', svg: DIODE_IV_SVG, caption: 'Ideal (pink) and practical silicon (blue) diode characteristics.' }] },
+        { type: 'reveal', prompt: String.raw`<p><b>D7 · Waveforms.</b> Draw the input and output voltage of a half-wave diode rectifier with a resistive load.</p>`,
+          checklist: [
+            String.raw`Input: a full sine.`,
+            String.raw`Output: positive half-cycles pass, negative half-cycles become 0 (diode reverse biased).`,
+            String.raw`Practical diode: output peak is 0.7 V lower and conduction starts slightly later.`,
+            String.raw`Output is DC (one polarity) but heavily pulsating.`,
+          ],
+          blocks: [pefig('wfRect', 'Half-wave rectifier: input sine and output with only the positive half-cycles.')] },
+        { type: 'reveal', prompt: String.raw`<p><b>D8 · Waveforms.</b> Draw the switch signals and output voltage of the half-bridge (half-wave) inverter.</p>`,
+          checklist: [
+            String.raw`S1 and S2 are complementary: never on at the same time.`,
+            String.raw`S1 on → output at the positive level; S2 on → output at the negative level.`,
+            String.raw`Output is a square wave alternating each half-period.`,
+            String.raw`Level labels from the lecture circuit (with a split DC supply, $\pm V_{dc}/2$).`,
+          ],
+          blocks: [pefig('wfInv', 'Half-bridge inverter: complementary switch signals S1 and S2 and a square-wave output.')] },
+        { type: 'reveal', prompt: String.raw`<p><b>D9 · Symbols.</b> Draw the circuit symbols and name the terminals: diode, Schottky diode, SCR, NPN BJT, N-channel MOSFET, IGBT.</p>`,
+          checklist: [
+            String.raw`Terminal names are often the marks.`,
+            String.raw`Diode: A/K.`,
+            String.raw`SCR: A/K/G, gate on the cathode side.`,
+            String.raw`BJT: B/C/E, arrow on the emitter, pointing out for NPN.`,
+            String.raw`MOSFET: G/D/S, gate insulated (a gap between gate line and channel).`,
+            String.raw`IGBT: G/C/E, MOS gate, BJT-like C/E with the arrow on the emitter.`,
+            String.raw`Compare with the symbols in the L3 slides; small style differences between textbooks are normal.`,
+          ],
+          blocks: [{ type: 'figure', svg: SYMBOLS_SVG, caption: 'Device symbols with terminal labels.' }] },
+      ],
+    },
+    {
+      id: 'self-check-quiz',
+      title: 'Self-check quiz',
+      blocks: [
+        { type: 'text', html: String.raw`<p>Set the penalty to match your exam (check Moodle). Use <em>Skip</em> when you would leave the question blank in the real exam: it scores 0. The net score shows whether your guessing habits pay off.</p>` },
+        { type: 'examquiz', penaltyDefault: 0.25, questions: [
+          { q: String.raw`A converter that turns AC into DC is called`,
+            choices: [String.raw`Inverter`, String.raw`Rectifier`, String.raw`Cycloconverter`, String.raw`Chopper`],
+            answer: 1, explain: String.raw`Rectifier: AC → DC. Inverter: DC → AC. Cycloconverter: AC → AC.` },
+          { q: String.raw`An industrial variable-speed motor drive fed from the grid is classed in L1 as`,
+            choices: [String.raw`AC → DC`, String.raw`DC → DC`, String.raw`AC → AC`, String.raw`DC → AC`],
+            answer: 2, explain: String.raw`Fixed-frequency grid AC in, variable-frequency AC out to the motor.` },
+          { q: String.raw`The first high-power AC → DC converter (1902) was the`,
+            choices: [String.raw`Mercury arc rectifier`, String.raw`Thyratron`, String.raw`SCR`, String.raw`Point-contact transistor`],
+            answer: 0, explain: String.raw`Peter Cooper Hewitt, 1902. The thyratron came in 1926, the SCR in 1956/57.` },
+          { q: String.raw`Which is the active component of a power converter?`,
+            choices: [String.raw`Diode`, String.raw`Inductor`, String.raw`Transformer`, String.raw`Transistor`],
+            answer: 3, explain: String.raw`Only the transistor can be commanded on/off independently. The diode is a semiconductor but passive.` },
+          { q: String.raw`Doping silicon with phosphorus (group 5) produces`,
+            choices: [String.raw`P-type, majority holes`, String.raw`N-type, majority electrons`, String.raw`Intrinsic silicon`, String.raw`P-type, majority electrons`],
+            answer: 1, explain: String.raw`Group 5 (P, As, Sb) has one more valence electron than Si → extra free electrons → N-type. Group 3 (B, Ga, In, Al) → holes → P-type.` },
+          { q: String.raw`Knee voltage of a silicon PN diode`,
+            choices: [String.raw`0.3 V`, String.raw`0.5 V`, String.raw`0.7 V`, String.raw`1.2 V`],
+            answer: 2, explain: String.raw`Si 0.7 V, Ge 0.3 V.` },
+          { q: String.raw`The depletion layer in an unbiased PN junction forms because`,
+            choices: [String.raw`Carriers diffuse across the junction, leaving fixed charges whose field stops further diffusion`, String.raw`The metal contact repels electrons`, String.raw`Avalanche breakdown occurs`, String.raw`The gate oxide charges up`],
+            answer: 0, explain: String.raw`Holes diffuse P → N and electrons N → P; the uncovered ions create a field and potential barrier.` },
+          { q: String.raw`Compared with a PN diode, a Schottky diode has`,
+            choices: [String.raw`Higher forward drop and lower leakage`, String.raw`Higher breakdown voltage`, String.raw`Slower switching`, String.raw`Lower forward drop but higher reverse leakage`],
+            answer: 3, explain: String.raw`Schottky: faster, lower drop, lower on-resistance, lower breakdown, higher leakage. Metal–N junction, majority carriers only.` },
+          { q: String.raw`The main benefit of the lightly doped intrinsic layer in a PIN diode is`,
+            choices: [String.raw`Lower forward voltage drop`, String.raw`Higher reverse breakdown voltage`, String.raw`Faster switching than Schottky`, String.raw`Higher leakage current`],
+            answer: 1, explain: String.raw`Under reverse bias the two depletion regions merge into one wide layer: high breakdown, low leakage. Cost: higher on-resistance and forward drop.` },
+          { q: String.raw`In SCR forward blocking mode (anode positive, no gate current)`,
+            choices: [String.raw`All three junctions are reverse biased`, String.raw`J1 and J3 reverse, J2 forward`, String.raw`J1 and J3 forward, J2 reverse`, String.raw`Only J1 is reverse biased`],
+            answer: 2, explain: String.raw`The middle junction J2 blocks the forward voltage. In reverse blocking it is the other way round.` },
+          { q: String.raw`Once an SCR is latched on, it turns off when`,
+            choices: [String.raw`The anode–cathode voltage is reversed`, String.raw`The gate current is removed`, String.raw`A negative gate pulse is applied`, String.raw`V<sub>GS</sub> drops below threshold`],
+            answer: 0, explain: String.raw`After latching, the gate has lost control; the outer layers keep supplying carriers. Reverse bias across A–K is needed.` },
+          { q: String.raw`An enhancement-mode N-channel MOSFET conducts when`,
+            choices: [String.raw`Base current is injected`, String.raw`$V_{GS}>V_{th}$`, String.raw`$V_{GS}=0$`, String.raw`The drain is reverse biased`],
+            answer: 1, explain: String.raw`Positive gate–source voltage above threshold forms the inversion n-channel. Enhancement mode = normally open.` },
+          { q: String.raw`Current in an N-channel MOSFET's channel is carried by`,
+            choices: [String.raw`Holes by diffusion`, String.raw`Holes and electrons equally`, String.raw`Ions in the oxide`, String.raw`Electrons in the inversion layer (majority carriers, no diffusion current)`],
+            answer: 3, explain: String.raw`That is why it has no built-in forward voltage drop and switches fast.` },
+          { q: String.raw`Per the L3 comparison table, the fastest switch is the`,
+            choices: [String.raw`BJT`, String.raw`IGBT`, String.raw`MOSFET`, String.raw`SCR`],
+            answer: 2, explain: String.raw`MOSFET: ns. BJT: µs. IGBT: medium-fast.` },
+          { q: String.raw`Per the L3 comparison table, a disadvantage of the MOSFET versus the BJT is`,
+            choices: [String.raw`Higher switching loss`, String.raw`Higher on-state resistance and lower current rating`, String.raw`Lower input impedance`, String.raw`Built-in forward voltage drop`],
+            answer: 1, explain: String.raw`MOSFET: higher conduction loss, lower current rating, more expensive. Advantages: speed, high input impedance, no built-in drop, small size.` },
+          { q: String.raw`For a 1.2 kV, 600 A motor-drive switch, the table points to`,
+            choices: [String.raw`IGBT`, String.raw`MOSFET`, String.raw`BJT`, String.raw`Schottky diode`],
+            answer: 0, explain: String.raw`IGBT: breakdown &gt; 1 kV, current &gt; 500 A, low on-resistance.` },
+          { q: String.raw`The IGBT combines the mechanisms of`,
+            choices: [String.raw`Diode and capacitor`, String.raw`BJT only`, String.raw`Schottky and PIN diodes`, String.raw`MOSFET (gate), BJT (conduction) and SCR (4-layer structure)`],
+            answer: 3, explain: String.raw`MOS gate forms the channel; resulting hole injection gives bipolar conduction; NPNP layers like an SCR.` },
+          { q: String.raw`Conduction in a GaN device happens in`,
+            choices: [String.raw`A heavily doped p+ region`, String.raw`An inversion layer under SiO₂`, String.raw`A 2DEG at the AlGaN/GaN heterojunction`, String.raw`The depletion layer`],
+            answer: 2, explain: String.raw`GaN has no doped regions; the bandgap difference accumulates electrons at the interface into a very high-mobility 2D electron gas.` },
+          { q: String.raw`SiC MOSFETs have lower on-resistance than Si MOSFETs mainly because`,
+            choices: [String.raw`They use a 2DEG channel`, String.raw`The drift layer is thinner and more heavily doped`, String.raw`They have no gate oxide`, String.raw`They are bipolar devices`],
+            answer: 1, explain: String.raw`Same MOS structure on SiC; the wide bandgap allows a thin, heavily doped drift layer for the same blocking voltage.` },
+          { q: String.raw`A capacitor in DC steady state behaves as`,
+            choices: [String.raw`An open circuit`, String.raw`A short circuit`, String.raw`A resistor equal to 1/C`, String.raw`A voltage source of zero`],
+            answer: 0, explain: String.raw`$i=C\,dv/dt$ and $dv/dt=0$ → $i=0$. The inductor is the opposite: a short to DC.` },
+          { q: String.raw`The time constant of an RL circuit is`,
+            choices: [String.raw`$RL$`, String.raw`$R/L$`, String.raw`$1/(RL)$`, String.raw`$L/R$`],
+            answer: 3, explain: String.raw`From the derivation: $\frac RL t=t/\tau$ → $\tau=L/R$. RC circuit: $\tau=RC$.` },
+          { q: String.raw`Lenz's law determines`,
+            choices: [String.raw`The magnitude of the induced EMF`, String.raw`The relation between charge and voltage`, String.raw`The direction of the induced EMF (it opposes the change in flux)`, String.raw`The sum of currents at a node`],
+            answer: 2, explain: String.raw`Faraday's second law gives the magnitude; Lenz gives the direction, the minus sign.` },
+          { q: String.raw`Solving KCL/KVL gives $I_1=-1.2$ A. This means`,
+            choices: [String.raw`The calculation is wrong`, String.raw`The real current is 1.2 A opposite to the assumed arrow`, String.raw`The current is AC`, String.raw`The branch carries no power`],
+            answer: 1, explain: String.raw`Directions are assumed first; a negative result just reverses the arrow.` },
+          { q: String.raw`Volt-second balance states that in steady state`,
+            choices: [String.raw`The average inductor voltage over one switching period is zero`, String.raw`The average capacitor current is zero`, String.raw`Inductor voltage is always zero`, String.raw`Input and output voltages are equal`],
+            answer: 0, explain: String.raw`Because $i_L(T_s)=i_L(0)$. The capacitor statement is amp-second balance.` },
+          { q: String.raw`A buck converter has $V_s=24$ V and $D=0.5$. V<sub>o</sub> is`,
+            choices: [String.raw`48 V`, String.raw`24 V`, String.raw`12 V`, String.raw`6 V`],
+            answer: 2, explain: String.raw`$V_o=DV_s=0.5\cdot24=12$ V.` },
+          { q: String.raw`A boost converter has $V_s=24$ V and $D=0.5$. V<sub>o</sub> is`,
+            choices: [String.raw`12 V`, String.raw`24 V`, String.raw`36 V`, String.raw`48 V`],
+            answer: 3, explain: String.raw`$V_o=V_s/(1-D)=24/0.5=48$ V.` },
+          { q: String.raw`In the buck converter's off-state`,
+            choices: [String.raw`The switch conducts and the diode blocks`, String.raw`The diode conducts and $v_L=-V_o$`, String.raw`The capacitor is disconnected`, String.raw`$v_L=V_s-V_o$`],
+            answer: 1, explain: String.raw`Inductor current freewheels through the diode; the inductor sees the output voltage reversed.` },
+          { q: String.raw`In the boost converter's on-state, the capacitor current is`,
+            choices: [String.raw`$-I_o$: the capacitor alone feeds the load`, String.raw`$I_L-I_o$`, String.raw`Zero`, String.raw`$I_L$`],
+            answer: 0, explain: String.raw`The closed switch shorts the inductor end to ground and the diode blocks, isolating the output.` },
+          { q: String.raw`For a boost converter, $I_o=I_L(1-D)$. With $D=0.75$ and $I_o=2$ A, the inductor current is`,
+            choices: [String.raw`0.5 A`, String.raw`1.5 A`, String.raw`8 A`, String.raw`2.67 A`],
+            answer: 2, explain: String.raw`$I_L=I_o/(1-D)=2/0.25=8$ A.` },
+          { q: String.raw`The small-ripple approximation means`,
+            choices: [String.raw`Ripple is zero in practice`, String.raw`The switching frequency is low`, String.raw`The LC filter can be omitted`, String.raw`Capacitor voltage and inductor current ripples are small compared with their averages, so they are treated as constant`],
+            answer: 3, explain: String.raw`$v=V+\Delta v\approx V$. It lets each on/off interval be integrated as a rectangle.` },
+          { q: String.raw`Why is a resistive voltage divider not used to make 5 V from 24 V for a real load?`,
+            choices: [String.raw`It cannot produce a voltage below the input`, String.raw`It dissipates large power as heat and the output changes with load`, String.raw`It only works with AC`, String.raw`Ohm's law does not apply`],
+            answer: 1, explain: String.raw`The L2 example (4.7 Ω / 1.2 Ω) burns about 98 W with no load connected.` },
+          { q: String.raw`Adding an L and C at the output of a switching converter`,
+            choices: [String.raw`Forms a low-pass filter that removes AC components, leaving the DC average`, String.raw`Raises the output above the input`, String.raw`Removes the need for a switch`, String.raw`Isolates input from output`],
+            answer: 0, explain: String.raw`LC = smoothing circuit. Ripple of about 1–3 % remains in practice.` },
+          { q: String.raw`In a bridge you assumed $I_5$ flows downward and calculated $I_5=-0.3$ A. This means`,
+            choices: [String.raw`The calculation must be wrong`, String.raw`The bridge is balanced`, String.raw`0.3 A flows upward, and the bottom middle node is at the higher potential`, String.raw`No current flows in R5`],
+            answer: 2, explain: String.raw`Negative = opposite to the assumed arrow, same magnitude. Current flows from higher to lower potential, so the bottom node is higher. Non-zero means unbalanced.` },
+          { q: String.raw`A bridge has 10 Ω (L–T), 30 Ω (T–R), 20 Ω (L–B), 40 Ω (B–R). Without the middle resistor, the top and bottom node voltages from a 12 V source are`,
+            choices: [String.raw`8 V and 9 V`, String.raw`9 V and 8 V`, String.raw`6 V and 6 V`, String.raw`3 V and 4 V`],
+            answer: 1, explain: String.raw`Dividers: $12\cdot\frac{30}{40}=9$ V and $12\cdot\frac{40}{60}=8$ V. Top is higher, so the bridge current flows top → bottom.` },
+        ] },
+      ],
+    },
+  ],
   matlab: [],
-  assignments: [],
+  assignments: [
+    {
+      id: 'p1-buck-full', title: 'P1 · Buck, full', difficulty: 'core',
+      statement: String.raw`<p>A buck converter has $V_s=48$ V, $D=0.25$, load $R=6\ \Omega$. Find $V_o$, $I_o$, $I_L$, the average input current and check the power balance.</p><p>Habit for every problem: write the formula in symbols first, rearrange it in symbols, and only then put numbers in.</p>`,
+      parts: [
+        { label: '(a)', prompt: String.raw`Output voltage $V_o$ in V`, kind: 'numeric', answer: 12,
+          solution: [
+            { type: 'text', html: String.raw`<p>We write the buck ratio in symbols, then put the numbers in.</p>` },
+            { type: 'derive', colors: { Vo: 1, Io: 2, D: 3, Vs: 4 }, steps: [
+              { kind: 'sub', label: 'Buck ratio, then numbers', from: String.raw`\T{Vo-1}{V_o}=\T{D-1}{D}\,\T{Vs-1}{V_s}`, to: String.raw`\T{Vo-1}{V_o}=\T{D-1}{0.25}\cdot\T{Vs-1}{48}=12\text{ V}`,
+                why: String.raw`In a buck converter the output is the input times the on-fraction $D$. $0.25\cdot48=12$.` },
+            ] },
+          ] },
+        { label: '(b)', prompt: String.raw`Load current $I_o$ in A`, kind: 'numeric', answer: 2,
+          solution: [
+            { type: 'text', html: String.raw`<p>We use Ohm's law on the load with $V_o=12$ V from (a).</p>` },
+            { type: 'derive', colors: { Vo: 1, Io: 2, R: 5 }, steps: [
+              { kind: 'sub', label: "Ohm's law on the load", from: String.raw`\T{Io-1}{I_o}=\frac{\T{Vo-1}{V_o}}{\T{R-1}{R}}`, to: String.raw`\T{Io-1}{I_o}=\frac{\T{Vo-1}{12}}{\T{R-1}{6}}=2\text{ A}`,
+                why: String.raw`The load resistor has the output voltage across it, so its current is $V_o/R$.` },
+            ] },
+          ] },
+        { label: '(c)', prompt: String.raw`Average inductor current $I_L$ in A`, kind: 'numeric', answer: 2,
+          solution: [
+            { type: 'text', html: String.raw`<p>We use the buck amp-second result: the average inductor current equals the load current.</p>` },
+            { type: 'derive', colors: { Io: 2, IL: 6 }, steps: [
+              { kind: 'sub', label: 'Buck amp-second result', from: String.raw`\T{IL-1}{I_L}=\T{Io-1}{I_o}`, to: String.raw`\T{IL-1}{I_L}=\T{Io-1}{2}\text{ A}`,
+                why: String.raw`In steady state the average capacitor current is zero (amp-second balance), so on average all of the inductor current goes to the load.` },
+            ] },
+          ] },
+        { label: '(d)', prompt: String.raw`Average input current $I_s$ in A`, kind: 'numeric', answer: 0.5,
+          solution: [
+            { type: 'text', html: String.raw`<p>The source only delivers current during the on-fraction $D$ of each period, so we scale $I_L$ by $D$.</p>` },
+            { type: 'derive', colors: { D: 3, IL: 6, Is: 7 }, steps: [
+              { kind: 'sub', label: 'Source current = on-fraction of the inductor current', from: String.raw`\T{Is-1}{I_s}=\T{D-1}{D}\,\T{IL-1}{I_L}`, to: String.raw`\T{Is-1}{I_s}=\T{D-1}{0.25}\cdot\T{IL-1}{2}=0.5\text{ A}`,
+                why: String.raw`During on, the switch connects the source to the inductor and the source carries $I_L$. During off the switch is open and the source carries nothing. The average is $D\cdot I_L$.` },
+            ] },
+          ] },
+        { label: '(e)', prompt: String.raw`Input power $P_{in}$ in W (it must equal $P_{out}$)`, kind: 'numeric', answer: 24,
+          solution: [
+            { type: 'text', html: String.raw`<p>We check that power in equals power out.</p>` },
+            { type: 'derive', colors: { Vo: 1, Io: 2, Vs: 4, Is: 7 }, steps: [
+              { kind: 'check', label: 'Power in = power out', from: String.raw`P_{in}=\T{Vs-1}{V_s}\,\T{Is-1}{I_s}\qquad P_{out}=\T{Vo-1}{V_o}\,\T{Io-1}{I_o}`,
+                to: String.raw`P_{in}=\T{Vs-1}{48}\cdot\T{Is-1}{0.5}=24\text{ W}\qquad P_{out}=\T{Vo-1}{12}\cdot\T{Io-1}{2}=24\text{ W}\ \checkmark`,
+                why: String.raw`Ideal converter: no loss. Voltage down ×4, current up ×4.` },
+            ] },
+          ] },
+      ],
+    },
+    {
+      id: 'p2-boost-find-d', title: 'P2 · Boost, find D', difficulty: 'core',
+      statement: String.raw`<p>A boost converter must make 48 V from a 12 V battery. What duty cycle is needed?</p>`,
+      parts: [
+        { label: '(a)', prompt: String.raw`Duty cycle $D$ (as a fraction, e.g. 0.5)`, kind: 'numeric', answer: 0.75,
+          solution: [
+            { type: 'text', html: String.raw`<p>We start from the boost ratio $V_o=\dfrac{V_s}{1-D}$. $D$ is stuck inside the bottom of a fraction. Plan: get the bracket out from underneath, then isolate $D$. We do it in symbols first, then put the numbers in.</p>` },
+            { type: 'derive', symbolic: true, title: 'Boost ratio solved for $D$', colors: { Vs: 1, Vo: 2, D: 3, omd: 4, rat: 5, one: 6 }, steps: [
+              { kind: 'both', label: String.raw`Both sides $\times(1-D)$`, from: String.raw`\T{Vo-1}{V_o}=\frac{\T{Vs-1}{V_s}}{\T{omd-1}{1-D}}`, to: String.raw`\T{Vo-1}{V_o}\,\T{omd-1}{(1-D)}=\T{Vs-1}{V_s}`,
+                arrows: { 'omd-1': '× (1−D) on both sides' },
+                why: String.raw`Multiplying by the bottom of a fraction removes the fraction: on the right $\frac{1-D}{1-D}=1$.` },
+              { kind: 'both', label: String.raw`Both sides $\div V_o$`, to: String.raw`\T{omd-1}{1-D}=\frac{\T{Vs-1}{V_s}}{\T{Vo-1}{V_o}}`,
+                arrows: { 'Vo-1': '÷ Vo on both sides' },
+                why: String.raw`Dividing both sides by $V_o$ leaves the bracket alone on the left and puts $V_o$ under $V_s$ on the right.` },
+              { kind: 'both', label: String.raw`Both sides $+D$`, from: String.raw`\T{one-1}{1}-\T{D-1}{D}=\T{rat-1}{\frac{V_s}{V_o}}`, to: String.raw`\T{one-1}{1}=\T{rat-1}{\frac{V_s}{V_o}}+\T{D-1}{D}`,
+                arrows: { 'D-1': '+D on both sides' },
+                why: String.raw`Adding $D$ to both sides cancels $-D$ on the left and makes $+D$ appear on the right. Now $D$ is positive.` },
+              { kind: 'both', label: String.raw`Both sides $-\frac{V_s}{V_o}$`, to: String.raw`\T{one-1}{1}-\T{rat-1}{\frac{V_s}{V_o}}=\T{D-1}{D}`,
+                arrows: { 'rat-1': '−Vs/Vo on both sides' },
+                why: String.raw`Subtracting $\frac{V_s}{V_o}$ from both sides removes it on the right; on the left it appears with a minus sign.` },
+              { kind: 'result', label: 'Read it right to left', to: String.raw`\T{D-1}{D}=\T{one-1}{1}-\T{rat-1}{\frac{V_s}{V_o}}`,
+                arrows: { 'D-1': 'swap sides' },
+                why: String.raw`An equation says the same thing in both directions. Symbol form done. Now numbers.` },
+            ] },
+            { type: 'derive', title: 'With numbers: 48 V from 12 V', given: String.raw`\T{Vs-0}{V_s}=12\text{ V},\quad \T{Vo-0}{V_o}=48\text{ V}`, colors: { Vs: 1, Vo: 2, D: 3, n: 8 }, steps: [
+              { kind: 'sub', label: 'Put the given values into the formula', from: String.raw`D=1-\frac{\T{Vs-x}{V_s}}{\T{Vo-x}{V_o}}\qquad\qquad V_s=\T{Vs-1}{12},\quad V_o=\T{Vo-1}{48}`,
+                to: String.raw`D=1-\frac{\T{Vs-1}{12}}{\T{Vo-1}{48}}`, arrows: { 'Vs-1': 'Vs = 12 V', 'Vo-1': 'Vo = 48 V' },
+                why: String.raw`Each number keeps the colour of the symbol it replaces. Both are volts, so the units cancel in the ratio.` },
+              { kind: 'calc', label: String.raw`$12\div48$`, from: String.raw`D=1-\T{n-1}{\frac{12}{48}}`, to: String.raw`D=1-\T{n-1}{0.25}`,
+                why: String.raw`$12$ is a quarter of $48$.` },
+              { kind: 'calc', label: String.raw`$1-0.25$`, from: String.raw`D=\T{n-2}{1-0.25}`, to: String.raw`D=\T{n-2}{0.75}`,
+                why: String.raw`The switch must be on 75 % of each period.` },
+              { kind: 'check', label: 'Put the answer back in', from: String.raw`V_o=\frac{\T{Vs-x}{V_s}}{1-\T{D-x}{D}}\qquad\qquad V_s=\T{Vs-1}{12},\quad D=\T{D-1}{0.75}`,
+                to: String.raw`V_o=\frac{\T{Vs-1}{12}}{1-\T{D-1}{0.75}}=\frac{12}{0.25}=48\text{ V}\ \checkmark`, arrows: { 'Vs-1': '', 'D-1': '' },
+                why: String.raw`It gives the 48 V we asked for, so $D=0.75$ is right.` },
+            ] },
+          ] },
+      ],
+    },
+    {
+      id: 'p3-boost-currents', title: 'P3 · Boost currents', difficulty: 'exam',
+      statement: String.raw`<p>Boost converter, $V_s=24$ V, $D=0.6$, $I_o=3$ A. Find $V_o$, $I_L$ and verify power.</p>`,
+      parts: [
+        { label: '(a)', prompt: String.raw`Output voltage $V_o$ in V`, kind: 'numeric', answer: 60,
+          solution: [
+            { type: 'text', html: String.raw`<p>We put the numbers into the boost ratio.</p>` },
+            { type: 'derive', colors: { Vs: 1, Vo: 2, D: 3 }, steps: [
+              { kind: 'sub', label: 'Boost ratio, then numbers', from: String.raw`\T{Vo-1}{V_o}=\frac{\T{Vs-1}{V_s}}{1-\T{D-1}{D}}`, to: String.raw`\T{Vo-1}{V_o}=\frac{\T{Vs-1}{24}}{1-\T{D-1}{0.6}}=\frac{24}{0.4}=60\text{ V}`,
+                why: String.raw`$1-0.6=0.4$. Dividing by 0.4 is the same as multiplying by 2.5.` },
+            ] },
+          ] },
+        { label: '(b)', prompt: String.raw`Average inductor current $I_L$ in A`, kind: 'numeric', answer: 7.5,
+          solution: [
+            { type: 'text', html: String.raw`<p>The boost amp-second result is $I_o=I_L(1-D)$. We solve it for $I_L$ in symbols, then put the numbers in.</p>` },
+            { type: 'derive', symbolic: true, title: 'Boost currents solved for $I_L$', colors: { Io: 1, IL: 2, omd: 4 }, steps: [
+              { kind: 'both', label: String.raw`Both sides $\div(1-D)$`, from: String.raw`\T{Io-1}{I_o}=\T{IL-1}{I_L}\,\T{omd-1}{(1-D)}`, to: String.raw`\frac{\T{Io-1}{I_o}}{\T{omd-1}{1-D}}=\T{IL-1}{I_L}`,
+                arrows: { 'omd-1': '÷ (1−D) on both sides' },
+                why: String.raw`On the right $\frac{1-D}{1-D}=1$, which frees $I_L$. On the left the bracket goes under $I_o$.` },
+              { kind: 'result', label: 'Read it right to left', to: String.raw`\T{IL-1}{I_L}=\frac{\T{Io-1}{I_o}}{\T{omd-1}{1-D}}`,
+                arrows: { 'IL-1': 'swap sides' },
+                why: String.raw`Since $1-D<1$, the inductor (and input) current is larger than the load current.` },
+            ] },
+            { type: 'derive', title: 'With numbers', given: String.raw`\T{Io-0}{I_o}=3\text{ A},\quad \T{D-0}{D}=0.6`, colors: { Io: 1, IL: 2, D: 3, n: 8 }, steps: [
+              { kind: 'sub', label: 'Put the given values into the formula', from: String.raw`I_L=\frac{\T{Io-x}{I_o}}{1-\T{D-x}{D}}\qquad\qquad I_o=\T{Io-1}{3},\quad D=\T{D-1}{0.6}`,
+                to: String.raw`I_L=\frac{\T{Io-1}{3}}{1-\T{D-1}{0.6}}`, arrows: { 'Io-1': 'Io = 3 A', 'D-1': 'D = 0.6' },
+                why: String.raw`Each number keeps the colour of the symbol it replaces.` },
+              { kind: 'calc', label: String.raw`$1-0.6$`, from: String.raw`I_L=\frac{3}{\T{n-1}{1-0.6}}`, to: String.raw`I_L=\frac{3}{\T{n-1}{0.4}}`,
+                why: String.raw`Work out the bottom first.` },
+              { kind: 'calc', label: String.raw`$3\div0.4$`, from: String.raw`I_L=\T{n-2}{\frac{3}{0.4}}`, to: String.raw`I_L=\T{n-2}{7.5\text{ A}}`,
+                why: String.raw`Dividing by 0.4 is multiplying by 2.5: $3\cdot2.5=7.5$.` },
+              { kind: 'check', label: 'Put the answer back in', from: String.raw`I_o=\T{IL-x}{I_L}\,(1-\T{D-x}{D})\qquad\qquad I_L=\T{IL-1}{7.5},\quad D=\T{D-1}{0.6}`,
+                to: String.raw`I_o=\T{IL-1}{7.5}\cdot(1-\T{D-1}{0.6})=7.5\cdot0.4=3\text{ A}\ \checkmark`, arrows: { 'IL-1': '', 'D-1': '' },
+                why: String.raw`We get back the given 3 A.` },
+            ] },
+          ] },
+        { label: '(c)', prompt: String.raw`Input power $P_{in}$ in W (it must equal $P_{out}$)`, kind: 'numeric', answer: 180,
+          solution: [
+            { type: 'text', html: String.raw`<p>We check power in = power out. In a boost the input current is the inductor current.</p>` },
+            { type: 'derive', colors: { Io: 1, IL: 2, Vs: 5, Vo: 6 }, steps: [
+              { kind: 'check', label: 'Power in = power out', from: String.raw`P_{in}=\T{Vs-1}{V_s}\,\T{IL-1}{I_L}\qquad P_{out}=\T{Vo-1}{V_o}\,\T{Io-1}{I_o}`,
+                to: String.raw`P_{in}=\T{Vs-1}{24}\cdot\T{IL-1}{7.5}=180\text{ W}\qquad P_{out}=\T{Vo-1}{60}\cdot\T{Io-1}{3}=180\text{ W}\ \checkmark`,
+                why: String.raw`The inductor sits in series with the source, so the source current is $I_L$. Balanced ✓.` },
+            ] },
+          ] },
+      ],
+    },
+    {
+      id: 'p4-timing', title: 'P4 · Timing', difficulty: 'core',
+      statement: String.raw`<p>A converter switches at $f_s=100$ kHz with $D=0.4$. Find $T_s$, $t_{on}$, $t_{off}$.</p>`,
+      parts: [
+        { label: '(a)', prompt: String.raw`Switching period $T_s$ in µs`, kind: 'numeric', answer: 10,
+          solution: [
+            { type: 'text', html: String.raw`<p>The period is one over the frequency.</p>` },
+            { type: 'derive', colors: { Ts: 1, fs: 2 }, steps: [
+              { kind: 'sub', label: 'Period = 1 / frequency', from: String.raw`\T{Ts-1}{T_s}=\frac{1}{\T{fs-1}{f_s}}`, to: String.raw`\T{Ts-1}{T_s}=\frac{1}{\T{fs-1}{100\,000\text{ Hz}}}=10^{-5}\text{ s}=10\ \mu\text{s}`,
+                why: String.raw`100 kHz = $10^5$ Hz, and $\frac1{10^5}=10^{-5}$. 1 µs = $10^{-6}$ s, so $10^{-5}$ s = 10 µs.` },
+            ] },
+          ] },
+        { label: '(b)', prompt: String.raw`On-time $t_{on}$ in µs`, kind: 'numeric', answer: 4,
+          solution: [
+            { type: 'text', html: String.raw`<p>The on-time is the fraction $D$ of the period.</p>` },
+            { type: 'derive', colors: { Ts: 1, D: 3 }, steps: [
+              { kind: 'sub', label: String.raw`On-time = $D$ × period`, from: String.raw`t_{on}=\T{D-1}{D}\,\T{Ts-1}{T_s}`, to: String.raw`t_{on}=\T{D-1}{0.4}\cdot\T{Ts-1}{10}=4\ \mu\text{s}`,
+                why: String.raw`$D$ is the fraction of each period that the switch is on.` },
+            ] },
+          ] },
+        { label: '(c)', prompt: String.raw`Off-time $t_{off}$ in µs`, kind: 'numeric', answer: 6,
+          solution: [
+            { type: 'text', html: String.raw`<p>The off-time is the rest of the period.</p>` },
+            { type: 'derive', colors: { Ts: 1, D: 3 }, steps: [
+              { kind: 'sub', label: 'Off-time = the rest', from: String.raw`t_{off}=(1-\T{D-1}{D})\,\T{Ts-1}{T_s}`, to: String.raw`t_{off}=(1-\T{D-1}{0.4})\cdot\T{Ts-1}{10}=0.6\cdot10=6\ \mu\text{s}`,
+                why: String.raw`Check: $4+6=10$ µs ✓.` },
+            ] },
+          ] },
+      ],
+    },
+    {
+      id: 'p5-kcl-kvl', title: 'P5 · KCL/KVL "food for thought"', difficulty: 'exam',
+      statement: String.raw`<p>Same circuit as slide 31 (the Lecture 2 Kirchhoff example) but with $V_1=100$ V and $V_2=20$ V. Solve all currents and resistor voltages. Keep the assumed current directions from the figure.</p><p>The equations from the L2 example are unchanged; only the source values change: KCL at B: $I_1+I_2-I_3=0$ (1); loop 1: $V_1-R_1I_3=0$ (2); loop 2: $V_2-R_3I_2-R_2I_2-R_1I_3=0$ (3).</p>`,
+      blocks: [{ type: 'figure', svg: P5_SVG, caption: String.raw`Slide 31 with the new source values. At node B: $I_1$ and $I_2$ flow in, $I_3$ flows out down through R1.` }],
+      parts: [
+        { label: '(a)', prompt: String.raw`$I_3$ in A`, kind: 'numeric', answer: 10,
+          solution: [
+            { type: 'text', html: String.raw`<p>Loop 1, equation (2), has only one unknown, so we solve it first.</p>` },
+            { type: 'derive', colors: { Ia: 1, Ib: 2, Ic: 3, k: 5, n: 8 }, steps: [
+              { kind: 'sub', label: 'Values into (2)', from: String.raw`V_1-R_1\,\T{Ic-1}{I_3}=0`, to: String.raw`100-\T{k-1}{10}\,\T{Ic-1}{I_3}=0`,
+                why: String.raw`$V_1=100$ V and $R_1=10\ \Omega$. Always start with the equation that has the fewest unknowns.` },
+              { kind: 'both', label: String.raw`Both sides $+10\,I_3$`, to: String.raw`100=\T{k-1}{10}\,\T{Ic-1}{I_3}`,
+                arrows: { 'k-1': '+10·I3 on both sides', 'Ic-1': '' },
+                why: String.raw`Adding $10I_3$ to both sides cancels $-10I_3$ on the left and makes it appear on the right with a plus sign.` },
+              { kind: 'both', label: String.raw`Both sides $\div10$`, to: String.raw`\T{Ic-1}{I_3}=\frac{100}{\T{k-1}{10}}=10\text{ A}`,
+                arrows: { 'k-1': '÷ 10 on both sides' },
+                why: String.raw`Dividing by 10 frees $I_3$. It is positive, so it really flows down through R1 as assumed.` },
+            ] },
+          ] },
+        { label: '(b)', prompt: String.raw`$I_2$ in A (keep the sign)`, kind: 'numeric', answer: -3.2,
+          solution: [
+            { type: 'text', html: String.raw`<p>We put the new values and $I_3=10$ A into loop 2, equation (3), and solve for $I_2$.</p>` },
+            { type: 'derive', colors: { Ia: 1, Ib: 2, Ic: 3, k: 5, n: 8 }, steps: [
+              { kind: 'sub', label: String.raw`Values and $I_3=10$ into (3)`, from: String.raw`V_2-R_3\,\T{Ib-1}{I_2}-R_2\,\T{Ib-2}{I_2}-R_1\,\T{Ic-1}{I_3}=0`, to: String.raw`20-20\,\T{Ib-1}{I_2}-5\,\T{Ib-2}{I_2}-10\cdot\T{Ic-1}{10}=0`,
+                why: String.raw`$V_2=20$ V, $R_3=20\ \Omega$, $R_2=5\ \Omega$, $R_1=10\ \Omega$, and $I_3=10$ A from (a).` },
+              { kind: 'calc', label: 'Collect like terms', from: String.raw`\T{n-1}{20}-\T{b-1}{20\,I_2}-\T{b-2}{5\,I_2}\T{n-2}{-10\cdot10}=0`, to: String.raw`\T{n-1}{-80}-\T{b-1}{25\,I_2}=0`,
+                map: { 'n-2': ['n-1'], 'b-2': ['b-1'] },
+                why: String.raw`Numbers with numbers: $20-10\cdot10=20-100=-80$. $I_2$-terms with $I_2$-terms: $-20I_2-5I_2=-25I_2$.` },
+              { kind: 'both', label: String.raw`Both sides $+80$`, from: String.raw`\T{n-1}{-80}-25\,\T{Ib-1}{I_2}=0`, to: String.raw`-25\,\T{Ib-1}{I_2}=\T{n-1}{80}`,
+                arrows: { 'n-1': '+80 on both sides' },
+                why: String.raw`Adding 80 to both sides cancels $-80$ on the left and leaves $+80$ on the right.` },
+              { kind: 'both', label: String.raw`Both sides $\div(-25)$`, from: String.raw`\T{k-1}{-25}\,\T{Ib-1}{I_2}=\T{n-1}{80}`, to: String.raw`\T{Ib-1}{I_2}=\frac{\T{n-1}{80}}{\T{k-1}{-25}}=-3.2\text{ A}`,
+                arrows: { 'k-1': '÷ (−25) on both sides' },
+                why: String.raw`Negative: the real current flows B → C, into the + terminal of V2. V2 is now being charged.` },
+            ] },
+          ] },
+        { label: '(c)', prompt: String.raw`$I_1$ in A`, kind: 'numeric', answer: 13.2,
+          solution: [
+            { type: 'text', html: String.raw`<p>We rearrange the KCL equation (1) for $I_1$, then substitute $I_3$ and $I_2$.</p>` },
+            { type: 'derive', colors: { Ia: 1, Ib: 2, Ic: 3 }, steps: [
+              { kind: 'both', label: String.raw`Both sides $+I_3$`, from: String.raw`\T{Ia-1}{I_1}+\T{Ib-1}{I_2}-\T{Ic-1}{I_3}=0`, to: String.raw`\T{Ia-1}{I_1}+\T{Ib-1}{I_2}=\T{Ic-1}{I_3}`,
+                arrows: { 'Ic-1': '+I3 on both sides' },
+                why: String.raw`Adding $I_3$ to both sides cancels $-I_3$ on the left: in = out at node B.` },
+              { kind: 'both', label: String.raw`Both sides $-I_2$`, to: String.raw`\T{Ia-1}{I_1}=\T{Ic-1}{I_3}-\T{Ib-1}{I_2}`,
+                arrows: { 'Ib-1': '−I2 on both sides' },
+                why: String.raw`Subtracting $I_2$ from both sides removes it on the left; on the right it appears with a minus sign.` },
+              { kind: 'sub', label: String.raw`$I_3=10$, $I_2=-3.2$`, to: String.raw`\T{Ia-1}{I_1}=\T{Ic-1}{10}-(\T{Ib-1}{-3.2})=10+3.2=13.2\text{ A}`,
+                why: String.raw`Subtracting a negative number adds it.` },
+            ] },
+          ] },
+        { label: '(d)', prompt: String.raw`$V_{R1}$ in V`, kind: 'numeric', answer: 100,
+          solution: String.raw`<p>Ohm's law on R1 with $I_3$: $V_{R1}=R_1I_3=10\cdot10=100$ V (it equals $V_1$, as loop 1 says).</p>` },
+        { label: '(e)', prompt: String.raw`$V_{R2}$ in V (sign relative to the assumed $I_2$ direction)`, kind: 'numeric', answer: -16,
+          solution: String.raw`<p>Ohm's law on R2 with $I_2$: $V_{R2}=R_2I_2=5\cdot(-3.2)=-16$ V.</p>` },
+        { label: '(f)', prompt: String.raw`$V_{R3}$ in V (sign relative to the assumed $I_2$ direction)`, kind: 'numeric', answer: -64,
+          solution: String.raw`<p>Ohm's law on R3 with $I_2$: $V_{R3}=R_3I_2=20\cdot(-3.2)=-64$ V. Check loop 2: $20-(-64)-(-16)-100=0$ ✓.</p>` },
+        { label: '(g)', kind: 'writeup', prompt: String.raw`Food for thought: compare with the original example ($V_1=20$ V, $V_2=100$ V, which gave $I_3=2$ A, $I_2=3.2$ A, $I_1=-1.2$ A). What changed, and what do the signs tell you?`,
+          solution: String.raw`<p>The equations are the same; only the source values swap. Now $I_2=-3.2$ A is negative: the real current flows B → C, into the + terminal of V2, so V2 is being charged (in the original it was V1 that was charged, since $I_1$ was negative). $I_1=13.2$ A is now positive. The resistor voltages $V_{R2}=-16$ V and $V_{R3}=-64$ V have the same 16 V and 64 V magnitudes as the original but reversed polarity. You never need to guess directions correctly: a negative result just reverses the arrow.</p>` },
+      ],
+    },
+    {
+      id: 'p6-rc-transient', title: 'P6 · RC transient', difficulty: 'exam',
+      statement: String.raw`<p>$R=10\ \text{k}\Omega$, $C=100\ \mu\text{F}$, $V_s=12$ V, capacitor initially empty. Find $\tau$, $i(0)$, $v_C$ at 2 s, and the time to reach 9 V.</p>`,
+      parts: [
+        { label: '(a)', prompt: String.raw`Time constant $\tau$ in s`, kind: 'numeric', answer: 1,
+          solution: [
+            { type: 'text', html: String.raw`<p>We use $\tau=RC$, writing the prefixes as powers of ten.</p>` },
+            { type: 'derive', colors: { R: 1, C: 2 }, steps: [
+              { kind: 'sub', label: 'Prefixes as powers of ten', from: String.raw`\tau=\T{R-1}{R}\,\T{C-1}{C}`, to: String.raw`\tau=\T{R-1}{\underbrace{10\cdot10^{3}}_{10\text{ k}\Omega}}\cdot\T{C-1}{\underbrace{100\cdot10^{-6}}_{100\ \mu\text{F}}}`,
+                why: String.raw`k = $10^3$ and µ = $10^{-6}$.` },
+              { kind: 'calc', label: 'Tidy each factor', to: String.raw`\tau=\T{R-1}{10^{4}}\cdot\T{C-1}{10^{-4}}`,
+                why: String.raw`$10\cdot10^3=10^4$ and $100\cdot10^{-6}=10^2\cdot10^{-6}=10^{-4}$.` },
+              { kind: 'calc', label: 'Add the exponents', from: String.raw`\tau=10^{\T{R-1}{4}}\cdot10^{\T{C-1}{-4}}`, to: String.raw`\tau=10^{\T{R-1}{4}+(\T{C-1}{-4})}=10^{0}=1\text{ s}`,
+                why: String.raw`Multiply powers of ten by adding exponents: $4+(-4)=0$, and $10^0=1$.` },
+            ] },
+          ] },
+        { label: '(b)', prompt: String.raw`Initial current $i(0)$ in mA`, kind: 'numeric', answer: 1.2,
+          solution: [
+            { type: 'text', html: String.raw`<p>We substitute $t=0$ into the charging current $i=\frac{V_s}{R}e^{-t/\tau}$.</p>` },
+            { type: 'derive', colors: { Vs: 3, R: 1, t: 4 }, steps: [
+              { kind: 'sub', label: String.raw`Substitute $t=0$`, from: String.raw`i=\frac{\T{Vs-1}{V_s}}{\T{R-1}{R}}\,e^{-\T{t-1}{t}/\tau}`, to: String.raw`i(0)=\frac{\T{Vs-1}{12}}{\T{R-1}{10\,000}}\,e^{-\T{t-1}{0}/1}=0.0012\cdot1=1.2\text{ mA}`,
+                why: String.raw`$e^0=1$. An empty capacitor acts like a wire, so only $R$ limits the current.` },
+            ] },
+          ] },
+        { label: '(c)', prompt: String.raw`$v_C$ at $t=2$ s, in V`, kind: 'numeric', answer: '12*(1-exp(-2))', tol: 0.005,
+          solution: [
+            { type: 'text', html: String.raw`<p>We substitute $t=2$ s into $v_C=V_s(1-e^{-t/\tau})$.</p>` },
+            { type: 'derive', colors: { Vs: 3, t: 4, tau: 5 }, steps: [
+              { kind: 'sub', label: String.raw`Substitute $t=2$ s, $\tau=1$ s`, from: String.raw`v_C=\T{Vs-1}{V_s}\,(1-e^{-\T{t-1}{t}/\T{tau-1}{\tau}})`, to: String.raw`v_C(2)=\T{Vs-1}{12}\,(1-e^{-\T{t-1}{2}/\T{tau-1}{1}})=12\,(1-0.135)=12\cdot0.865=10.38\text{ V}`,
+                why: String.raw`$t/\tau=2/1=2$ and $e^{-2}\approx0.135$.` },
+            ] },
+          ] },
+        { label: '(d)', prompt: String.raw`Time to reach $v_C=9$ V, in s`, kind: 'numeric', answer: '-log(0.25)', tol: 0.005,
+          solution: [
+            { type: 'text', html: String.raw`<p>We set $v_C=9$ in $v_C=12(1-e^{-t})$ (with $\tau=1$ s, $t/\tau=t$). $t$ is trapped inside the exponential, so first we get the exponential alone, then undo it with ln.</p>` },
+            { type: 'derive', colors: { vc: 1, e: 2, n: 8, k: 5, mt: 3, v: 6, t: 4 }, steps: [
+              { kind: 'sub', label: String.raw`Set $v_C=9$`, from: String.raw`\T{vc-1}{v_C}=12\,(1-\T{e-1}{e^{-t}})`, to: String.raw`\T{vc-1}{9}=12\,(1-\T{e-1}{e^{-t}})`,
+                why: String.raw`We want the moment when the capacitor voltage is 9 V.` },
+              { kind: 'both', label: String.raw`Both sides $\div12$`, from: String.raw`9=\T{k-1}{12}\,(1-\T{e-1}{e^{-t}})`, to: String.raw`\frac{9}{\T{k-1}{12}}=1-\T{e-1}{e^{-t}}`,
+                arrows: { 'k-1': '÷ 12 on both sides' },
+                why: String.raw`Dividing both sides by 12 removes the factor in front of the bracket, so the bracket disappears.` },
+              { kind: 'calc', label: String.raw`$9\div12$`, from: String.raw`\T{n-1}{\frac{9}{12}}=1-\T{e-1}{e^{-t}}`, to: String.raw`\T{n-1}{0.75}=1-\T{e-1}{e^{-t}}`,
+                why: String.raw`$9/12=3/4=0.75$.` },
+              { kind: 'both', label: String.raw`Both sides $+e^{-t}$`, to: String.raw`\T{n-1}{0.75}+\T{e-1}{e^{-t}}=1`,
+                arrows: { 'e-1': '+e^(−t) on both sides' },
+                why: String.raw`Adding $e^{-t}$ to both sides cancels $-e^{-t}$ on the right and makes it positive on the left.` },
+              { kind: 'both', label: String.raw`Both sides $-0.75$`, to: String.raw`\T{e-1}{e^{-t}}=1-\T{n-1}{0.75}=0.25`,
+                arrows: { 'n-1': '−0.75 on both sides' },
+                why: String.raw`Subtracting 0.75 from both sides leaves the exponential alone.` },
+              { kind: 'both', label: 'ln on both sides', from: String.raw`\T{e-1}{e^{\T{mt-1}{-t}}}=0.25`, to: String.raw`\ln\big(\T{e-1}{e^{\T{mt-1}{-t}}}\big)=\ln0.25`,
+                why: String.raw`Taking ln of both equal sides keeps them equal. ln undoes e.` },
+              { kind: 'cancel', label: String.raw`$\ln(e^{x})=x$`, to: String.raw`\T{mt-1}{-t}=\ln0.25=-1.386`,
+                why: String.raw`ln and e cancel each other, leaving just the exponent $-t$. A calculator gives $\ln0.25\approx-1.386$.` },
+              { kind: 'both', label: String.raw`Both sides $\times(-1)$`, from: String.raw`\T{mt-1}{-t}=\T{v-1}{-1.386}`, to: String.raw`\T{mt-1}{t}=\T{v-1}{1.386}\text{ s}\approx1.39\text{ s}`,
+                why: String.raw`Multiplying both sides by $-1$ flips both signs.` },
+              { kind: 'check', label: 'Put the answer back in', from: String.raw`v_C=12\,(1-e^{-\T{t-x}{t}})\qquad\qquad t=\T{t-1}{1.39}`, to: String.raw`v_C=12\,(1-e^{-\T{t-1}{1.39}})=12\,(1-0.25)=9\text{ V}\ \checkmark`,
+                arrows: { 't-1': '' },
+                why: String.raw`$e^{-1.39}\approx0.25$, so we get back 9 V.` },
+            ] },
+          ] },
+      ],
+    },
+    {
+      id: 'p7-rl-transient', title: 'P7 · RL transient', difficulty: 'exam',
+      statement: String.raw`<p>$L=50$ mH, $R=10\ \Omega$, $V_s=20$ V. Find $\tau$, the final current, and $i$ and $v_L$ at $t=5$ ms.</p>`,
+      parts: [
+        { label: '(a)', prompt: String.raw`Time constant $\tau$ in ms`, kind: 'numeric', answer: 5,
+          solution: [
+            { type: 'text', html: String.raw`<p>We use $\tau=L/R$ with $L$ in henry.</p>` },
+            { type: 'derive', colors: { L: 1, R: 2 }, steps: [
+              { kind: 'sub', label: String.raw`$\tau=L/R$, then numbers`, from: String.raw`\tau=\frac{\T{L-1}{L}}{\T{R-1}{R}}`, to: String.raw`\tau=\frac{\T{L-1}{0.05\text{ H}}}{\T{R-1}{10\ \Omega}}=0.005\text{ s}=5\text{ ms}`,
+                why: String.raw`50 mH = 0.050 H.` },
+            ] },
+          ] },
+        { label: '(b)', prompt: String.raw`Final current $i(\infty)$ in A`, kind: 'numeric', answer: 2,
+          solution: [
+            { type: 'text', html: String.raw`<p>In DC steady state the inductor is a wire, so only $R$ limits the current.</p>` },
+            { type: 'derive', colors: { Vs: 3, R: 2 }, steps: [
+              { kind: 'sub', label: 'End value: inductor = wire', from: String.raw`i(\infty)=\frac{\T{Vs-1}{V_s}}{\T{R-1}{R}}`, to: String.raw`i(\infty)=\frac{\T{Vs-1}{20}}{\T{R-1}{10}}=2\text{ A}`,
+                why: String.raw`When the current stops changing, $v_L=L\,di/dt=0$, so all of $V_s$ is across $R$.` },
+            ] },
+          ] },
+        { label: '(c)', prompt: String.raw`Current $i$ at $t=5$ ms, in A`, kind: 'numeric', answer: '2*(1-exp(-1))', tol: 0.005,
+          solution: [
+            { type: 'text', html: String.raw`<p>$t=5$ ms $=\tau$, so $t/\tau=1$. We substitute into the rising current.</p>` },
+            { type: 'derive', colors: { fin: 1, t: 4 }, steps: [
+              { kind: 'sub', label: String.raw`Substitute $t/\tau=1$`, from: String.raw`i=\T{fin-1}{\frac{V_s}{R}}\,(1-e^{-\T{t-1}{t/\tau}})`, to: String.raw`i=\T{fin-1}{2}\,(1-e^{-\T{t-1}{1}})=2\cdot0.632=1.26\text{ A}`,
+                why: String.raw`$V_s/R=2$ A from (b). After one time constant the current has reached 63.2 % of its final value.` },
+            ] },
+          ] },
+        { label: '(d)', prompt: String.raw`Inductor voltage $v_L$ at $t=5$ ms, in V`, kind: 'numeric', answer: '20*exp(-1)', tol: 0.005,
+          solution: [
+            { type: 'text', html: String.raw`<p>We substitute $t/\tau=1$ into the decaying inductor voltage, then check KVL.</p>` },
+            { type: 'derive', colors: { Vs: 3, t: 4, i: 1, vL: 2 }, steps: [
+              { kind: 'sub', label: String.raw`Substitute $t/\tau=1$`, from: String.raw`v_L=\T{Vs-1}{V_s}\,e^{-\T{t-1}{t/\tau}}`, to: String.raw`v_L=\T{Vs-1}{20}\,e^{-\T{t-1}{1}}=20\cdot0.368=7.36\text{ V}`,
+                why: String.raw`The inductor voltage starts at $V_s$ and decays to 37 % after one time constant.` },
+              { kind: 'check', label: 'KVL check', from: String.raw`R\,\T{i-x}{i}+\T{vL-x}{v_L}=V_s\qquad\qquad i=\T{i-1}{1.264},\quad v_L=\T{vL-1}{7.36}`, to: String.raw`10\cdot\T{i-1}{1.264}+\T{vL-1}{7.36}=12.64+7.36=20\text{ V}\ \checkmark`,
+                arrows: { 'i-1': '', 'vL-1': '' },
+                why: String.raw`Resistor voltage plus inductor voltage must equal the source voltage at every instant.` },
+            ] },
+          ] },
+      ],
+    },
+    {
+      id: 'p8-component-laws', title: 'P8 · Component laws', difficulty: 'core',
+      statement: String.raw`<p>(a) A 2 mH inductor's current ramps from 1 A to 3 A in 20 µs: inductor voltage? (b) A 10 µF capacitor's voltage rises at 5 V/ms: current? (c) A 200-turn coil's flux changes by 0.02 Wb in 10 ms: induced EMF?</p>`,
+      parts: [
+        { label: '(a)', prompt: String.raw`Inductor voltage $v$ in V`, kind: 'numeric', answer: 200,
+          solution: [
+            { type: 'text', html: String.raw`<p>For a straight ramp the slope is rise ÷ run. Then we use $v=L\,di/dt$.</p>` },
+            { type: 'derive', colors: { i: 1, dt: 2, L: 3, d: 4 }, steps: [
+              { kind: 'calc', label: 'Slope: rise ÷ run', from: String.raw`\frac{di}{dt}=\frac{\T{i-1}{3}-\T{i-2}{1}}{\T{dt-1}{20\cdot10^{-6}}}`, to: String.raw`\frac{di}{dt}=\frac{\T{i-1}{2}}{\T{dt-1}{2\cdot10^{-5}}}=10^{5}\text{ A/s}`,
+                map: { 'i-2': ['i-1'] },
+                why: String.raw`The current rises by $3-1=2$ A in $20\ \mu\text{s}=2\cdot10^{-5}$ s.` },
+              { kind: 'sub', label: String.raw`$v=L\,\frac{di}{dt}$`, from: String.raw`v=\T{L-1}{L}\,\T{d-1}{\frac{di}{dt}}`, to: String.raw`v=\T{L-1}{2\cdot10^{-3}}\cdot\T{d-1}{10^{5}}=2\cdot10^{2}=200\text{ V}`,
+                why: String.raw`A small inductor still makes a large voltage when its current changes fast.` },
+            ] },
+          ] },
+        { label: '(b)', prompt: String.raw`Capacitor current $i$ in mA`, kind: 'numeric', answer: 50,
+          solution: [
+            { type: 'text', html: String.raw`<p>Units first: per millisecond → per second. Then $i=C\,dv/dt$.</p>` },
+            { type: 'derive', colors: { ms: 1, C: 3, d: 4 }, steps: [
+              { kind: 'calc', label: 'Per millisecond → per second', from: String.raw`\frac{dv}{dt}=\frac{5\text{ V}}{\T{ms-1}{1\text{ ms}}}`, to: String.raw`\frac{dv}{dt}=\frac{5\text{ V}}{\T{ms-1}{10^{-3}\text{ s}}}=5000\text{ V/s}`,
+                why: String.raw`1 ms = $10^{-3}$ s, and dividing by $10^{-3}$ multiplies by 1000.` },
+              { kind: 'sub', label: String.raw`$i=C\,\frac{dv}{dt}$`, from: String.raw`i=\T{C-1}{C}\,\T{d-1}{\frac{dv}{dt}}`, to: String.raw`i=\T{C-1}{10\cdot10^{-6}}\cdot\T{d-1}{5000}=0.05\text{ A}=50\text{ mA}`,
+                why: String.raw`µ = $10^{-6}$. $10^{-5}\cdot5000=0.05$.` },
+            ] },
+          ] },
+        { label: '(c)', prompt: String.raw`Induced EMF $e$ in V (with sign)`, kind: 'numeric', answer: -400,
+          solution: [
+            { type: 'text', html: String.raw`<p>We use Faraday's law with Lenz's minus sign.</p>` },
+            { type: 'derive', colors: { N: 1, dP: 2, dt: 3 }, steps: [
+              { kind: 'sub', label: 'Faraday', from: String.raw`e=-\T{N-1}{N}\,\frac{\T{dP-1}{\Delta\Phi}}{\T{dt-1}{\Delta t}}`, to: String.raw`e=-\T{N-1}{200}\cdot\frac{\T{dP-1}{0.02}}{\T{dt-1}{0.01}}=-200\cdot2=-400\text{ V}`,
+                why: String.raw`10 ms = 0.01 s. Magnitude 400 V; the minus sign (Lenz) means the EMF opposes the flux change.` },
+            ] },
+          ] },
+      ],
+    },
+    {
+      id: 'p9-resistors', title: 'P9 · Resistors', difficulty: 'core',
+      statement: String.raw`<p>For $R_1=4.7\ \Omega$, $R_2=1.2\ \Omega$: series and parallel equivalents, and the power in each when the parallel pair sits across 12 V.</p>`,
+      parts: [
+        { label: '(a)', prompt: String.raw`Series equivalent $R_s$ in Ω`, kind: 'numeric', answer: 5.9,
+          solution: String.raw`<p>Series resistances add: $R_s=R_1+R_2=4.7+1.2=5.9\ \Omega$.</p>` },
+        { label: '(b)', prompt: String.raw`Parallel equivalent $R_p$ in Ω`, kind: 'numeric', answer: '4.7*1.2/5.9', tol: 0.005,
+          solution: [
+            { type: 'text', html: String.raw`<p>For two resistors in parallel we use product over sum.</p>` },
+            { type: 'derive', colors: { Ra: 1, Rb: 2 }, steps: [
+              { kind: 'sub', label: 'Product over sum', from: String.raw`R_p=\frac{\T{Ra-1}{R_1}\,\T{Rb-1}{R_2}}{\T{Ra-2}{R_1}+\T{Rb-2}{R_2}}`, to: String.raw`R_p=\frac{\T{Ra-1}{4.7}\cdot\T{Rb-1}{1.2}}{\T{Ra-2}{4.7}+\T{Rb-2}{1.2}}=\frac{5.64}{5.9}=0.956\ \Omega`,
+                why: String.raw`Smaller than 1.2 Ω ✓: a parallel combination is always smaller than its smallest resistor.` },
+            ] },
+          ] },
+        { label: '(c)', prompt: String.raw`Power $P_1$ in $R_1$ across 12 V, in W`, kind: 'numeric', answer: '144/4.7', tol: 0.005,
+          solution: [
+            { type: 'text', html: String.raw`<p>In parallel both resistors have the same voltage, so we use $P=V^2/R$.</p>` },
+            { type: 'derive', colors: { V: 3, Ra: 1 }, steps: [
+              { kind: 'sub', label: String.raw`$P=V^2/R$`, from: String.raw`P_1=\frac{\T{V-1}{V}^2}{\T{Ra-1}{R_1}}`, to: String.raw`P_1=\frac{\T{V-1}{12}^2}{\T{Ra-1}{4.7}}=\frac{144}{4.7}=30.6\text{ W}`,
+                why: String.raw`$V$ is the same 12 V for both, so this form needs no current.` },
+            ] },
+          ] },
+        { label: '(d)', prompt: String.raw`Power $P_2$ in $R_2$ across 12 V, in W`, kind: 'numeric', answer: 120,
+          solution: [
+            { type: 'text', html: String.raw`<p>Same voltage, so again $P=V^2/R$.</p>` },
+            { type: 'derive', colors: { V: 3, Rb: 2 }, steps: [
+              { kind: 'sub', label: String.raw`$P=V^2/R$`, from: String.raw`P_2=\frac{\T{V-1}{V}^2}{\T{Rb-1}{R_2}}`, to: String.raw`P_2=\frac{\T{V-1}{12}^2}{\T{Rb-1}{1.2}}=\frac{144}{1.2}=120\text{ W}`,
+                why: String.raw`In parallel the <em>smaller</em> resistor takes more power.` },
+            ] },
+          ] },
+      ],
+    },
+    {
+      id: 'p10-concept', title: 'P10 · Concept', difficulty: 'exam',
+      statement: String.raw`<p>Explain why a buck converter needs the diode, and why its output can never exceed the input.</p>`,
+      parts: [
+        { label: '(a)', kind: 'writeup', prompt: String.raw`Why does a buck converter need the diode?`,
+          solution: String.raw`<p>When S opens, the inductor current cannot change instantly ($v=L\,di/dt$ would be infinite). The diode gives that current a freewheeling path from ground through L to the output. Without it, the voltage across the opening switch would spike and destroy it.</p>` },
+        { label: '(b)', kind: 'writeup', prompt: String.raw`Why can its output never exceed the input?`,
+          solution: String.raw`<p>$V_o=DV_s$ with $D\le1$. In picture form (figure in L4): volt-second balance needs a positive rectangle and a negative rectangle. The negative one is $-V_o$, fine. The positive one is $V_s-V_o$, which is only positive if $V_o<V_s$.</p>` },
+      ],
+    },
+    {
+      id: 'theory', title: 'Short theory questions', difficulty: 'exam',
+      statement: String.raw`<p>Answer in 2–4 sentences, out loud or on paper, then compare. A good exam answer names the mechanism and the consequence.</p>`,
+      parts: [
+        { label: 'T1', kind: 'writeup', prompt: String.raw`Why does a switch-mode converter waste far less power than a linear regulator or resistive divider?`,
+          solution: String.raw`<p>A resistive element drops the excess voltage while carrying the full current, so $P=VI$ is lost as heat. An ideal switch is either fully on (current but ~0 V) or fully off (voltage but ~0 A), so $P=VI\approx0$ in both states. Energy is moved through L and C, which store and release it without loss; only switching transitions and non-ideal resistances cause losses.</p>` },
+        { label: 'T2', kind: 'writeup', prompt: String.raw`Explain how the depletion layer forms and what happens to it under forward and reverse bias.`,
+          solution: String.raw`<p>At the junction, holes diffuse from P to N and electrons from N to P. They leave behind fixed ions, which creates a charge-free depletion layer with an electric field that stops further diffusion (the potential barrier). Forward bias (+ on P) pushes carriers towards the junction; above the knee voltage the layer collapses and current flows. Reverse bias widens the layer; only a small leakage current flows until breakdown.</p>` },
+        { label: 'T3', kind: 'writeup', prompt: String.raw`Compare a Schottky diode with a PN diode. When would you choose each?`,
+          solution: String.raw`<p>Schottky uses a metal–N junction with only majority carriers, so its barrier is smaller: lower forward drop, lower on-resistance, faster switching, but lower breakdown voltage and higher leakage. Choose Schottky for low-voltage, high-frequency converters where conduction and switching losses matter. Choose PN (or PIN for high voltage) where blocking voltage and low leakage matter more.</p>` },
+        { label: 'T4', kind: 'writeup', prompt: String.raw`Describe the three operating modes of an SCR and why it cannot be turned off from the gate.`,
+          solution: String.raw`<p>Forward blocking: anode positive, outer junctions J1 and J3 forward biased, middle J2 reverse biased, so it blocks. Reverse blocking: anode negative, J1 and J3 reverse biased, so it blocks even with a gate signal. Forward conduction: a gate current pulse injects carriers, J2 breaks down and the device conducts. Once on, the outer layers keep supplying carriers to the middle layers by themselves (latching), so the gate loses control; it turns off only when the anode–cathode is reverse biased.</p>` },
+        { label: 'T5', kind: 'writeup', prompt: String.raw`How does an N-channel enhancement MOSFET turn on? Why does it switch faster than a BJT?`,
+          solution: String.raw`<p>The gate–oxide–body forms a capacitor. A positive $V_{GS}$ above threshold pushes holes away from under the oxide and pulls electrons in, forming an n-type inversion channel between drain and source; current then flows from D to S. Only majority carriers (electrons) conduct and the gate is insulated, so there is no stored minority charge to remove and almost no gate current: fast switching and low drive power. The cost is a higher on-resistance and lower current rating.</p>` },
+        { label: 'T6', kind: 'writeup', prompt: String.raw`Why is the IGBT preferred for high-power motor drives and EV charging?`,
+          solution: String.raw`<p>It combines a MOSFET-style insulated gate (easy, low-power drive) with bipolar conduction: the channel current causes hole injection into the drift layer, which lowers the on-state resistance at high current. It handles very high voltage (&gt; 1 kV) and current (&gt; 500 A) with low conduction loss, at medium switching speed. MOSFETs are faster but have higher on-resistance and lower current rating.</p>` },
+        { label: 'T7', kind: 'writeup', prompt: String.raw`What advantages do wide-bandgap devices (SiC, GaN) have, and how does GaN conduct?`,
+          solution: String.raw`<p>A bandgap 2–3× that of silicon allows higher voltage and temperature, higher efficiency and smaller converters. SiC MOSFETs have the same MOS structure but a thinner, more heavily doped drift layer, so lower on-resistance. GaN has no doped regions: at the AlGaN/GaN heterojunction electrons gather into a 2DEG, a nanometre-thin channel with very high electron mobility.</p>` },
+        { label: 'T8', kind: 'writeup', prompt: String.raw`State volt-second balance and explain why it must hold in steady state.`,
+          solution: String.raw`<p>In steady state the integral of the inductor voltage over one switching period is zero, i.e. the average inductor voltage is zero. From $v_L=L\,di_L/dt$, that integral equals $L\,[i_L(T_s)-i_L(0)]$. In steady state the current waveform repeats, so the current at the end of a period equals that at the start, and the integral must be zero. Otherwise the current would grow or shrink every cycle.</p>` },
+        { label: 'T9', kind: 'writeup', prompt: String.raw`What is the small-ripple approximation and why is it needed?`,
+          solution: String.raw`<p>It assumes the ripple in capacitor voltage and inductor current is small compared with their average values, so they are treated as constants ($v_o\approx V_o$, $i_L\approx I_L$) within each switching interval. This makes the inductor voltage and capacitor current piecewise constant, so the balance integrals become simple height × width products that give $V_o/V_s$ and $I_o/I_L$.</p>` },
+        { label: 'T10', kind: 'writeup', prompt: String.raw`Why do a capacitor and an inductor at the output of a chopper give a smooth DC output?`,
+          solution: String.raw`<p>The chopped voltage is a DC average plus AC components at the switching frequency and its harmonics. The LC network is a low-pass filter: the inductor opposes fast current changes (high impedance at high frequency) and the capacitor shunts fast voltage changes (low impedance at high frequency). The DC average passes through; only a small ripple (about 1–3 %) remains.</p>` },
+      ],
+    },
+  ],
 };
