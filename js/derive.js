@@ -149,8 +149,8 @@ export function renderDerive(b) {
     });
   }
 
-  async function playStep(S) {
-    if (busy || S.st.from === S.st.to) return; // nothing moves in a statement-only step
+  async function playStep(S, fromPlayAll = false) {
+    if (busy || (playingAll && !fromPlayAll) || S.st.from === S.st.to) return; // nothing moves in a statement-only step
     busy = true;
     try {
       const { inner, newL, oldL } = S;
@@ -228,17 +228,21 @@ export function renderDerive(b) {
     } finally { revealing = false; }
   };
   allBtn.onclick = () => { while (shown < steps.length) reveal(); };
+  let playingAll = false;
   playAll.onclick = async () => {
-    if (busy) return;
+    if (busy || playingAll) return;
+    playingAll = true;
+    try {
     while (shown < steps.length) reveal();
     await (document.fonts?.ready || Promise.resolve());
     for (const S of built) {
       S.li.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'center' });
       await wait(400);
       draw(S);
-      await playStep(S);
+      await playStep(S, true);
       await wait(350);
     }
+    } finally { playingAll = false; }
   };
   root.appendChild(h('div', { class: 'derive-controls' }, nextBtn, allBtn, playAll));
   reveal(); // the first step is always visible

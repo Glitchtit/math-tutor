@@ -18,6 +18,7 @@ function walkTags(tex) {
     if (c === '\\') {
       if (s[i + 1] === 'T' && s[i + 2] === '{') {
         const close = s.indexOf('}', i + 3);
+        if (close < 0) break; // unclosed \T{ : stop instead of rescanning forever
         const id = s.slice(i + 3, close);
         out.push({ id, parent: stack.length ? stack[stack.length - 1].id : null });
         // the content brace opens right after the id

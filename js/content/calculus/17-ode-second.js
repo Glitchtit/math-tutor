@@ -257,7 +257,7 @@ where $y_h$ is the general solution of the homogeneous equation ($f = 0$) and $y
             why: String.raw`At $t = 0$ the bracket is $C_1$; both sides $-0.024$.` },
           { kind: 'sub', label: String.raw`$Q'(0) = 0$`, from: String.raw`Q' = -10e^{-10t}(C_1\cos 20t + C_2\sin 20t) + e^{-10t}(-20C_1\sin 20t + 20C_2\cos 20t)`, to: String.raw`-10C_1 + 20C_2 = 0`,
             why: String.raw`Product rule, then $t = 0$; the constant $0.024$ has derivative $0$.` },
-          { kind: 'sub', label: String.raw`Put $C_1 = -0.024$, then solve`, from: String.raw`-10\T{Ca-1}{C_1} + 20C_2 = 0\qquad C_1 = \T{Ca-2}{-0.024}`, to: String.raw`0.24 + 20C_2 = 0\ \Rightarrow\ \T{Cb-1}{C_2} = -0.012`, arrows: { 'Ca-2': '' },
+          { kind: 'sub', label: String.raw`Put $C_1 = -0.024$, then solve`, from: String.raw`-10\T{Ca-1}{C_1} + 20C_2 = 0\qquad C_1 = \T{Ca-2}{-0.024}`, to: String.raw`\T{Ca-2}{0.24} + 20C_2 = 0\ \Rightarrow\ \T{Cb-1}{C_2} = -0.012`, arrows: { 'Ca-2': '' },
             why: String.raw`$-10\cdot(-0.024) = 0.24$; both sides $-0.24$, then $\div 20$.` },
           { kind: 'result', label: 'Insert the constants', from: String.raw`Q(t) = 0.024 + e^{-10t}(\T{Ca-1}{C_1}\cos 20t + \T{Cb-1}{C_2}\sin 20t)`,
             to: String.raw`Q(t) = 0.024 - e^{-10t}\big(\T{Ca-1}{0.024}\cos 20t + \T{Cb-1}{0.012}\sin 20t\big)\ \mathrm C`,

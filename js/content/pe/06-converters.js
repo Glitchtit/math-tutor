@@ -299,7 +299,7 @@ export default {
           { kind: 'expand', label: String.raw`Multiply $V_s$ into $(1-D)$`,
             from: String.raw`\T{Vs-1}{V_s}\,\T{D-1}{D}+\T{Vs-2}{V_s}\,\T{omd-1}{(\T{one-1}{1}-\T{D-2}{D})}-\T{Vo-1}{V_o}\,\T{omd-2}{(1-D)}=0`,
             to: String.raw`\T{Vs-1}{V_s}\,\T{D-1}{D}+\T{Vs-2}{V_s}-\T{Vs-3}{V_s}\,\T{D-2}{D}-\T{Vo-1}{V_o}\,\T{omd-2}{(1-D)}=0`,
-            map: { 'Vs-2': ['Vs-2', 'Vs-3'] }, arrows: { 'Vs-2': '× 1 and × D', 'D-2': '' },
+            map: { 'Vs-2': ['Vs-2', 'Vs-3'] }, arrows: { 'Vs-2': '× 1 and × (−D)', 'D-2': '' },
             why: String.raw`$V_s\cdot 1 = V_s$ (the 1 changes nothing, so it is crossed out) and $V_s\cdot(-D) = -V_sD$.` },
           { kind: 'cancel', label: String.raw`$+V_sD - V_sD = 0$`,
             to: String.raw`\T{Vs-2}{V_s}-\T{Vo-1}{V_o}\,\T{omd-2}{(1-D)}=0`,
@@ -309,7 +309,7 @@ export default {
             why: String.raw`Adding $V_o(1-D)$ to both sides cancels it on the left and makes it appear on the right with a $+$. That is why "moving a term across the $=$" flips its sign.` },
           { kind: 'result', label: String.raw`Both sides $\div V_s(1-D)$`,
             to: String.raw`\frac{\T{Vo-1}{V_o}}{\T{Vs-2}{V_s}}=\frac{1}{\T{omd-2}{1-D}}`, arrows: { 'Vs-2': '÷Vs', 'Vo-1': 'swap sides', 'omd-2': '÷(1−D)' },
-            why: String.raw`Divide both sides by $V_s$ to get the ratio, and by $(1-D)$ to free it on the right. Valid for $D<1$. Since $1-D<1$, the output is always higher than the input: step-up.` },
+            why: String.raw`Divide both sides by $V_s$ to get the ratio, and by $(1-D)$ to free it on the right. Valid for $D<1$. Since $0<1-D\le 1$, the output is never lower than the input (equal only at $D=0$): step-up.` },
         ] },
         { type: 'derive', title: 'With numbers: what duty cycle gives 30 V from 12 V?', given: String.raw`\T{Vs-0}{V_s}=12\text{ V},\quad \T{Vo-0}{V_o}=30\text{ V}`, colors: { ...COL, n: 8 }, steps: [
           { kind: 'sub', label: 'Put the given values into the formula',

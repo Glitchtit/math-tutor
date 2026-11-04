@@ -151,3 +151,20 @@ test('route: a source in a numerator leaves sideways instead of cutting through 
   assert.equal(r.hits, 0);
   assert.ok(cubicPoints(r.d).every((p) => !inside(p, denom)));
 });
+
+test('tagIds terminates on an unclosed tag', () => {
+  assert.deepEqual(tagIds(String.raw`x+\T{a`), []);
+});
+
+test('checkText: whole-number input only, and signs in short answers matter', () => {
+  assert.ok(!checkText({ num: 1 }, '1/2').ok);
+  assert.ok(checkText({ num: 0.75 }, '0.75').ok);
+  assert.ok(!checkText({ answers: ['n-'] }, 'n').ok);
+  assert.ok(checkText({ answers: ['n-'] }, 'n−').ok);
+  assert.ok(checkText({ answers: ['mercury arc rectifier'] }, 'Mercury-arc rectifier').ok);
+});
+
+test('validator: an arrows key must be a term that moves', () => {
+  const r = issuesOf([D([{ kind: 'calc', from: R`\T{a-1}{x}+1`, to: 'y', arrows: { 'a-1': '' } }])]);
+  assert.ok(r.some((s) => /arrows key "a-1" has no destination/.test(s)), r.join('\n'));
+});

@@ -21,7 +21,7 @@ export const DEMO_LESSON =
             why: String.raw`$(1-D)$ multiplies everything inside the bracket: one copy goes to $V_s$, one to $V_o$. The minus in front of $V_o$ stays with it.` },
           { kind: 'expand', label: String.raw`Multiply $V_s$ into $(1-D)$`, from: String.raw`\T{Vs-1}{V_s}\,\T{D-1}{D}+\T{Vs-2}{V_s}\,\T{omd-1}{(\T{one-1}{1}-\T{D-2}{D})}-\T{Vo-1}{V_o}\,\T{omd-2}{(1-D)}=0`,
             to: String.raw`\T{Vs-1}{V_s}\,\T{D-1}{D}+\T{Vs-2}{V_s}-\T{Vs-3}{V_s}\,\T{D-2}{D}-\T{Vo-1}{V_o}\,\T{omd-2}{(1-D)}=0`,
-            map: { 'Vs-2': ['Vs-2', 'Vs-3'] }, arrows: { 'Vs-2': '× 1 and × D', 'D-2': '' },
+            map: { 'Vs-2': ['Vs-2', 'Vs-3'] }, arrows: { 'Vs-2': '× 1 and × (−D)', 'D-2': '' },
             why: String.raw`$V_s\cdot 1 = V_s$ (the 1 changes nothing, so it is crossed out) and $V_s\cdot(-D) = -V_sD$.` },
           { kind: 'cancel', label: String.raw`$+V_sD - V_sD = 0$`, to: String.raw`\T{Vs-2}{V_s}-\T{Vo-1}{V_o}\,\T{omd-2}{(1-D)}=0`,
             why: String.raw`$+V_sD$ and $-V_sD$ are the same size with opposite signs, so together they are $0$.` },

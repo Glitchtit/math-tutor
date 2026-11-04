@@ -138,7 +138,10 @@ function validateDerive(b, next, w, issues) {
       const bad = list.find((id) => !TAG_ID.test(id));
       if (bad) issues.push(`${sw}: tag id "${bad}" should look like prefix-n`);
     }
-    for (const k of Object.keys(st.arrows || {})) if (!ids.from.includes(k)) issues.push(`${w}: arrows key "${k}" not in step ${i + 1} from line`);
+    for (const k of Object.keys(st.arrows || {})) {
+      if (!ids.from.includes(k)) issues.push(`${w}: arrows key "${k}" not in step ${i + 1} from line`);
+      else if (![].concat((st.map || {})[k] ?? k).some((t) => ids.to.includes(t))) issues.push(`${w}: arrows key "${k}" has no destination in step ${i + 1} (no arrow would be drawn)`);
+    }
     for (const [k, ts] of Object.entries(st.map || {})) {
       if (!ids.from.includes(k)) issues.push(`${sw}: map key "${k}" not in from line`);
       for (const t of [].concat(ts)) if (!ids.to.includes(t)) issues.push(`${sw}: map target "${t}" not in to line`);

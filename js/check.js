@@ -82,7 +82,8 @@ export function checkPart(part, input) {
 
 // Fill-in-the-blank answers. spec: { answers: [alternatives] } for words, or { num, tol } for numbers.
 // Words: case, spaces, hyphens and punctuation are ignored, and one typo is forgiven in words of 5+ letters.
-const normWord = (s) => String(s).toLowerCase().normalize('NFKC').replace(/[−–—]/g, '-').replace(/[\s\-_.,;:!?'"()]+/g, '');
+// hyphens between letters are spelling ("mercury-arc"); a leading/trailing sign is meaning ("n-", "p+")
+const normWord = (s) => String(s).toLowerCase().normalize('NFKC').replace(/[−–—]/g, '-').replace(/([a-z0-9])-(?=[a-z0-9])/g, '$1').replace(/[\s_.,;:!?'"()]+/g, '');
 function editDistance(a, b) {
   const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
   for (let j = 1; j <= b.length; j++) d[0][j] = j;
@@ -93,7 +94,8 @@ export function checkText(spec, input) {
   const raw = String(input ?? '').trim();
   if (!raw) return { ok: false };
   if (typeof spec.num === 'number') {
-    const x = parseFloat(raw.replace(',', '.').replace(/−/g, '-'));
+    const t = raw.replace(',', '.').replace(/−/g, '-');
+    const x = /^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(t) ? Number(t) : NaN; // reject "1/2", "3 V" etc.
     const tol = spec.tol ?? 0.01;
     return { ok: Number.isFinite(x) && Math.abs(x - spec.num) <= Math.max(Math.abs(spec.num) * tol, 1e-9) };
   }
