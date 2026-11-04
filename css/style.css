@@ -534,3 +534,60 @@ body {
 .derive-why p { margin: .3em 0; }
 .derive-controls { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
 @media (prefers-reduced-motion: reduce) { .derive-step { animation: none; } .derive-clone { transition: none; } }
+
+/* ---- PE figures (js/pefig.js, figure block): the artifact's variable names mapped onto the theme ---- */
+.pefig { --ink: var(--text); --muted: var(--text-muted); --rule: var(--border); --panel: var(--surface); --paper: var(--bg);
+  --c-a: var(--term-1); --c-b: var(--term-6); --c-c: var(--term-7); --c-g: var(--term-3); --trace: var(--term-6); --amber: var(--term-7);
+  --f-mono: var(--font-mono); }
+.pefig svg { width: 100%; max-width: 620px; height: auto; display: block; margin: 0 auto; }
+.pefig.explorer svg { max-width: none; }
+.pefig-figure, .blk-figure { margin: 14px 0; padding: 10px 12px; background: var(--fig-bg); border: 1px solid var(--fig-border); border-radius: 10px; overflow-x: auto; }
+.pefig figcaption { font-size: .88rem; color: var(--text-muted); margin-top: 6px; }
+.pefig svg text { font-family: var(--font-mono); }
+.pefig .ca { color: var(--c-a); fill: var(--c-a); } .pefig .cb { color: var(--c-b); fill: var(--c-b); }
+.pefig .cc { color: var(--c-c); fill: var(--c-c); } .pefig .cg { color: var(--c-g); fill: var(--c-g); }
+.pefig .sa { stroke: var(--c-a); } .pefig .sb { stroke: var(--c-b); } .pefig .sc { stroke: var(--c-c); } .pefig .sg { stroke: var(--c-g); }
+.pefig .fa { fill: var(--c-a); } .pefig .fb { fill: var(--c-b); } .pefig .fc { fill: var(--c-c); } .pefig .fg { fill: var(--c-g); }
+.pefig .sch { stroke: var(--ink); fill: none; stroke-width: 2; }
+.pefig .dim { stroke: var(--rule); fill: none; stroke-width: 2; }
+.pefig .hot { stroke: var(--c-a); fill: none; stroke-width: 3.2; }
+.pefig .hot2 { stroke: var(--c-b); fill: none; stroke-width: 3.2; }
+.pefig .sch-t { fill: var(--ink); font-size: 13px; } .pefig .sch-m { fill: var(--muted); font-size: 12px; } .pefig .sch-c { fill: var(--accent); font-size: 13px; }
+.pefig .ax { stroke: var(--muted); stroke-width: 1.2; fill: none; }
+.pefig .grid { stroke: var(--rule); stroke-width: 1; fill: none; stroke-dasharray: 3 4; }
+.pefig .svgtxt { font-size: 12px; fill: var(--muted); } .pefig .svgtxt-i { font-size: 12px; fill: var(--ink); }
+.pefig .dot { fill: var(--muted); }
+.pefig.explorer { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin: 14px 0; }
+.pefig .controls { display: flex; flex-wrap: wrap; gap: 12px 22px; align-items: center; margin-bottom: 10px; }
+.pefig .controls label { display: flex; gap: 8px; align-items: center; font-size: .9rem; }
+.pefig .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.pefig .seg button { font: inherit; font-size: .9rem; padding: 6px 14px; border: 0; background: transparent; color: var(--text); cursor: pointer; }
+.pefig .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.pefig .tw { overflow-x: auto; }
+.pefig .tw svg text { fill: var(--text-muted); font-size: 12px; }
+.pefig .readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-top: 10px; }
+.pefig .readout div { border: 1px solid var(--border); padding: 6px 10px; border-radius: 8px; font-size: .82rem; color: var(--text-muted); }
+.pefig .readout b { display: block; font-family: var(--font-mono); font-size: 1.05rem; color: var(--text); font-variant-numeric: tabular-nums; }
+.pefig .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* ---- practice blocks (js/practice.js) ---- */
+.blk-reveal, .blk-blanks, .blk-examquiz { margin: 16px 0; padding: 12px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+.reveal-prompt { font-weight: 500; }
+.reveal-body { margin-top: 10px; }
+.reveal-check-title { font: 600 .72rem var(--font-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); }
+.reveal-checklist { list-style: none; padding: 0; margin: 6px 0 10px; display: grid; gap: 4px; }
+.reveal-checklist li { display: flex; gap: 8px; align-items: baseline; }
+.blanks-bar, .eq-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-bottom: 8px; font-size: .9rem; color: var(--text-muted); }
+.blanks-list, .eq-list { margin: 0; padding-left: 1.4em; display: grid; gap: 8px; }
+.blank-input { font: inherit; width: 11em; max-width: 100%; padding: 2px 6px; margin: 0 4px; border: 1px solid var(--border-strong); border-radius: 6px; background: var(--surface-2); color: var(--text); }
+.blank-input.ok { border-color: var(--ok); background: var(--ok-soft); } .blank-input.bad { border-color: var(--bad); background: var(--bad-soft); }
+.blank-res { font-size: .85rem; color: var(--text-muted); } .blank-res.ok { color: var(--ok); } .blank-res.bad { color: var(--bad); }
+.eq-text { margin-bottom: 6px; }
+.eq-opts { display: grid; gap: 6px; }
+.eq-opt { font: inherit; text-align: left; padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-2); color: var(--text); cursor: pointer; }
+.eq-opt:hover:not(:disabled) { border-color: var(--accent); }
+.eq-opt:disabled { cursor: default; }
+.eq-opt.right { border-color: var(--ok); background: var(--ok-soft); } .eq-opt.wrong { border-color: var(--bad); background: var(--bad-soft); }
+.eq-skip { margin-top: 4px; }
+.eq-explain { margin-top: 6px; color: var(--text-muted); font-size: .92rem; }
+.eq-bar select { font: inherit; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 2px 6px; }

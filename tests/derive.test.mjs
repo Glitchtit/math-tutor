@@ -105,3 +105,28 @@ test('validator: part solutions may be block arrays', () => {
   assert.deepEqual(issuesOf([{ type: 'answer', part: { kind: 'writeup', prompt: 'x', solution: [{ type: 'text', html: '$x$' }] } }]), []);
   assert.ok(issuesOf([{ type: 'answer', part: { kind: 'writeup', prompt: 'x', solution: [{ type: 'text', html: '$x' }] } }]).length > 0);
 });
+
+// ---- practice blocks and PE widgets ----
+import { checkText } from '../js/check.js';
+
+test('checkText: loose word matching', () => {
+  assert.ok(checkText({ answers: ['balanced'] }, ' Balanced ').ok);
+  assert.ok(checkText({ answers: ['balanced'] }, 'balnced').ok);
+  assert.ok(!checkText({ answers: ['balanced'] }, 'unbalanced').ok);
+  assert.ok(checkText({ answers: ['mercury arc rectifier', 'mercury arc'] }, 'Mercury-arc').ok);
+  assert.ok(!checkText({ answers: ['RC'] }, 'RL').ok);
+  assert.ok(checkText({ num: 3, tol: 0.01 }, '3.00').ok);
+  assert.ok(checkText({ num: 0.632 }, '0,632').ok);
+  assert.ok(!checkText({ num: 3 }, '4').ok);
+});
+
+test('validator: practice blocks', () => {
+  const quiz = issuesOf([{ type: 'examquiz', questions: [{ q: 'x', choices: ['a', 'b'], answer: 2, explain: '' }] }]);
+  assert.ok(quiz.some((s) => /answer index 2 out of range/.test(s)), quiz.join('\n'));
+  const bl = issuesOf([{ type: 'blanks', items: [{ html: 'A [[]] and a [[]].', answers: ['x'] }] }]);
+  assert.ok(bl.some((s) => /2 gaps but 1 answers/.test(s)), bl.join('\n'));
+  assert.deepEqual(issuesOf([{ type: 'blanks', items: [{ html: 'A $R$ is a [[]].', answers: ['resistor|resistance'] }, { html: '[[]] gaps', answers: [{ num: 3 }] }] }]), []);
+  assert.ok(issuesOf([{ type: 'figure', svg: '<div></div>' }]).some((s) => /figure needs an <svg>/.test(s)));
+  assert.deepEqual(issuesOf([{ type: 'reveal', prompt: 'Draw it', blocks: [{ type: 'widget', name: 'pefig', config: { fig: 'wfBuck' } }], checklist: ['$v_L$ is a rectangle'] }]), []);
+  assert.ok(issuesOf([{ type: 'widget', name: 'pefig', config: { fig: 'nope' } }]).some((s) => /unknown pefig/.test(s)));
+});

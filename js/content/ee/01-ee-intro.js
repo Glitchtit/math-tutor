@@ -14,6 +14,12 @@ export default {
       id: 'derive-demo',
       title: 'DEMO: derive block (temporary)',
       blocks: [
+        { type: 'widget', name: 'converter', config: { topology: 'boost', D: 0.6 } },
+        { type: 'widget', name: 'pefig', config: { fig: 'buckOn', caption: 'Buck on-state' } },
+        { type: 'reveal', prompt: 'Draw the buck waveforms over two periods ($D=0.4$).', checklist: ['$v_L$ is a rectangle', '$i_L$ is a triangle around $I_L$'], blocks: [{ type: 'widget', name: 'pefig', config: { fig: 'wfBuck' } }] },
+        { type: 'blanks', items: [{ html: 'If $R_1/R_3=R_2/R_4$ the bridge is [[]].', answers: ['balanced'] }, { html: 'A bridge with 4 nodes needs [[]] KCL equations.', answers: [{ num: 3 }] }] },
+        { type: 'examquiz', questions: [{ q: 'AC to DC is a', choices: ['Inverter', 'Rectifier'], answer: 1, explain: 'Rectifier.' }, { q: 'DC to AC is an', choices: ['Inverter', 'Rectifier'], answer: 0, explain: 'Inverter.' }] },
+        { type: 'figure', svg: '<svg viewBox="0 0 200 60"><path class="sch" d="M10 30 H190"/><text class="sch-t" x="90" y="22">wire</text></svg>', caption: 'Static figure' },
         { type: 'derive', symbolic: true, title: 'Boost converter: from volt-second balance to the gain', colors: { Vs: 1, Vo: 2, D: 3, omd: 4, Ts: 5 }, steps: [
           { kind: 'both', label: String.raw`Both sides $\div T_s$`, from: String.raw`\T{Vs-1}{V_s}\,\T{D-1}{D}\,\T{Ts-1}{T_s}+(\T{Vs-2}{V_s}-\T{Vo-1}{V_o})\,\T{omd-1}{(1-D)}\,\T{Ts-2}{T_s}=0`,
             to: String.raw`\T{Vs-1}{V_s}\,\T{D-1}{D}+(\T{Vs-2}{V_s}-\T{Vo-1}{V_o})\,\T{omd-1}{(1-D)}=0`,

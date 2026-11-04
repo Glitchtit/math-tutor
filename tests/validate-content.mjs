@@ -7,11 +7,11 @@
 import katex from '../vendor/katex/katex.mjs';
 import { MODULES, PARTS, COURSES } from '../js/content/index.js';
 import { REFERENCE } from '../js/content/reference.js';
-import { WIDGET_NAMES } from '../js/widgets.js';
+import { WIDGET_NAMES, PE_FIGURES } from '../js/widgets.js';
 import { compile } from '../js/matlab/compile.js';
 import { Matlab } from '../js/matlab/interp.js';
 import { runMatlabChecks } from '../js/matlab/checks.js';
-import { checkPart } from '../js/check.js';
+import { checkPart, checkText } from '../js/check.js';
 import { parse } from '../js/matlab/parser.js';
 import { TAG_MACROS, KATEX_TRUST, KINDS, TAG_ID, tagIds, resolveSteps } from '../js/derive-core.js';
 
@@ -57,6 +57,9 @@ function checkExprString(expr, params, where, issues, samples) {
 function checkWidget(b, where, issues) {
   if (!WIDGET_NAMES.includes(b.name)) { issues.push(`${where}: unknown widget "${b.name}"`); return; }
   const cfg = b.config || {};
+  if (b.name === 'pefig' && !(cfg.fig in PE_FIGURES)) issues.push(`${where}: unknown pefig "${cfg.fig}" (one of ${Object.keys(PE_FIGURES).join(', ')})`);
+  if (b.name === 'pefig') mathIn(cfg.caption, where, issues);
+  if (b.name === 'converter' && cfg.topology && !['buck', 'boost'].includes(cfg.topology)) issues.push(`${where}: converter topology must be buck or boost`);
   const params = Object.keys(cfg.params || {});
   for (const [k, vars] of Object.entries(EXPR_KEYS)) {
     if (k in cfg && typeof cfg[k] === 'string') {
@@ -174,6 +177,34 @@ export function validateBlocks(blocks, where, issues) {
       case 'livescript': checkLiveBlocks(b.blocks || [], w, issues); break;
       case 'answer': validatePart(b.part, w, issues); break;
       case 'derive': validateDerive(b, blocks[i + 1], w, issues); break;
+      case 'figure':
+        if (!/^\s*<svg[\s>]/.test(b.svg || '')) issues.push(`${w}: figure needs an <svg> element`);
+        mathIn(b.caption, w, issues);
+        break;
+      case 'reveal':
+        mathIn(b.prompt, w, issues); (b.checklist || []).forEach((c) => mathIn(c, w, issues));
+        validateBlocks(b.blocks || [], `${w} reference`, issues);
+        break;
+      case 'blanks':
+        (b.items || []).forEach((it, j) => {
+          mathIn(it.html, `${w} item ${j + 1}`, issues);
+          const gaps = (String(it.html).match(/\[\[\]\]/g) || []).length;
+          const n = (it.answers || []).length;
+          if (!gaps || gaps !== n) issues.push(`${w} item ${j + 1}: ${gaps} gaps but ${n} answers`);
+          (it.answers || []).forEach((a) => {
+            const spec = typeof a === 'string' ? { answers: a.split('|') } : a;
+            if (!checkText(spec, typeof a === 'string' ? a.split('|')[0] : String(a.num)).ok) issues.push(`${w} item ${j + 1}: answer ${JSON.stringify(a)} does not check against itself`);
+          });
+        });
+        break;
+      case 'examquiz':
+        (b.questions || []).forEach((q, j) => {
+          const qw = `${w} Q${j + 1}`;
+          mathIn(q.q, qw, issues); (q.choices || []).forEach((c) => mathIn(c, qw, issues)); mathIn(q.explain, qw, issues);
+          if (!Array.isArray(q.choices) || q.choices.length < 2) issues.push(`${qw}: needs at least 2 choices`);
+          if (!(Number.isInteger(q.answer) && q.answer >= 0 && q.answer < (q.choices || []).length)) issues.push(`${qw}: answer index ${q.answer} out of range`);
+        });
+        break;
       default: issues.push(`${w}: unknown block type`);
     }
   });

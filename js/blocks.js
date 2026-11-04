@@ -8,6 +8,7 @@ import { runMatlabChecks } from './matlab/checks.js';
 import { LiveScript, renderLiveDoc } from './livescript.js';
 import { progress } from './progress.js';
 import { renderDerive } from './derive.js';
+import { renderFigure, renderReveal, renderBlanks, renderExamQuiz } from './practice.js';
 
 export function askTutor(prompt, context = '') {
   window.dispatchEvent(new CustomEvent('tutor:ask', { detail: { prompt, context } }));
@@ -170,6 +171,10 @@ RENDER.livescript = (b, ctx) => {
 };
 
 RENDER.derive = (b) => renderDerive(b);
+RENDER.figure = (b) => renderFigure(b);
+RENDER.reveal = (b, ctx) => renderReveal(b, ctx, renderBlocks);
+RENDER.blanks = (b) => renderBlanks(b);
+RENDER.examquiz = (b) => renderExamQuiz(b);
 
 RENDER.answer = (b, ctx) => renderPart(b.part, ctx?.key ? `${ctx.key}/answer/${ctx.index}` : null, ctx);
 
