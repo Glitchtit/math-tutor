@@ -174,7 +174,7 @@ export function renderDerive(b) {
         const e = oldL.querySelector(`[data-t="${CSS.escape(mv.id)}"]`);
         if (!e) continue;
         const a = e.getBoundingClientRect();
-        const g = { id: mv.id, e, clones: [] };
+        const g = { id: mv.id, e, clones: [], targets: [] };
         for (const tid of mv.targets) {
           const t = newL.querySelector(`[data-t="${CSS.escape(tid)}"]`);
           if (!t) continue;
@@ -183,13 +183,16 @@ export function renderDerive(b) {
           w.style.fontSize = fs;
           w.style.left = `${a.left - c.left}px`; w.style.top = `${a.top - c.top}px`;
           w.appendChild(e.cloneNode(true));
+          g.targets.push(t);
           g.clones.push([w, `translate(${z.left - a.left}px, ${z.top - a.top}px) scale(${a.height ? z.height / a.height : 1})`]);
         }
         if (g.clones.length) groups.push(g);
       }
-      const clones = groups.flatMap((g) => g.clones);
-      for (const [k, g] of groups.entries()) {
-        if (k) await wait(GAP_MS);
+      // the unchanged skeleton of the new line appears first, with empty slots the terms then slide into
+      groups.forEach((g) => g.targets.forEach((t) => t.classList.add('pending')));
+      newL.style.transition = 'opacity .3s'; newL.style.opacity = 1;
+      await wait(450);
+      for (const g of groups) {
         S.svg.querySelectorAll('.active').forEach((x) => x.classList.remove('active'));
         S.svg.querySelectorAll(`[data-mv="${CSS.escape(g.id)}"]`).forEach((x) => x.classList.add('active'));
         g.clones.forEach(([w]) => inner.appendChild(w));
@@ -197,11 +200,11 @@ export function renderDerive(b) {
         await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
         g.clones.forEach(([w, tr]) => { w.style.transform = tr; });
         await wait(SLIDE_MS + 50);
+        g.targets.forEach((t) => t.classList.remove('pending'));
+        g.clones.forEach(([w]) => w.remove());
+        await wait(GAP_MS);
       }
       S.svg.querySelectorAll('.active').forEach((x) => x.classList.remove('active'));
-      newL.style.transition = 'opacity .3s'; newL.style.opacity = 1;
-      await wait(320);
-      clones.forEach(([w]) => w.remove());
       oldL.querySelectorAll('.ghosted').forEach((e) => e.classList.remove('ghosted'));
       newL.style.transition = '';
     } finally {
