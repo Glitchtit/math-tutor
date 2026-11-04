@@ -24,6 +24,14 @@ import c20 from './calculus/20-alternating.js';
 import c21 from './calculus/21-power-series.js';
 import c22 from './calculus/22-taylor.js';
 import ee01 from './ee/01-ee-intro.js';
+import pe00 from './pe/00-exam.js';
+import pe01 from './pe/01-fundamentals.js';
+import pe02 from './pe/02-components.js';
+import pe03 from './pe/03-transients.js';
+import pe04 from './pe/04-kirchhoff.js';
+import pe05 from './pe/05-semiconductors.js';
+import pe06 from './pe/06-converters.js';
+import pe07 from './pe/07-practice.js';
 
 export const COURSES = [
   {
@@ -40,6 +48,13 @@ export const COURSES = [
     description: 'Circuit laws, resistive networks, RC/RL/RLC transients and sinusoidal steady state with phasors — built on the calculus and ODE modules, with MATLAB for every computation. Assignments for this course are being added.',
     tutorScope: 'introductory electrical engineering (circuit laws, resistive networks, capacitors and inductors, first and second order transients, phasors and AC power), using calculus, complex numbers and MATLAB',
   },
+  {
+    id: 'pe',
+    title: 'Power Electronics',
+    subtitle: 'PE1 Mini Exam 1: lectures 1–4',
+    description: 'Preparation for Mini Exam 1 of Power Electronics 1: conversion types, circuit laws and components, RC/RL transients, KCL/KVL with bridge circuits, power semiconductors, and buck and boost converters. Every derivation is shown step by step with the moving terms traced, then applied with real numbers.',
+    tutorScope: 'introductory power electronics (lectures 1–4 of PE1): conversion types, components, RC/RL transients, KCL/KVL incl. bridge circuits, power semiconductors (diode, BJT, SCR, MOSFET, IGBT, SiC/GaN), buck and boost DC-DC converters with volt-second and amp-second balance',
+  },
 ];
 
 export const PARTS = [
@@ -51,13 +66,19 @@ export const PARTS = [
   { course: 'calculus', id: 'series', title: 'Sequences & series', desc: 'Convergence of sequences and series, power series and Taylor polynomials.', hw: 'HW5–HW6' },
   { course: 'ee', id: 'ee-dc', title: 'DC circuits', desc: 'Charge, current, voltage, power; Ohm, Kirchhoff; resistive networks.', hw: '' },
   { course: 'ee', id: 'ee-transients', title: 'Energy storage & transients', desc: 'Capacitors, inductors, RC/RL/RLC step responses.', hw: '' },
+  { course: 'pe', id: 'pe-prep', title: 'Exam prep', desc: 'Exam format, negative marking, the formula sheet and the math toolkit.', hw: '' },
+  { course: 'pe', id: 'pe-basics', title: 'Lectures 1–2', desc: 'Fundamentals, circuit laws and components, RC/RL transients, KCL/KVL and bridges.', hw: '' },
+  { course: 'pe', id: 'pe-devices', title: 'Lectures 3–4', desc: 'Power semiconductors and DC-DC converters.', hw: '' },
+  { course: 'pe', id: 'pe-practice', title: 'Practice', desc: 'Mini Exam 1 practice: problems, blanks, drawing, theory and quiz.', hw: '' },
   { course: 'ee', id: 'ee-ac', title: 'AC circuits', desc: 'Sinusoids, complex numbers, phasors, impedance and AC power.', hw: '' },
 ];
 
 const calculus = [c01, c02, c03, c04, c05, c06, c07, c08, c09, c10, c11, c12, c13, c14, c15, c16, c17, c18, c19, c20, c21, c22].map((m) => ({ ...m, course: 'calculus' }));
 const ee = [ee01].map((m) => ({ ...m, course: 'ee' }));
 
-export const MODULES = [...calculus, ...ee];
+const pe = [pe00, pe01, pe02, pe03, pe04, pe05, pe06, pe07].map((m) => ({ ...m, course: 'pe' }));
+
+export const MODULES = [...calculus, ...ee, ...pe];
 
 export const HOMEWORK_TEMPLATE = {
   title: 'Homework N',
