@@ -41,6 +41,8 @@ const tutor = new TutorPanel({
 });
 document.getElementById('tutor-btn').addEventListener('click', () => tutor.toggle());
 document.getElementById('menu-btn').addEventListener('click', () => document.body.classList.toggle('nav-open'));
+// phone drawer: a tap on the page behind it closes it instead of hitting what is underneath
+document.getElementById('main').addEventListener('click', (e) => { if (document.body.classList.contains('nav-open')) { e.preventDefault(); e.stopPropagation(); document.body.classList.remove('nav-open'); } }, true);
 
 // ------------------------------------------------------------------ navigation sidebar
 function buildNav() {

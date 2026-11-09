@@ -183,6 +183,8 @@ body.tutor-open .main { margin-right: var(--tutor-w); }
   .menu-btn { display: inline-grid; }
   .sidebar { position: fixed; left: 0; top: 56px; z-index: 25; transform: translateX(-100%); transition: transform .2s; box-shadow: var(--shadow); }
   body.nav-open .sidebar { transform: none; }
+  .sidebar { width: min(85vw, var(--sidebar-w)); height: calc(100dvh - 56px); overscroll-behavior: contain; }
+  body.nav-open .main { opacity: .35; }
   body.tutor-open .main { margin-right: 0; }
   .hide-sm { display: none !important; }
   .main { padding: 16px 16px 80px; }
@@ -477,7 +479,7 @@ body {
   background-attachment: fixed;
 }
 .topbar { background: color-mix(in srgb, var(--surface) 82%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-.sidebar { background: color-mix(in srgb, var(--surface) 70%, transparent); }
+@media (min-width: 901px) { .sidebar { background: color-mix(in srgb, var(--surface) 70%, transparent); } } /* phone drawer stays opaque over the page */
 .brand-mark { background: linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: 0 0 18px var(--accent-soft); }
 .btn-primary { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, var(--accent-2))); border-color: transparent; box-shadow: 0 4px 14px var(--accent-soft); }
 .btn-primary:hover { filter: brightness(1.1); }
