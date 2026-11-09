@@ -76,3 +76,11 @@ test('coverage: nearly every lesson derive line becomes a drill line, and every 
     for (const l of d.lines) for (const c of l.chunks) assert.ok(checkChunk(c.plain, c.plain).ok, c.plain);
   }
 });
+
+test('a whole line given at once (AI-read handwriting) matches every drill line', () => {
+  for (const m of MODULES) for (const d of drillsOf(m)) for (const L of d.lines) {
+    const r = matchLine(L.chunks, L.chunks.map((c) => c.plain).join(' '));
+    assert.equal(r.done, L.chunks.length, `${d.key}: ${L.tex}`);
+    assert.equal(r.typoAt, -1, `${d.key}: ${L.tex}`);
+  }
+});

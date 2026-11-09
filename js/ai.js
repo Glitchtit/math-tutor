@@ -335,3 +335,24 @@ export async function testConnection() {
   const r = await c.messages.create({ model: s.model, max_tokens: 64, messages: [{ role: 'user', content: 'Reply with the single word: ready' }], output_config: { effort: 'low' } });
   return r.content.filter((b) => b.type === 'text').map((b) => b.text).join('').trim();
 }
+
+// Handwritten Train line → plain typed notation, so train-core's matchLine can judge it.
+export async function readInk(pngBase64) {
+  const c = await getClient();
+  const model = 'claude-haiku-5-5'; // plain transcription: the fast, cheap model is enough, whatever the tutor uses
+  const r = await c.beta.messages.create({
+    model,
+    max_tokens: 4000,
+    messages: [{ role: 'user', content: [
+      { type: 'image', source: { type: 'base64', media_type: 'image/png', data: pngBase64 } },
+      { type: 'text', text: `Transcribe this handwritten maths line exactly as written, mistakes included, in this plain notation:
+a/b with brackets around multi-term numerators/denominators, x^(n+1), V_out, 2*3, sqrt(x), ln x, sin x, pi, tau, Delta, inf, <= >= != ~ -> =>, +-, int_a^b f dx, lim_(x->0), sum_(n=1)^inf.
+Return only the transcription.` },
+    ] }],
+    output_config: { effort: 'low', format: { type: 'json_schema', schema: { type: 'object', properties: { plain: { type: 'string' } }, required: ['plain'], additionalProperties: false } } },
+    ...fallbackParams(model),
+  });
+  if (r.stop_reason === 'refusal') throw new Error('The model declined this request.');
+  const text = r.content.filter((b) => b.type === 'text').map((b) => b.text).join('');
+  try { return JSON.parse(text).plain; } catch { throw new Error('The model returned malformed JSON. Try again.'); }
+}

@@ -645,3 +645,7 @@ details.refresher summary { color: var(--accent); }
 .train-done { padding: 20px 0; }
 /* the prompt must show the literal keys: no != -> >= ligatures */
 .train code, .train-input { font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0; }
+/* Write mode: handwritten drills */
+.train-mode { gap: 6px; margin-bottom: 8px; }
+.train-ink .row { gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.ink-pad { display: block; width: 100%; height: 200px; touch-action: none; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-2); color: var(--text); cursor: crosshair; }
