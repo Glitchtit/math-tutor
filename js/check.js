@@ -21,7 +21,12 @@ function closeEnough(a, b, tol) {
 }
 
 // part: { kind:'numeric', answer: number | 'matlab expr', tol }
+const PLAIN_NUMBER = /^\s*[-+−]?\s*\d+(\.\d+)?(\s*\/\s*\d+(\.\d+)?)?\s*$/;
+export const isPlainNumber = (s) => PLAIN_NUMBER.test(String(s));
+
 export function checkNumeric(part, input) {
+  // plain: the answer is a number, so typing the calculation itself (e.g. 1/2+1/3) must not count
+  if (part.plain && !isPlainNumber(input)) return { ok: false, error: 'Enter just the result as a number or a single fraction (like 5/6), not a calculation.' };
   let v;
   try { v = evalStudentNumber(input); } catch (e) { return { ok: false, error: e.message }; }
   const target = typeof part.answer === 'number' ? part.answer : M().evalNumber(String(part.answer));

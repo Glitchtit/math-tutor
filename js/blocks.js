@@ -346,7 +346,8 @@ export function renderPart(part, key, ctx = {}) {
       if (!r.ok && a.tries >= 2 && part.solution && !part.walkthrough) solBtn.classList.remove('hidden');
       if (!r.ok && a.tries >= 2 && part.walkthrough) walkBtn.classList.add('btn-primary');
     }
-    ctx.onResult?.();
+    if (locked) { locked = false; [hintBtn, walkBtn].forEach((b) => b.classList.remove('hidden')); lockNote.remove(); }
+    ctx.onResult?.(r);
   };
   // Help ladder: hint 1 (nudge) -> hint 2 (method) -> hint 3 (first step) -> full step-by-step walkthrough
   const hints = part.hints || (part.hint ? [part.hint] : []);
@@ -354,12 +355,14 @@ export function renderPart(part, key, ctx = {}) {
   let hintLevel = 0;
   const hintBtn = h('button', { class: 'btn btn-small btn-ghost' }, hints.length ? `Hint 1 of ${hints.length}` : '');
   hintBtn.onclick = () => {
+    ctx.onHelp?.();
     helpBox.appendChild(html(h('div', { class: 'hint' }), `<b>Hint ${hintLevel + 1}.</b> ${hints[hintLevel]}`));
     hintLevel++;
     if (hintLevel >= hints.length) hintBtn.remove(); else hintBtn.textContent = `Hint ${hintLevel + 1} of ${hints.length}`;
   };
   const walkBtn = h('button', { class: 'btn btn-small btn-ghost' }, 'Walk me through it');
   walkBtn.onclick = () => {
+    ctx.onHelp?.();
     walkBtn.remove();
     const box = h('div', { class: 'walkthrough' }, h('div', { class: 'steps-kicker' }, 'Step-by-step solution'));
     helpBox.appendChild(box);
@@ -368,12 +371,19 @@ export function renderPart(part, key, ctx = {}) {
     else renderStepList(box, part.walkthrough, { context: `${stripHtml(ctx.statement || '')} ${stripHtml(part.prompt || '')}` });
   };
   const solBtn = h('button', { class: 'btn btn-small btn-ghost' + (part.solution && !part.walkthrough ? '' : ' hidden'), onclick: () => { sol.classList.toggle('hidden'); if (!sol.childNodes.length) { if (Array.isArray(part.solution)) renderBlocks(sol, part.solution, { module: ctx.module }); else html(sol, part.solution); } } }, 'Show solution');
+  // unfamiliar-problem practice: no hints until the student has made one attempt of their own
+  let locked = !!ctx.lockHelp && part.kind !== 'writeup' && !(key && progress.getAttempt(key));
+  const lockNote = h('span', { class: 'muted small' }, 'Try it yourself first: hints unlock after your first attempt.');
+  if (locked) [hintBtn, walkBtn].forEach((b) => b.classList.add('hidden'));
   const row = h('div', { class: 'row' });
   if (part.kind !== 'writeup') row.appendChild(h('button', { class: 'btn btn-small btn-primary', onclick: doCheck }, 'Check'));
   if (hints.length) row.appendChild(hintBtn);
   if (part.walkthrough) row.appendChild(walkBtn);
   row.appendChild(solBtn);
-  row.appendChild(h('button', { class: 'btn btn-small btn-ghost', onclick: () => askTutor('I am stuck on this problem. Coach me through it one small step at a time: tell me only the next step and why, ask me to do it, and wait for my answer before going on. Never skip algebra.', `Problem: ${stripHtml(ctx.statement || '')}\nPart ${part.label || ''}: ${stripHtml(part.prompt || '')}\nMy answer so far: ${getInput() || '(none yet)'}\nChecker: ${stripHtml(fb.innerHTML) || 'not checked'}`) }, "I'm stuck — coach me"));
+  if (locked) row.appendChild(lockNote);
+  row.appendChild(h('button', { class: 'btn btn-small btn-ghost', onclick: () => askTutor(ctx.lockHelp
+    ? 'I am stuck on an unfamiliar problem. Do not tell me the method or the next step. Coach me like Pólya: ask me one question at a time (What is given? What is asked? Have I solved a problem that looks like this? Which earlier problem type does it reduce to? What would a first step be?), wait for my answer, and only narrow the question if I am still stuck. Never give the solution.'
+    : 'I am stuck on this problem. Coach me through it one small step at a time: tell me only the next step and why, ask me to do it, and wait for my answer before going on. Never skip algebra.', `Problem: ${stripHtml(ctx.statement || '')}\nPart ${part.label || ''}: ${stripHtml(part.prompt || '')}\nMy answer so far: ${getInput() || '(none yet)'}\nChecker: ${stripHtml(fb.innerHTML) || 'not checked'}`) }, "I'm stuck — coach me"));
   el.append(row, helpBox, fb, sol);
   if (key && progress.getAttempt(key)?.ok) { fb.className = 'feedback ok'; fb.innerHTML = '<b>Solved earlier.</b>'; }
   return el;
@@ -414,7 +424,8 @@ export function renderAssignment(container, a, ctx = {}) {
     if (auto.length && solved === auto.length && !a.writeup) progress.markDone(key);
     ctx.onChange?.();
   };
-  parts.forEach((p, i) => card.appendChild(renderPart(p, `${key}/p${i}`, { ...ctx, statement: a.statement, title: a.title, onResult: refresh })));
+  const lockHelp = a.difficulty === 'challenge' || a.difficulty === 'exam';
+  parts.forEach((p, i) => card.appendChild(renderPart(p, `${key}/p${i}`, { ...ctx, statement: a.statement, title: a.title, onResult: refresh, lockHelp })));
   if (a.writeup) {
     const wrap = h('details', { class: 'writeup' }, h('summary', {}, 'Write the full solution in Live Script format'));
     const intro = h('div', { class: 'prose small' });

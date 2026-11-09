@@ -10,6 +10,8 @@ import { LiveScript } from './livescript.js';
 import { TutorPanel } from './tutorpanel.js';
 import { setCourseOutline, generateAssignments, generateLesson, connectionMode } from './ai.js';
 import { REFERENCE } from './content/reference.js';
+import { renderSkillPage, renderSkillsPage, renderPlacementPage, renderMixedPage, renderReviewPage, renderComparePage, moduleSkillsSection, dueCount, nextDue } from './skillpages.js';
+import { skillById, COMPARE } from './skills/index.js';
 
 const main = document.getElementById('main');
 const nav = document.getElementById('nav');
@@ -63,6 +65,12 @@ function buildNav() {
     });
     nav.appendChild(sec);
   }
+  const due = dueCount();
+  nav.appendChild(h('div', { class: 'nav-part' }, h('div', { class: 'nav-part-title' }, 'Practice'),
+    h('a', { href: '#/review', class: 'nav-mod' }, h('span', { class: 'nav-num' }, '↻'), h('span', { class: 'nav-name' }, 'Review'), h('span', { class: 'nav-pct nav-due' }, due ? String(due) : '')),
+    h('a', { href: '#/skills', class: 'nav-mod' }, h('span', { class: 'nav-num' }, '▦'), h('span', { class: 'nav-name' }, 'Foundations & skills')),
+    h('a', { href: '#/mixed', class: 'nav-mod' }, h('span', { class: 'nav-num' }, '⤨'), h('span', { class: 'nav-name' }, 'Mixed practice')),
+    COMPARE.length ? h('a', { href: '#/compare', class: 'nav-mod' }, h('span', { class: 'nav-num' }, '⇄'), h('span', { class: 'nav-name' }, 'Compare methods')) : null));
   nav.appendChild(h('div', { class: 'nav-part' }, h('div', { class: 'nav-part-title' }, 'Tools'),
     h('a', { href: '#/editor', class: 'nav-mod' }, h('span', { class: 'nav-num' }, '✎'), h('span', { class: 'nav-name' }, 'Live Script editor')),
     h('a', { href: '#/practice', class: 'nav-mod' }, h('span', { class: 'nav-num' }, '✦'), h('span', { class: 'nav-name' }, 'AI practice & lessons')),
@@ -127,7 +135,16 @@ function home() {
     });
     map.append(h('div', { class: 'map-part-head' }, h('h2', {}, part.title), h('p', { class: 'muted' }, part.desc)), grid);
   }
-  page(course.title, hero, how, map);
+  const due = dueCount(), started = Object.keys(skillById).some((id) => progress.skill(id).stage > 0 || progress.skill(id).placed !== undefined);
+  const today = h('section', { class: 'today card' },
+    h('h2', {}, 'Today'),
+    due ? h('p', {}, `${due} item${due > 1 ? 's' : ''} due for review. Reviewing just before you would forget is what makes it stick.`)
+      : h('p', { class: 'muted' }, nextDue() ? `Nothing due. Next review ${new Date(nextDue()).toLocaleDateString()}.` : 'Nothing to review yet: mastered skills and drills appear here after 1, 3, 7, 21 and 60 days.'),
+    h('div', { class: 'row wrap' },
+      due ? h('a', { class: 'btn btn-primary', href: '#/review' }, `Start review (${due})`) : null,
+      started ? h('a', { class: 'btn', href: '#/mixed' }, 'Mixed practice') : h('a', { class: 'btn btn-primary', href: '#/placement' }, 'New here? Take the placement test'),
+      h('a', { class: 'btn btn-ghost', href: '#/skills' }, 'Foundations & skills')));
+  page(course.title, hero, today, how, map);
 }
 
 function moduleNavList(m, kind, items) {
@@ -168,7 +185,7 @@ function modulePage(m) {
       h('div', { class: 'muted small' }, `${st.done} of ${st.total} items complete`)),
     intro,
     first ? h('a', { class: 'btn btn-primary', href: `#/module/${m.id}/learn/${first.id}` }, 'Start learning →') : null,
-    cols, aiRow);
+    cols, moduleSkillsSection(m), aiRow);
 }
 
 function sequenceOf(m) {
@@ -377,6 +394,13 @@ function settingsPage() {
     h('div', { class: 'card' }, h('h3', {}, 'Adding course material'), h('div', { class: 'prose', html: '<p>Modules live in <code>js/content/</code>, one file per module. See <code>CONTENT.md</code> in the repository for the format, so new homework topics can be added as new modules.</p>' })));
 }
 
+function shellPage(title, kicker, intro, render, crumb = null) {
+  const wrap = h('div', { class: 'skillpage' });
+  page(title, ...[crumb, h('header', { class: 'lesson-head' }, h('div', { class: 'mod-num' }, kicker), h('h1', {}, title)), intro ? h('p', { class: 'muted' }, intro) : null, wrap].filter(Boolean));
+  render(wrap);
+  renderMath(wrap);
+}
+
 function notFound() {
   page('Not found', h('h1', {}, 'Page not found'), h('a', { href: '#/' }, 'Back to the course map'));
 }
@@ -385,6 +409,7 @@ function notFound() {
 
 function route() {
   document.body.classList.remove('nav-open');
+  buildNav(); // keeps the review count and module percentages current
   const raw = location.hash.replace(/^#/, '') || '/';
   const [pathPart, queryPart] = raw.split('?');
   const path = pathPart.split('#')[0];
@@ -404,6 +429,12 @@ function route() {
   else if (seg[0] === 'practice') practicePage(query);
   else if (seg[0] === 'reference') referencePage();
   else if (seg[0] === 'settings') settingsPage();
+  else if (seg[0] === 'skills') shellPage('Foundations & skills', 'Practice', 'Each skill makes fresh problems with new numbers. The worked solution fades out step by step until you solve it on your own; then it is scheduled for review.', renderSkillsPage);
+  else if (seg[0] === 'skill' && skillById[seg[1]]) shellPage(skillById[seg[1]].title, skillById[seg[1]].area === 'foundations' ? 'Foundations' : 'Calculus skill', '', (w) => renderSkillPage(w, seg[1]), crumbs({ label: 'Skills', href: '#/skills' }, { label: skillById[seg[1]].title }));
+  else if (seg[0] === 'placement') shellPage('Placement test', 'Foundations', 'One question per algebra skill, easiest first. Answer what you can; skills that depend on one you missed are skipped.', renderPlacementPage);
+  else if (seg[0] === 'mixed') shellPage('Mixed practice', 'Practice', 'Problems from different skills, shuffled and unlabelled. First decide which method each one needs, then solve it. Hints unlock after your first attempt.', renderMixedPage);
+  else if (seg[0] === 'review') shellPage('Review', 'Practice', 'Things you have mastered, brought back just as you start to forget them.', renderReviewPage);
+  else if (seg[0] === 'compare') shellPage(seg[1] ? (COMPARE.find((c) => c.id === seg[1])?.title || 'Compare methods') : 'Compare two methods', 'Practice', seg[1] ? 'The same problem solved two correct ways. Read both, then decide which is better here.' : 'Knowing two ways to solve something, and when each is quicker, is what lets you handle problems you have never seen.', (w) => renderComparePage(w, seg[1]), seg[1] ? crumbs({ label: 'Compare methods', href: '#/compare' }, { label: 'Problem' }) : null);
   else if (!seg.length) home();
   else notFound();
   highlightNav(modId);

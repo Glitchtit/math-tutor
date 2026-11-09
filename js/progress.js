@@ -2,10 +2,13 @@
 
 import { store } from './util.js';
 import { hasDrills } from './train-core.js';
+import { nextReview, dueKeys } from './review-core.js';
 
 const KEY = 'progress';
 let state = store.get(KEY, null) || { visited: {}, done: {}, attempts: {}, log: [] };
 state.train ||= {};
+state.skills ||= {}; // skill id → { stage, mastered?, placed? }
+state.review ||= {}; // 'skill:<id>' | 'drill:<key>' → { step, due, last }
 
 function save() { store.set(KEY, state); }
 
@@ -38,9 +41,16 @@ export const progress = {
   // Train drills: round 0 (new) .. 3 (mastered after copy, cover, recall)
   trainRound(key) { return state.train[key] || 0; },
   setTrainRound(key, n) { state.train[key] = Math.max(0, Math.min(3, n)); save(); },
-  reset() { state = { visited: {}, done: {}, attempts: {}, log: [], train: {} }; save(); },
+  // skills (generated practice): stage 0 worked example .. 3 on your own; mastered = timestamp
+  skill(id) { return state.skills[id] || { stage: 0 }; },
+  setSkill(id, patch) { state.skills[id] = { ...this.skill(id), ...patch }; save(); },
+  // spaced review
+  reviewOf(key) { return state.review[key] || null; },
+  schedule(key, ok, now = Date.now()) { state.review[key] = nextReview(state.review[key], ok, now); save(); },
+  dueReviews(now = Date.now()) { return dueKeys(state.review, now); },
+  reset() { state = { visited: {}, done: {}, attempts: {}, log: [], train: {}, skills: {}, review: {} }; save(); },
   export() { return JSON.stringify(state, null, 2); },
-  import(json) { state = JSON.parse(json); state.train ||= {}; save(); },
+  import(json) { state = JSON.parse(json); state.train ||= {}; state.skills ||= {}; state.review ||= {}; save(); },
 
   moduleStats(mod) {
     const keys = moduleKeys(mod);

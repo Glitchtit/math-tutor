@@ -252,3 +252,26 @@ to "small variation" to "combination" — and every variation must itself have b
 * Assignments: 3–5 per module, prefer auto-checkable parts, include at least one `writeup` problem with a
   model `solution` from module 5 on. The last module of each part ends with an exam/homework-style
   capstone. Do not copy graded homework problems; write analogous problems with different data.
+
+## Skills (generated practice)
+
+`js/skills/` holds **skill generators**: one problem type each, producing fresh numbers and a fully
+worked solution every time. They power the placement test (`#/placement`), the Foundations &
+skills list (`#/skills`), the fading ladder on each skill page (`#/skill/<id>`), mixed practice
+(`#/mixed`) and spaced review (`#/review`). `algebra.js` has the pre-calculus foundations,
+`calculus.js` the calculus types (each tied to a `module`, optionally a `lesson`), `compare.js` the
+"compare two methods" items. The format is documented at the top of `js/skills/index.js`.
+
+* `steps` are the worked solution **and** the fading scaffold: stage 1 shows all but the last step,
+  stage 2 the first half, stage 3 none. So write one transformation per step, arithmetic shown.
+* `method` and `family` drive "Which method?" in mixed practice: methods in one family must be
+  distinct, and the statement must not name the method.
+* A part must not accept its own statement typed back (no "expand/factor/simplify" expression parts;
+  use choices or ask for one number).
+* `npm test` (`tests/skills.test.mjs`) renders every generated problem for 40 seeds, checks the answer
+  key against the app's checker, prerequisites, families and variety.
+
+Progress for skills and the review schedule live in `progress.skills` and `progress.review`
+(`js/review-core.js`: 1, 3, 7, 21, 60 days; a miss starts over). Mastered Train drills and skills
+enter review automatically. Assignments marked `challenge` or `exam` lock hints until the first
+attempt, and their "coach me" asks guiding questions instead of giving steps.

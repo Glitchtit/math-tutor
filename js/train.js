@@ -48,6 +48,7 @@ export function renderTrainPage(container, m, onChange = () => {}) {
     runDrill(runBox, d, playedRound(k), (clean) => {
       const r = playedRound(k) + 1;
       if (clean && r > progress.trainRound(k)) progress.setTrainRound(k, r);
+      if (clean && r === 3 && !progress.reviewOf(`drill:${k}`)) progress.schedule(`drill:${k}`, true); // mastered drills enter spaced review
       if (drills.every((x) => progress.trainRound(x.key) >= 1)) progress.markDone(`${m.id}/train`);
       onChange();
       return { next: () => start(nextDrill()), again: () => start(d), list: showList };
@@ -212,7 +213,7 @@ export function runDrill(el, drill, round, onDone, write = false) {
 
   function finish(clean) {
     stopped = true;
-    const nav = onDone(clean ?? false);
+    const nav = onDone(clean); // null = left early: callers must not count it as a miss
     if (clean === null) return nav.list();
     const total = missesPerLine.reduce((a, b) => a + b, 0);
     const msg = clean
