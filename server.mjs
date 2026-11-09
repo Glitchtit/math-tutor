@@ -77,7 +77,8 @@ async function serveStatic(req, res, path) {
     const st = await stat(file);
     if (!st.isFile()) throw new Error('not a file');
     const data = await readFile(file);
-    res.writeHead(200, { 'content-type': MIME[extname(file)] || 'application/octet-stream', 'cache-control': 'no-cache' });
+    // no-store: ES modules must never mix versions after a deploy (an old cached check.js broke the app once); it is a small SPA, reloads are rare
+    res.writeHead(200, { 'content-type': MIME[extname(file)] || 'application/octet-stream', 'cache-control': 'no-store' });
     res.end(data);
   } catch {
     res.writeHead(404); res.end('Not found');
