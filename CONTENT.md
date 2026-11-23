@@ -208,7 +208,8 @@ lecture: [
 Board text (`board.html`, inline `text.html`) must stay under 200 characters.
 
 The beat ends when the line has been spoken (and its derive step animated), then the next starts.
-A beat that shows a `guided` or `quiz` waits until the student has finished it. **Every `guided` and
+A beat that shows a `guided` or `quiz` waits until the student has finished it; `blanks`, `reveal`,
+`examquiz` and `answer` have no natural end, so they get a "Continue the lecture" button and the lecture waits for it. **Every `guided` and
 `quiz` of the lesson must appear in its lecture.** Inline `guided`/`quiz` blocks are allowed where
 the lesson has no exercise to stop on (they keep their own progress).
 

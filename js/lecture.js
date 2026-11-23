@@ -9,7 +9,8 @@ import { ttsId, readingMs, boardBlock } from './lecture-core.js';
 let healthP = null;
 const health = () => (healthP ||= fetch('/api/health').then((r) => r.json()).catch(() => { healthP = null; return {}; }));
 const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-const EXERCISE = new Set(['guided', 'quiz']);
+const EXERCISE = new Set(['guided', 'quiz', 'blanks', 'reveal', 'examquiz', 'answer']);
+const OPEN_ENDED = new Set(['blanks', 'reveal', 'examquiz', 'answer']); // no natural end: the student says when to go on
 
 export function mountLecture(container, lesson, ctx) {
   const beats = lesson.lecture;
@@ -79,6 +80,7 @@ export function mountLecture(container, lesson, ctx) {
       if (block.type === 'derive' && beat.step === undefined) el.firstChild.dataset.firstPlayed = '1'; // shown without narration: step 0 stays still
       if (block.type === 'widget') lastWidget = el;
       if (EXERCISE.has(block.type)) el.addEventListener('block:done', () => { el.dataset.done = '1'; }, { once: true });
+      if (OPEN_ENDED.has(block.type)) el.appendChild(h('div', { class: 'row lec-continue' }, h('button', { class: 'btn btn-small', type: 'button', onclick: (e) => { e.currentTarget.disabled = true; el.dispatchEvent(new CustomEvent('block:done', { bubbles: true })); } }, 'Continue the lecture ▶')));
     }
     if (beat.step !== undefined && lastSteps) { if (narrate) { await new Promise((r) => requestAnimationFrame(r)); focusBeat(i, !lastSteps.querySelector('.blk-derive')); const cur = lastSteps.querySelector('.derive-steps > li:last-child'); if (cur) scrollTo(cur); await narrate.beforeStep(); } await advance(lastSteps, beat.step, silent, narrate?.onMove); }
     else if (narrate) await narrate.beforeStep();
