@@ -21,7 +21,7 @@ export function mountLecture(container, lesson, ctx) {
   const audio = new Audio(); // one element reused for every line: iOS only lets a gesture-started element play
   let audioOn = false;
   const ids = new Map(); // spoken text → tts id, filled at mount so a click can start audio synchronously
-  const idOf = async (text) => { if (!ids.has(text)) { const { ttsVoice } = await health(); if (ttsVoice) ids.set(text, await ttsId(ttsVoice, text)); } return ids.get(text); };
+  const idOf = async (text) => { if (!ids.has(text)) { const { tts, ttsVoice } = await health(); if (tts && ttsVoice) ids.set(text, await ttsId(ttsVoice, text)); } return ids.get(text); };
   (async () => { for (const b of beats) { await idOf(b.say); for (const m of Object.values(b.moves || {})) await idOf(m); } })();
   let speed = Math.min(2, Math.max(0.75, +store.get('lecture:speed', 1) || 1));
   let sound = store.get('lecture:sound', true);
@@ -80,7 +80,7 @@ export function mountLecture(container, lesson, ctx) {
       if (block.type === 'widget') lastWidget = el;
       if (EXERCISE.has(block.type)) el.addEventListener('block:done', () => { el.dataset.done = '1'; }, { once: true });
     }
-    if (beat.step !== undefined && lastSteps) { if (narrate) { await new Promise((r) => requestAnimationFrame(r)); focusBeat(i); await narrate.beforeStep(); } await advance(lastSteps, beat.step, silent, narrate?.onMove); }
+    if (beat.step !== undefined && lastSteps) { if (narrate) { await new Promise((r) => requestAnimationFrame(r)); focusBeat(i, !lastSteps.querySelector('.blk-derive')); const cur = lastSteps.querySelector('.derive-steps > li:last-child'); if (cur) scrollTo(cur); await narrate.beforeStep(); } await advance(lastSteps, beat.step, silent, narrate?.onMove); }
     else if (narrate) await narrate.beforeStep();
     if (beat.set && lastWidget) await setSliders(lastWidget, beat.set, silent);
   }
@@ -89,13 +89,14 @@ export function mountLecture(container, lesson, ctx) {
     const d = el.querySelector('.blk-derive');
     if (d?.lecture) {
       // step 0 is on screen as soon as the block lands; in a live beat play its animation once too
-      if (!silent && !d.dataset.firstPlayed) { d.dataset.firstPlayed = '1'; await d.lecture.playFirst(onMove); }
+      if (!silent && !d.dataset.firstPlayed) { d.dataset.firstPlayed = '1'; await d.lecture.playFirst(onMove, scrollTo); }
       if (silent) { d.dataset.firstPlayed = '1'; d.lecture.revealTo(step); }
-      else while (d.lecture.shown() <= step) { const before = d.lecture.shown(); await d.lecture.next(onMove); if (d.lecture.shown() === before) break; }
+      else while (d.lecture.shown() <= step) { const before = d.lecture.shown(); await d.lecture.next(onMove, scrollTo); if (d.lecture.shown() === before) break; }
       return;
     }
     const list = el.querySelector('.steps-list');
     while (list && list.children.length <= step) { const b = el.querySelector('.steps-controls .btn'); if (!b) break; b.click(); }
+    if (!silent && list?.lastElementChild) scrollTo(list.lastElementChild);
   }
 
   async function setSliders(el, set, silent) {
@@ -156,13 +157,22 @@ export function mountLecture(container, lesson, ctx) {
     return new Promise((r) => { const tick = () => (my !== token || el.dataset.done ? r() : setTimeout(tick, 200)); tick(); });
   }
 
-  function focusBeat(i) {
+  function focusBeat(i, scroll = true) {
     board.querySelectorAll('.lec-current').forEach((el) => el.classList.remove('lec-current'));
     const el = items[i] || items.slice(0, i + 1).reverse().find(Boolean);
     if (!el) return;
     el.classList.add('lec-current');
-    el.style.scrollMarginBottom = `${dock.offsetHeight + 16}px`;
-    el.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'nearest' });
+    if (scroll) scrollTo(el);
+  }
+
+  // keep what is being talked about between the sticky top bar and the sticky dock;
+  // too tall to fit → show its top (a derivation's newest step is scrolled to on its own)
+  function scrollTo(el) {
+    const top = 56 + 12, bottom = dock.offsetHeight + 16;
+    el.style.scrollMarginTop = `${top}px`;
+    el.style.scrollMarginBottom = `${bottom}px`;
+    const tall = el.getBoundingClientRect().height > window.innerHeight - top - bottom;
+    el.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: tall ? 'start' : 'nearest' });
   }
 
   async function runBeat(i, my) {
@@ -176,7 +186,7 @@ export function mountLecture(container, lesson, ctx) {
     if (fresh && beat.step !== undefined) {
       // say what the step does, then play it: each moving term slides while its own line is spoken
       const narrate = {
-        beforeStep: async () => { focusBeat(i); await speakText(beat.say, my, upcoming(i)); },
+        beforeStep: async () => { await speakText(beat.say, my, upcoming(i)); },
         onMove: (id) => (beat.moves?.[id] && my === token ? (caption.textContent = beat.moves[id], speakText(beat.moves[id], my)) : null),
       };
       await apply(i, false, narrate);

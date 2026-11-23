@@ -297,7 +297,7 @@ export function renderDerive(b) {
   const allBtn = h('button', { class: 'btn btn-small btn-ghost', type: 'button' }, 'Show all');
   const playAll = h('button', { class: 'btn btn-small btn-ghost', type: 'button' }, '▶ Play all');
   let revealing = false; // blocks extra clicks between reveal and the start of the animation
-  const revealAndPlay = async (onMove = null) => {
+  const revealAndPlay = async (onMove = null, onReveal = null) => {
     if (busy || revealing || shown >= steps.length) return;
     revealing = true;
     try {
@@ -305,6 +305,7 @@ export function renderDerive(b) {
       await (document.fonts?.ready || Promise.resolve());
       await new Promise((r) => requestAnimationFrame(r));
       draw(S);
+      onReveal?.(S.li);
       await playStep(S, false, onMove);
     } finally { revealing = false; }
   };
@@ -331,8 +332,8 @@ export function renderDerive(b) {
   // driven by the lecture player: next() animates one more step, revealTo(n) shows steps 0..n at once
   root.lecture = {
     shown: () => shown,
-    async next(onMove) { while (busy || revealing) await wait(50); return revealAndPlay(onMove); },
-    async playFirst(onMove) { while (busy || revealing) await wait(50); await (document.fonts?.ready || Promise.resolve()); draw(built[0]); return playStep(built[0], false, onMove); },
+    async next(onMove, onReveal) { while (busy || revealing) await wait(50); return revealAndPlay(onMove, onReveal); },
+    async playFirst(onMove, onReveal) { while (busy || revealing) await wait(50); await (document.fonts?.ready || Promise.resolve()); draw(built[0]); onReveal?.(built[0].li); return playStep(built[0], false, onMove); },
     revealTo(n) { while (shown <= n && shown < steps.length) reveal(); },
   };
   return root;
