@@ -83,6 +83,7 @@ export function mountLecture(container, lesson, ctx) {
     if (beat.step !== undefined && lastSteps) { if (narrate) { await new Promise((r) => requestAnimationFrame(r)); focusBeat(i, !lastSteps.querySelector('.blk-derive')); const cur = lastSteps.querySelector('.derive-steps > li:last-child'); if (cur) scrollTo(cur); await narrate.beforeStep(); } await advance(lastSteps, beat.step, silent, narrate?.onMove); }
     else if (narrate) await narrate.beforeStep();
     if (beat.set && lastWidget) await setSliders(lastWidget, beat.set, silent);
+    else if (!silent && block?.type === 'widget') await autoAnimate(items[i]);
   }
 
   async function advance(el, step, silent, onMove = null) {
@@ -97,6 +98,17 @@ export function mountLecture(container, lesson, ctx) {
     const list = el.querySelector('.steps-list');
     while (list && list.children.length <= step) { const b = el.querySelector('.steps-controls .btn'); if (!b) break; b.click(); }
     if (!silent && list?.lastElementChild) scrollTo(list.lastElementChild);
+  }
+
+  // a widget's own animation ("Approach a", "Sweep", …) plays once when it lands; the beat waits for it
+  async function autoAnimate(el) {
+    let btn = null;
+    for (let n = 0; n < 60 && !(btn = el.querySelector('.widget-anim')); n++) await new Promise((r) => requestAnimationFrame(r));
+    if (!btn || btn.dataset.loop || reducedMotion()) return;
+    await new Promise((r) => setTimeout(r, 600)); // let the student see the start first
+    btn.click();
+    const t0 = Date.now();
+    while (btn.isConnected && !btn.textContent.startsWith('▶') && Date.now() - t0 < 15000) await new Promise((r) => setTimeout(r, 150));
   }
 
   async function setSliders(el, set, silent) {
@@ -167,12 +179,22 @@ export function mountLecture(container, lesson, ctx) {
 
   // keep what is being talked about between the sticky top bar and the sticky dock;
   // too tall to fit → show its top (a derivation's newest step is scrolled to on its own)
+  let follow = null;
   function scrollTo(el) {
-    const top = 56 + 12, bottom = dock.offsetHeight + 16;
-    el.style.scrollMarginTop = `${top}px`;
-    el.style.scrollMarginBottom = `${bottom}px`;
-    const tall = el.getBoundingClientRect().height > window.innerHeight - top - bottom;
-    el.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: tall ? 'start' : 'nearest' });
+    const place = () => {
+      const top = 56 + 12, bottom = dock.offsetHeight + 16;
+      el.style.scrollMarginTop = `${top}px`;
+      el.style.scrollMarginBottom = `${bottom}px`;
+      const tall = el.getBoundingClientRect().height > window.innerHeight - top - bottom;
+      el.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: tall ? 'start' : 'nearest' });
+    };
+    // graphs mount a frame later and derivation lines grow as fonts load: re-place while the element settles
+    follow?.disconnect();
+    if (typeof ResizeObserver === 'undefined') { place(); return; }
+    follow = new ResizeObserver(place);
+    follow.observe(el);
+    const f = follow;
+    setTimeout(() => f.disconnect(), 1500);
   }
 
   async function runBeat(i, my) {
@@ -249,7 +271,7 @@ export function mountLecture(container, lesson, ctx) {
     if (e.key === ' ') { e.preventDefault(); playing ? pause() : play(); } else if (e.key === 'ArrowRight') nextBtn.click(); else if (e.key === 'ArrowLeft') prevBtn.click();
   };
   window.addEventListener('keydown', onKey);
-  function destroy() { token++; playing = false; stopAudio(); window.removeEventListener('keydown', onKey); window.removeEventListener('hashchange', destroy); }
+  function destroy() { follow?.disconnect(); token++; playing = false; stopAudio(); window.removeEventListener('keydown', onKey); window.removeEventListener('hashchange', destroy); }
   window.addEventListener('hashchange', destroy);
   ui();
   return { destroy };

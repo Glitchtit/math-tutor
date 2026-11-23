@@ -114,6 +114,8 @@ function animator(parent, { from, to, duration = 4000, loop = false, onFrame, la
     raf = requestAnimationFrame(tick);
   });
   function stop() { if (raf) cancelAnimationFrame(raf); raf = null; btn.textContent = '▶ ' + label; }
+  btn.classList.add('widget-anim'); // the lecture plays it once when the widget lands
+  if (loop) btn.dataset.loop = '1';
   return { stop };
 }
 
