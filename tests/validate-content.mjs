@@ -205,6 +205,11 @@ export function validateBlocks(blocks, where, issues) {
       case 'livescript': checkLiveBlocks(b.blocks || [], w, issues); break;
       case 'answer': validatePart(b.part, w, issues); break;
       case 'derive': validateDerive(b, blocks[i + 1], w, issues); break;
+      case 'board':
+        if (!b.tex && !b.html) issues.push(`${w}: board needs tex or html`);
+        if (b.tex) texErrors(b.tex, w, issues);
+        mathIn(b.html, w, issues); mathIn(b.title, w, issues);
+        break;
       case 'figure':
         if (!/^\s*<svg[\s>]/.test(b.svg || '')) issues.push(`${w}: figure needs an <svg> element`);
         mathIn(b.caption, w, issues);
@@ -280,6 +285,50 @@ function findLesson(ref, m) {
   return mod && [...(mod.lessons || []), ...(mod.matlab || [])].find((l) => l.id === id);
 }
 
+const plain = (s) => String(s || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+
+// Lecture beats (CONTENT.md "Lectures"): spoken lines, what lands on the board, derive steps, slider moves.
+export function validateLecture(l, where, issues) {
+  const blocks = l.blocks || [];
+  const shown = new Set();
+  let steps = null, stepAt = -1, widget = null;
+  l.lecture.forEach((beat, i) => {
+    const w = `${where} lecture[${i}]`;
+    if (typeof beat.say !== 'string' || !beat.say.trim()) issues.push(`${w}: needs "say" (the spoken line)`);
+    else if (/[$\\{}]/.test(beat.say)) issues.push(`${w}: "say" is spoken aloud — write maths in words, no $, \\, { or }: "${beat.say.slice(0, 60)}"`);
+    let b = null;
+    if (typeof beat.show === 'number') {
+      b = blocks[beat.show];
+      if (!b) issues.push(`${w}: show ${beat.show} is not a block index of this lesson`);
+      else shown.add(beat.show);
+    } else if (beat.show !== undefined) {
+      b = beat.show;
+      validateBlocks([b], `${w} show`, issues);
+      if (['board', 'text'].includes(b.type) && plain(b.html).length > 200) issues.push(`${w}: board text is ${plain(b.html).length} characters — keep the board short (≤ 200), say the rest`);
+    }
+    if (b && (b.type === 'derive' || b.type === 'steps')) { steps = b; stepAt = -1; }
+    if (b && b.type === 'widget') widget = b;
+    if (beat.step !== undefined) {
+      const n = steps ? (steps.type === 'derive' ? resolveSteps(steps).length : steps.steps.length) : 0;
+      if (!steps) issues.push(`${w}: step without a derive/steps block on the board`);
+      else if (!Number.isInteger(beat.step) || beat.step < 0 || beat.step >= n) issues.push(`${w}: step ${beat.step} out of range (0..${n - 1})`);
+      else if (beat.step < stepAt) issues.push(`${w}: step ${beat.step} goes back (was ${stepAt})`);
+      else stepAt = beat.step;
+    }
+    if (beat.set) {
+      const params = widget?.name === 'plot' ? widget.config?.params || {} : null;
+      if (!params) issues.push(`${w}: set without a plot widget on the board`);
+      else for (const [k, v] of Object.entries(beat.set)) {
+        if (!params[k]) issues.push(`${w}: set "${k}" is not a slider of the widget`);
+        else if (!(v >= params[k].min && v <= params[k].max)) issues.push(`${w}: set ${k} = ${v} is outside the slider range ${params[k].min}..${params[k].max}`);
+      }
+    }
+  });
+  blocks.forEach((b, k) => {
+    if ((b.type === 'guided' || b.type === 'quiz') && !shown.has(k)) issues.push(`${where} lecture: the lesson's ${b.type} (block ${k}) never appears — every exercise must be in the lecture`);
+  });
+}
+
 export function validateModule(m) {
   const issues = [];
   const w = `[${m.id}]`;
@@ -293,6 +342,7 @@ export function validateModule(m) {
       seen.add(kind + l.id);
       if (!/^[a-z0-9-]+$/.test(l.id)) issues.push(`${w}: id "${l.id}" should be lowercase-kebab`);
       validateBlocks(l.blocks, `${w} ${kind}/${l.id}`, issues);
+      if (l.lecture) validateLecture(l, `${w} ${kind}/${l.id}`, issues);
     }
   }
   for (const a of m.assignments || []) {

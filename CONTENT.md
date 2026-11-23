@@ -175,6 +175,68 @@ The module's **Train** page (`#/module/<id>/train`, between Learn and Assignment
 
 You don't author drills: good tags and clear step labels make good drills. A line is skipped if it uses `\underbrace`, `\begin`, `\binom`, `\overset`, `\xrightarrow`, `\lceil`, `\overline`, `\not` or `\bar`. `npm test` checks that at least 85% of derive lines convert.
 
+## Lectures (Learn lessons)
+
+A Learn lesson may carry `lecture: [beat, ...]` next to `blocks`. A lesson with a lecture opens in
+**lecture mode**: a narrator (Google TTS, voice `en-GB-Chirp3-HD-Algenib`) speaks one beat at a time
+while the board builds up; the classic page stays one click away ("Read"). The validator checks every
+lecture (`validateLecture` in `tests/validate-content.mjs`).
+
+```js
+lecture: [
+  { say: 'A function is a rule: give it a number x, and it gives back exactly one number, f of x.',
+    show: { type: 'board', tex: String.raw`x \;\longmapsto\; f(x)` } },
+  { say: 'Watch what each number does to the sine curve.', show: 1 },     // lesson block 1 (a plot)
+  { say: 'Make a bigger, and the wave gets taller.', set: { a: 3 } },      // animate its slider a to 3
+  { say: 'First, the square-root condition.', show: 5, step: 0 },        // derive block 5, step 0
+  { say: 'Subtract three from both sides.', step: 1 },                   // play derive step 1
+  { say: 'Your turn. Same recipe, new numbers.', show: 6 },              // guided: the lecture waits
+  { say: 'New idea: the logarithm.', clear: true, show: { type: 'board', tex: String.raw`\ln x` } },
+]
+```
+
+| field | meaning |
+|---|---|
+| `say` | **required.** The spoken line, also the caption. Plain words: no `$`, `\`, `{`, `}`. |
+| `show` | What lands on the board: a block **index** of this lesson (reuse its derive, steps, guided, quiz, widget, table, callout) or an **inline block** (any type, usually `board`). |
+| `step` | Reveal and animate the latest `derive`/`steps` block on the board up to this 0-based step while speaking. Non-decreasing. Step 0 is visible as soon as the block appears. |
+| `set` | `{ param: value }`: animate sliders of the latest `plot` widget (values within the slider range). |
+| `clear` | `true`: draw a divider and fade the old board (a new section). |
+
+`board` block (inline): `tex` (one display formula) and/or `html` (a few words), optional `title`.
+Board text (`board.html`, inline `text.html`) must stay under 200 characters.
+
+The beat ends when the line has been spoken (and its derive step animated), then the next starts.
+A beat that shows a `guided` or `quiz` waits until the student has finished it. **Every `guided` and
+`quiz` of the lesson must appear in its lecture.** Inline `guided`/`quiz` blocks are allowed where
+the lesson has no exercise to stop on (they keep their own progress).
+
+### Lecture style guide
+
+* **It is a lecture, not the page read aloud.** Talk like a good lecturer at a whiteboard: warm,
+  direct, second person ("you"), short sentences. One idea per beat, one or two sentences per `say`.
+* **The board holds only what is being talked about:** the formula, two or three words, the graph,
+  the derivation. Explanations go into `say`. Never put a paragraph on the board.
+* **Spoken maths** is written as a person would say it: "x squared minus one, over x plus two",
+  "f of x", "the square root of x plus three", "e to the minus x", "the limit as x goes to zero",
+  "d y by d x", "pi over four", "is greater than or equal to". Read Greek letters as words (theta).
+  Numbers as digits are fine ("3", "0.5"). Avoid symbols TTS mangles (≥, →, ∞, /, ^): write the words.
+* **Open with why** (one or two beats: what problem this lesson solves, or where it is used later),
+  then build the idea **visually first** (show the widget, move a slider with `set`, point at what
+  changes), then the rule on a `board`, then the worked example.
+* **Every derive step gets its own beat** (`step`), saying the operation and the reason ("Subtract 3
+  from both sides; that clears the plus 3 on the left"). Never say "move it across" without the
+  operation. Symbolic derivations are followed by their numbers example, narrated the same way.
+* **Exercises:** introduce each one ("Your turn: same recipe, new numbers. Do one step at a time.")
+  and, in the next beat, debrief it in one sentence (what the trick was). Quizzes likewise.
+* **Refreshers:** when the lesson has a refresher the example depends on, remind the student of the
+  rule in one or two beats (a `board` with the rule) right before it is needed; `show` the
+  refresher block itself only if its worked steps help.
+* **Close** with a one- or two-beat summary on a `board`: the recipe or the key formula.
+* Typical length: 15–40 beats, 3–8 minutes. Use `clear` between sections so the board stays readable.
+* `docs/superpowers/specs/2026-11-23-lecture-mode-design.md` has the design; the reference lecture is
+  `functions` → `graphs-transformations` in `js/content/calculus/01-functions.js`.
+
 ## Practice blocks and power-electronics widgets
 
 * `blanks` answers: one per `[[]]` gap, either a string with `|`-separated alternatives
