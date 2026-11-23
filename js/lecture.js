@@ -7,7 +7,7 @@ import { renderBlock } from './blocks.js';
 import { ttsId, readingMs, boardBlock } from './lecture-core.js';
 
 let healthP = null;
-const health = () => (healthP ||= fetch('/api/health').then((r) => r.json()).catch(() => ({})));
+const health = () => (healthP ||= fetch('/api/health').then((r) => r.json()).catch(() => { healthP = null; return {}; }));
 const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 const SPEEDS = [1, 1.25, 1.5];
 const EXERCISE = new Set(['guided', 'quiz']);
@@ -19,7 +19,10 @@ export function mountLecture(container, lesson, ctx) {
   let applied = 0;      // beats whose board effects are on the board
   let playing = false;
   let token = 0;        // bumped on every pause/jump; stale async work checks it and stops
-  let audio = null;
+  const audio = new Audio(); // one element reused for every line: iOS only lets a gesture-started element play
+  let audioOn = false;
+  const ids = [];       // tts id per beat, filled at mount
+  health().then(async ({ ttsVoice }) => { if (ttsVoice) for (let k = 0; k < beats.length; k++) ids[k] = await ttsId(ttsVoice, beats[k].say); });
   let speed = store.get('lecture:speed', 1);
   let sound = store.get('lecture:sound', true);
   let lastSteps = null; // latest derive/steps element on the board
@@ -32,8 +35,8 @@ export function mountLecture(container, lesson, ctx) {
   const bar = h('div', { class: 'lec-progress' }, h('i'));
   const btn = (label, title, onclick) => h('button', { class: 'btn btn-small btn-ghost', type: 'button', title, 'aria-label': title, onclick }, label);
   const playBtn = h('button', { class: 'btn btn-small btn-primary lec-play', type: 'button', onclick: () => (playing ? pause() : play()) }, '▶ Start lecture');
-  const speedBtn = btn(`${speed}×`, 'Playback speed', () => { speed = SPEEDS[(SPEEDS.indexOf(speed) + 1) % SPEEDS.length]; store.set('lecture:speed', speed); if (audio) audio.playbackRate = speed; ui(); });
-  const soundBtn = btn('', 'Sound on/off', () => { sound = !sound; store.set('lecture:sound', sound); if (!sound && audio) audio.pause(); if (playing) playFrom(pos); ui(); });
+  const speedBtn = btn(`${speed}×`, 'Playback speed', () => { speed = SPEEDS[(SPEEDS.indexOf(speed) + 1) % SPEEDS.length]; store.set('lecture:speed', speed); audio.playbackRate = speed; ui(); });
+  const soundBtn = btn('', 'Sound on/off', () => { sound = !sound; store.set('lecture:sound', sound); if (!sound) audio.pause(); if (playing) playFrom(pos); ui(); });
   const prevBtn = btn('⏮', 'Previous beat (←)', () => go(Math.max(0, pos - 1)));
   const nextBtn = btn('⏭', 'Next beat (→)', () => { if (pos < beats.length - 1) go(pos + 1); });
   const dock = h('div', { class: 'lec-dock' }, caption, h('div', { class: 'lec-controls' }, prevBtn, playBtn, nextBtn, speedBtn, soundBtn, count), bar);
@@ -43,7 +46,7 @@ export function mountLecture(container, lesson, ctx) {
   const saved = store.get(resumeKey, 0);
   caption.textContent = saved > 0 && saved < beats.length ? `You stopped at step ${saved + 1} of ${beats.length}.` : 'Press play: the lecture talks you through this lesson step by step and stops for exercises.';
   if (saved > 0 && saved < beats.length) {
-    dock.querySelector('.lec-controls').insertBefore(h('button', { class: 'btn btn-small', type: 'button', onclick: (e) => { e.target.remove(); go(saved, true); } }, `Resume from step ${saved + 1}`), playBtn);
+    dock.querySelector('.lec-controls').insertBefore(h('button', { class: 'btn btn-small lec-resume', type: 'button', onclick: (e) => { e.target.remove(); unlockAudio(saved); go(saved, true); } }, `Resume from step ${saved + 1}`), playBtn);
   }
 
   function ui() {
@@ -110,23 +113,30 @@ export function mountLecture(container, lesson, ctx) {
 
   const sleep = (ms, my) => new Promise((r) => { const t0 = Date.now(); const tick = () => (my !== token || Date.now() - t0 >= ms ? r() : setTimeout(tick, 100)); tick(); });
 
-  function stopAudio() { if (audio) { audio.pause(); audio.src = ''; audio = null; } }
+  function stopAudio() { audioOn = false; audio.pause(); }
+  // called synchronously from a click so the browser counts the element as user-started
+  function unlockAudio(i) { if (sound && ids[i]) { audio.src = `/api/tts/${ids[i]}`; audio.play().catch(() => {}); } }
 
   async function speak(i, my) {
     const say = beats[i].say;
     const { tts, ttsVoice } = await health();
     if (sound && tts) {
       try {
-        const url = `/api/tts/${await ttsId(ttsVoice, say)}`;
+        const id = ids[i] || await ttsId(ttsVoice, say);
         if (my !== token) return;
-        audio = new Audio(url);
+        const url = `/api/tts/${id}`;
+        if (!audio.src.endsWith(url)) audio.src = url;
+        audio.currentTime = 0;
         audio.playbackRate = speed;
-        const a = audio;
-        const ended = new Promise((r) => { a.onended = () => r(true); a.onerror = () => r(false); });
-        await a.play();
-        prefetch(i + 1, ttsVoice);
-        const ok = await Promise.race([ended, new Promise((r) => { const t = setInterval(() => { if (my !== token) { clearInterval(t); r(true); } }, 150); ended.then(() => clearInterval(t)); })]);
-        if (ok) return;
+        audioOn = true;
+        const ended = new Promise((r) => { audio.onended = () => r(true); audio.onerror = () => r(false); });
+        // a stalled server never blocks the lecture: give up after 20 s and use the caption timing
+        const started = await Promise.race([audio.play().then(() => true), new Promise((r) => setTimeout(() => r(false), 20000))]);
+        if (started) {
+          prefetch(i + 1, ttsVoice);
+          const ok = await Promise.race([ended, new Promise((r) => { const t = setInterval(() => { if (my !== token) { clearInterval(t); r(true); } }, 150); ended.then(() => clearInterval(t)); })]);
+          if (ok) return;
+        }
       } catch (e) { console.warn('lecture audio failed, using captions', e); }
       if (my !== token) return;
     }
@@ -146,6 +156,7 @@ export function mountLecture(container, lesson, ctx) {
     const el = items[i] || items.slice(0, i + 1).reverse().find(Boolean);
     if (!el) return;
     el.classList.add('lec-current');
+    el.style.scrollMarginBottom = `${dock.offsetHeight + 16}px`;
     el.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'nearest' });
   }
 
@@ -181,6 +192,8 @@ export function mountLecture(container, lesson, ctx) {
   }
 
   function play() {
+    root.querySelector('.lec-resume')?.remove();
+    unlockAudio(applied >= beats.length && !playing ? 0 : pos);
     if (applied >= beats.length && pos >= beats.length - 1 && !playing) { go(0, true); return; }
     playFrom(pos);
   }
@@ -204,7 +217,7 @@ export function mountLecture(container, lesson, ctx) {
   }
 
   const onKey = (e) => {
-    if (e.target.closest?.('input, textarea, select, [contenteditable="true"]')) return;
+    if (e.altKey || e.ctrlKey || e.metaKey || e.target.closest?.('input, textarea, select, button, a, [role="button"], [contenteditable="true"]')) return;
     if (e.key === ' ') { e.preventDefault(); playing ? pause() : play(); } else if (e.key === 'ArrowRight') nextBtn.click(); else if (e.key === 'ArrowLeft') prevBtn.click();
   };
   window.addEventListener('keydown', onKey);

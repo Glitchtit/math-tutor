@@ -13,17 +13,18 @@ const MP3 = Buffer.from('fake-mp3-bytes');
 
 function listen(server) { return new Promise((r) => server.listen(0, '127.0.0.1', () => r(server.address().port))); }
 
-async function startUpstream() {
+async function startUpstream({ hang = false } = {}) {
   const state = { calls: 0, bodies: [] };
   const srv = http.createServer(async (req, res) => {
     let body = ''; for await (const c of req) body += c;
     state.calls++; state.bodies.push({ url: req.url, body: JSON.parse(body) });
+    if (hang) return; // never answers
     await new Promise((r) => setTimeout(r, 150)); // slow enough for requests to overlap
     res.writeHead(200, { 'content-type': 'application/json' });
     res.end(JSON.stringify({ audioContent: MP3.toString('base64') }));
   });
   state.port = await listen(srv);
-  state.close = () => srv.close();
+  state.close = () => { srv.closeAllConnections(); srv.close(); };
   return state;
 }
 
@@ -75,4 +76,50 @@ test('TTS route without credentials → 503', { skip: !line && 'no lecture lines
   const app = await startApp({ GOOGLE_TTS_API_KEY: '', GOOGLE_TTS_CREDENTIALS: '', TTS_CACHE_DIR: dir });
   t.after(() => { app.stop(); rmSync(dir, { recursive: true, force: true }); });
   assert.equal((await fetch(`${app.base}/api/tts/${await ttsId(VOICE, line)}`)).status, 503);
+});
+
+test('TTS hardening', { skip: !line && 'no lecture lines yet', timeout: 20000 }, async (t) => {
+  const id = await ttsId(VOICE, line);
+
+  await t.test('an unwritable cache still serves the audio', async () => {
+    const up = await startUpstream();
+    const app = await startApp({ GOOGLE_TTS_API_KEY: 'k', TTS_UPSTREAM: `http://127.0.0.1:${up.port}`, TTS_CACHE_DIR: join(process.cwd(), 'package.json', 'tts'), GOOGLE_TTS_CREDENTIALS: '' }); // cache dir below a file: mkdir fails with ENOTDIR
+    try {
+      const r = await fetch(`${app.base}/api/tts/${id}`);
+      assert.equal(r.status, 200);
+      assert.deepEqual(Buffer.from(await r.arrayBuffer()), MP3);
+    } finally { app.stop(); up.close(); }
+  });
+
+  await t.test('a hanging Google call fails fast with 502', async () => {
+    const up = await startUpstream({ hang: true });
+    const dir = mkdtempSync(join(tmpdir(), 'tts-'));
+    const app = await startApp({ GOOGLE_TTS_API_KEY: 'k', TTS_UPSTREAM: `http://127.0.0.1:${up.port}`, TTS_CACHE_DIR: dir, TTS_TIMEOUT_MS: '500', GOOGLE_TTS_CREDENTIALS: '' });
+    try {
+      const t0 = Date.now();
+      const r = await fetch(`${app.base}/api/tts/${id}`);
+      assert.equal(r.status, 502);
+      assert.ok(Date.now() - t0 < 3000);
+    } finally { app.stop(); up.close(); rmSync(dir, { recursive: true, force: true }); }
+  });
+
+  await t.test('Range requests get 206 partial content', async () => {
+    const up = await startUpstream();
+    const dir = mkdtempSync(join(tmpdir(), 'tts-'));
+    const app = await startApp({ GOOGLE_TTS_API_KEY: 'k', TTS_UPSTREAM: `http://127.0.0.1:${up.port}`, TTS_CACHE_DIR: dir, GOOGLE_TTS_CREDENTIALS: '' });
+    try {
+      const r = await fetch(`${app.base}/api/tts/${id}`, { headers: { range: 'bytes=0-3' } });
+      assert.equal(r.status, 206);
+      assert.equal(r.headers.get('content-range'), `bytes 0-3/${MP3.length}`);
+      assert.deepEqual(Buffer.from(await r.arrayBuffer()), MP3.subarray(0, 4));
+      assert.equal(r.headers.get('accept-ranges'), 'bytes');
+    } finally { app.stop(); up.close(); rmSync(dir, { recursive: true, force: true }); }
+  });
+
+  await t.test('a credentials file inside the app folder is never served', async () => {
+    const app = await startApp({ GOOGLE_TTS_API_KEY: '', GOOGLE_TTS_CREDENTIALS: './package.json' });
+    try {
+      assert.equal((await fetch(`${app.base}/package.json`)).status, 404);
+    } finally { app.stop(); }
+  });
 });

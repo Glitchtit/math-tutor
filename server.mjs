@@ -28,6 +28,9 @@ const TTS_VOICE = process.env.TTS_VOICE || 'en-GB-Chirp3-HD-Algenib';
 const TTS_UPSTREAM = process.env.TTS_UPSTREAM || 'https://texttospeech.googleapis.com';
 const TTS_DIR = resolve(process.env.TTS_CACHE_DIR || join(ROOT, 'tts-cache'));
 const TTS_ON = !!(TTS_KEY || TTS_CREDS);
+const TTS_TIMEOUT = Number(process.env.TTS_TIMEOUT_MS || 15000);
+// a key file inside the app folder would otherwise be downloadable by the static server
+const TTS_CREDS_PATH = TTS_CREDS ? resolve(TTS_CREDS) : '';
 // only lines that exist in lecture content can be spoken, so the open port cannot run up the bill
 const TTS_LINES = new Map(await Promise.all(lectureLines(Object.values(MODULES)).map(async (t) => [await ttsId(TTS_VOICE, t), t])));
 const ttsInflight = new Map();
@@ -41,7 +44,7 @@ async function googleAuth() {
     const b64 = (o) => Buffer.from(JSON.stringify(o)).toString('base64url');
     const unsigned = `${b64({ alg: 'RS256', typ: 'JWT' })}.${b64({ iss: sa.client_email, scope: 'https://www.googleapis.com/auth/cloud-platform', aud: 'https://oauth2.googleapis.com/token', iat: now, exp: now + 3600 })}`;
     const jwt = `${unsigned}.${createSign('RSA-SHA256').update(unsigned).sign(sa.private_key, 'base64url')}`;
-    const r = await fetch('https://oauth2.googleapis.com/token', { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer', assertion: jwt }) });
+    const r = await fetch('https://oauth2.googleapis.com/token', { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer', assertion: jwt }), signal: AbortSignal.timeout(TTS_TIMEOUT) });
     if (!r.ok) throw new Error(`Google token exchange failed: ${r.status} ${await r.text()}`);
     const j = await r.json();
     gToken = { token: j.access_token, exp: Date.now() + j.expires_in * 1000 };
@@ -56,23 +59,36 @@ async function synthesize(id, text) {
   const r = await fetch(`${TTS_UPSTREAM}/v1/text:synthesize${auth.query}`, {
     method: 'POST', headers: { 'content-type': 'application/json', ...auth.headers },
     body: JSON.stringify({ input: { text }, voice: { languageCode: TTS_VOICE.slice(0, 5), name: TTS_VOICE }, audioConfig: { audioEncoding: 'MP3' } }),
+    signal: AbortSignal.timeout(TTS_TIMEOUT),
   });
   if (!r.ok) throw new Error(`Google TTS ${r.status}: ${(await r.text()).slice(0, 300)}`);
   const mp3 = Buffer.from((await r.json()).audioContent, 'base64');
-  await mkdir(TTS_DIR, { recursive: true });
-  await writeFile(`${file}.tmp`, mp3);
-  await rename(`${file}.tmp`, file); // never serve a half-written file
+  try {
+    await mkdir(TTS_DIR, { recursive: true });
+    await writeFile(`${file}.tmp`, mp3);
+    await rename(`${file}.tmp`, file); // never serve a half-written file
+  } catch (e) { console.error(`TTS cache not writable (${TTS_DIR}): every play will call Google again. ${e.message}`); }
   return mp3;
 }
 
-async function tts(res, id) {
+async function tts(req, res, id) {
   const text = TTS_LINES.get(id);
   if (!text) { res.writeHead(404); res.end('Unknown line'); return; }
   if (!TTS_ON) { res.writeHead(503); res.end('Text-to-speech is not configured'); return; }
   if (!ttsInflight.has(id)) ttsInflight.set(id, synthesize(id, text).finally(() => ttsInflight.delete(id)));
   try {
     const mp3 = await ttsInflight.get(id);
-    res.writeHead(200, { 'content-type': 'audio/mpeg', 'content-length': mp3.length, 'cache-control': 'public, max-age=31536000, immutable' });
+    const head = { 'content-type': 'audio/mpeg', 'accept-ranges': 'bytes', 'cache-control': 'public, max-age=31536000, immutable' };
+    const range = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range || ''); // Safari insists on ranges for media
+    if (range && (range[1] || range[2])) {
+      const start = range[1] ? Number(range[1]) : Math.max(0, mp3.length - Number(range[2]));
+      const end = range[1] && range[2] ? Math.min(Number(range[2]), mp3.length - 1) : mp3.length - 1;
+      if (start > end || start >= mp3.length) { res.writeHead(416, { 'content-range': `bytes */${mp3.length}` }); res.end(); return; }
+      res.writeHead(206, { ...head, 'content-range': `bytes ${start}-${end}/${mp3.length}`, 'content-length': end - start + 1 });
+      res.end(mp3.subarray(start, end + 1));
+      return;
+    }
+    res.writeHead(200, { ...head, 'content-length': mp3.length });
     res.end(mp3);
   } catch (e) {
     console.error(e.message);
@@ -132,7 +148,7 @@ async function serveStatic(req, res, path) {
   let p = decodeURIComponent(path);
   if (p.endsWith('/')) p += 'index.html';
   const file = normalize(join(ROOT, p));
-  if (!file.startsWith(ROOT) || /(^|[\\/])\.(?!well-known)/.test(file.slice(ROOT.length)) || file.includes('node_modules')) {
+  if (!file.startsWith(ROOT) || /(^|[\\/])\.(?!well-known)/.test(file.slice(ROOT.length)) || file.includes('node_modules') || file === TTS_CREDS_PATH || file.startsWith(TTS_DIR)) {
     res.writeHead(404); res.end('Not found'); return;
   }
   try {
@@ -156,7 +172,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
     const ttsMatch = /^\/api\/tts\/([0-9a-f]{64})$/.exec(url.pathname);
-    if (ttsMatch) { await tts(res, ttsMatch[1]); return; }
+    if (ttsMatch) { await tts(req, res, ttsMatch[1]); return; }
     if (url.pathname.startsWith('/api/anthropic/')) {
       await proxy(req, res, url.pathname.slice('/api/anthropic'.length));
       return;
