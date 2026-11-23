@@ -3,3 +3,4 @@ node_modules/
 *.tmp.*
 .superpowers/
 .playwright-mcp/
+tts-cache/
