@@ -9,7 +9,6 @@ import { ttsId, readingMs, boardBlock } from './lecture-core.js';
 let healthP = null;
 const health = () => (healthP ||= fetch('/api/health').then((r) => r.json()).catch(() => { healthP = null; return {}; }));
 const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-const SPEEDS = [1, 1.25, 1.5];
 const EXERCISE = new Set(['guided', 'quiz']);
 
 export function mountLecture(container, lesson, ctx) {
@@ -21,9 +20,10 @@ export function mountLecture(container, lesson, ctx) {
   let token = 0;        // bumped on every pause/jump; stale async work checks it and stops
   const audio = new Audio(); // one element reused for every line: iOS only lets a gesture-started element play
   let audioOn = false;
-  const ids = [];       // tts id per beat, filled at mount
-  health().then(async ({ ttsVoice }) => { if (ttsVoice) for (let k = 0; k < beats.length; k++) ids[k] = await ttsId(ttsVoice, beats[k].say); });
-  let speed = store.get('lecture:speed', 1);
+  const ids = new Map(); // spoken text → tts id, filled at mount so a click can start audio synchronously
+  const idOf = async (text) => { if (!ids.has(text)) { const { ttsVoice } = await health(); if (ttsVoice) ids.set(text, await ttsId(ttsVoice, text)); } return ids.get(text); };
+  (async () => { for (const b of beats) { await idOf(b.say); for (const m of Object.values(b.moves || {})) await idOf(m); } })();
+  let speed = Math.min(2, Math.max(0.75, +store.get('lecture:speed', 1) || 1));
   let sound = store.get('lecture:sound', true);
   let lastSteps = null; // latest derive/steps element on the board
   let lastWidget = null;
@@ -35,7 +35,10 @@ export function mountLecture(container, lesson, ctx) {
   const bar = h('div', { class: 'lec-progress' }, h('i'));
   const btn = (label, title, onclick) => h('button', { class: 'btn btn-small btn-ghost', type: 'button', title, 'aria-label': title, onclick }, label);
   const playBtn = h('button', { class: 'btn btn-small btn-primary lec-play', type: 'button', onclick: () => (playing ? pause() : play()) }, '▶ Start lecture');
-  const speedBtn = btn(`${speed}×`, 'Playback speed', () => { speed = SPEEDS[(SPEEDS.indexOf(speed) + 1) % SPEEDS.length]; store.set('lecture:speed', speed); audio.playbackRate = speed; ui(); });
+  const speedVal = h('span', { class: 'lec-speed-val' });
+  const speedIn = h('input', { type: 'range', min: 0.75, max: 2, step: 0.05, value: speed, 'aria-label': 'Narration speed' });
+  speedIn.addEventListener('input', () => { speed = +speedIn.value; store.set('lecture:speed', speed); audio.playbackRate = speed; ui(); });
+  const speedBtn = h('label', { class: 'lec-speed', title: 'Narration speed' }, h('span', { class: 'muted small' }, 'Speed'), speedIn, speedVal);
   const soundBtn = btn('', 'Sound on/off', () => { sound = !sound; store.set('lecture:sound', sound); if (!sound) audio.pause(); if (playing) playFrom(pos); ui(); });
   const prevBtn = btn('⏮', 'Previous beat (←)', () => go(Math.max(0, pos - 1)));
   const nextBtn = btn('⏭', 'Next beat (→)', () => { if (pos < beats.length - 1) go(pos + 1); });
@@ -51,7 +54,7 @@ export function mountLecture(container, lesson, ctx) {
 
   function ui() {
     playBtn.textContent = playing ? '⏸ Pause' : applied === 0 ? '▶ Start lecture' : pos >= beats.length - 1 && applied >= beats.length && !playing ? '↺ Replay' : '▶ Play';
-    speedBtn.textContent = `${speed}×`;
+    speedVal.textContent = `${+speed.toFixed(2)}×`;
     soundBtn.textContent = sound ? '🔊' : '🔇';
     count.textContent = `${Math.min(pos + 1, beats.length)} / ${beats.length}`;
     bar.firstChild.style.width = `${(100 * Math.min(pos + 1, beats.length)) / beats.length}%`;
@@ -62,7 +65,7 @@ export function mountLecture(container, lesson, ctx) {
     : { key: `${ctx.key}/lecture`, module: ctx.module, index: i });
 
   // put beat i's effects on the board; silent = no animation (used when rebuilding)
-  async function apply(i, silent) {
+  async function apply(i, silent, narrate = null) {
     const beat = beats[i];
     if (beat.clear) { board.querySelectorAll('.lec-item').forEach((el) => el.classList.add('lec-old')); board.appendChild(h('hr', { class: 'lec-break' })); }
     const block = boardBlock(lesson, beat);
@@ -73,18 +76,22 @@ export function mountLecture(container, lesson, ctx) {
       board.appendChild(el);
       items[i] = el;
       if (block.type === 'derive' || block.type === 'steps') lastSteps = el;
+      if (block.type === 'derive' && beat.step === undefined) el.firstChild.dataset.firstPlayed = '1'; // shown without narration: step 0 stays still
       if (block.type === 'widget') lastWidget = el;
       if (EXERCISE.has(block.type)) el.addEventListener('block:done', () => { el.dataset.done = '1'; }, { once: true });
     }
-    if (beat.step !== undefined && lastSteps) await advance(lastSteps, beat.step, silent);
+    if (beat.step !== undefined && lastSteps) { if (narrate) { await new Promise((r) => requestAnimationFrame(r)); focusBeat(i); await narrate.beforeStep(); } await advance(lastSteps, beat.step, silent, narrate?.onMove); }
+    else if (narrate) await narrate.beforeStep();
     if (beat.set && lastWidget) await setSliders(lastWidget, beat.set, silent);
   }
 
-  async function advance(el, step, silent) {
+  async function advance(el, step, silent, onMove = null) {
     const d = el.querySelector('.blk-derive');
     if (d?.lecture) {
-      if (silent) d.lecture.revealTo(step);
-      else while (d.lecture.shown() <= step) { const before = d.lecture.shown(); await d.lecture.next(); if (d.lecture.shown() === before) break; }
+      // step 0 is on screen as soon as the block lands; in a live beat play its animation once too
+      if (!silent && !d.dataset.firstPlayed) { d.dataset.firstPlayed = '1'; await d.lecture.playFirst(onMove); }
+      if (silent) { d.dataset.firstPlayed = '1'; d.lecture.revealTo(step); }
+      else while (d.lecture.shown() <= step) { const before = d.lecture.shown(); await d.lecture.next(onMove); if (d.lecture.shown() === before) break; }
       return;
     }
     const list = el.querySelector('.steps-list');
@@ -115,14 +122,14 @@ export function mountLecture(container, lesson, ctx) {
 
   function stopAudio() { audioOn = false; audio.pause(); }
   // called synchronously from a click so the browser counts the element as user-started
-  function unlockAudio(i) { if (sound && ids[i]) { audio.src = `/api/tts/${ids[i]}`; audio.play().catch(() => {}); } }
+  function unlockAudio(i) { const id = ids.get(beats[i]?.say); if (sound && id) { audio.src = `/api/tts/${id}`; audio.play().catch(() => {}); } }
 
-  async function speak(i, my) {
-    const say = beats[i].say;
-    const { tts, ttsVoice } = await health();
+  // speak one line (TTS, or a timed caption without audio); prefetch = lines likely needed next
+  async function speakText(text, my, prefetch = []) {
+    const { tts } = await health();
     if (sound && tts) {
       try {
-        const id = ids[i] || await ttsId(ttsVoice, say);
+        const id = await idOf(text);
         if (my !== token) return;
         const url = `/api/tts/${id}`;
         if (!audio.src.endsWith(url)) audio.src = url;
@@ -133,19 +140,17 @@ export function mountLecture(container, lesson, ctx) {
         // a stalled server never blocks the lecture: give up after 20 s and use the caption timing
         const started = await Promise.race([audio.play().then(() => true), new Promise((r) => setTimeout(() => r(false), 20000))]);
         if (started) {
-          prefetch(i + 1, ttsVoice);
+          prefetch.forEach(async (t) => fetch(`/api/tts/${await idOf(t)}`).catch(() => {}));
           const ok = await Promise.race([ended, new Promise((r) => { const t = setInterval(() => { if (my !== token) { clearInterval(t); r(true); } }, 150); ended.then(() => clearInterval(t)); })]);
           if (ok) return;
         }
       } catch (e) { console.warn('lecture audio failed, using captions', e); }
       if (my !== token) return;
     }
-    await sleep(readingMs(say) / speed, my);
+    await sleep(readingMs(text) / speed, my);
   }
 
-  async function prefetch(i, voice) {
-    if (i < beats.length) fetch(`/api/tts/${await ttsId(voice, beats[i].say)}`).catch(() => {});
-  }
+  const upcoming = (i) => [...Object.values(beats[i].moves || {}), ...(beats[i + 1] ? [beats[i + 1].say] : [])];
 
   function waitExercise(el, my) {
     return new Promise((r) => { const tick = () => (my !== token || el.dataset.done ? r() : setTimeout(tick, 200)); tick(); });
@@ -165,9 +170,22 @@ export function mountLecture(container, lesson, ctx) {
     store.set(resumeKey, i);
     caption.textContent = beats[i].say;
     ui();
-    const effects = applied <= i ? (applied = i + 1, apply(i, false)) : null;
-    focusBeat(i);
-    await Promise.all([speak(i, my), effects]);
+    const beat = beats[i];
+    const fresh = applied <= i;
+    if (fresh) applied = i + 1;
+    if (fresh && beat.step !== undefined) {
+      // say what the step does, then play it: each moving term slides while its own line is spoken
+      const narrate = {
+        beforeStep: async () => { focusBeat(i); await speakText(beat.say, my, upcoming(i)); },
+        onMove: (id) => (beat.moves?.[id] && my === token ? (caption.textContent = beat.moves[id], speakText(beat.moves[id], my)) : null),
+      };
+      await apply(i, false, narrate);
+      if (my === token) caption.textContent = beat.say;
+    } else {
+      const effects = fresh ? apply(i, false) : null;
+      focusBeat(i);
+      await Promise.all([speakText(beat.say, my, upcoming(i)), effects]);
+    }
     if (my !== token) return;
     const el = items[i];
     if (el && EXERCISE.has(el.dataset.kind) && !el.dataset.done) {

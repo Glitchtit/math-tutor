@@ -8,7 +8,7 @@ export async function ttsId(voice, text) {
 
 export function lectureLines(modules) {
   const lines = new Set();
-  for (const m of modules) for (const l of m.lessons || []) for (const b of l.lecture || []) if (b.say) lines.add(b.say);
+  for (const m of modules) for (const l of m.lessons || []) for (const b of l.lecture || []) { if (b.say) lines.add(b.say); for (const m of Object.values(b.moves || {})) lines.add(m); }
   return [...lines];
 }
 

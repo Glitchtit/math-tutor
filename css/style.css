@@ -702,3 +702,6 @@ details.refresher summary { color: var(--accent); }
   .lec-dock { margin: 0 -16px; border-radius: 0; border-left: 0; border-right: 0; padding: 10px 16px; }
   .lec-caption { font-size: .98rem; }
 }
+.lec-speed { display: inline-flex; align-items: center; gap: 6px; margin-left: 4px; }
+.lec-speed input { width: 110px; accent-color: var(--accent); }
+.lec-speed-val { font-variant-numeric: tabular-nums; min-width: 3.2em; font-size: .85rem; }

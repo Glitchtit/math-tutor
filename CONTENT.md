@@ -200,6 +200,7 @@ lecture: [
 | `say` | **required.** The spoken line, also the caption. Plain words: no `$`, `\`, `{`, `}`. |
 | `show` | What lands on the board: a block **index** of this lesson (reuse its derive, steps, guided, quiz, widget, table, callout) or an **inline block** (any type, usually `board`). |
 | `step` | Reveal and animate the latest `derive`/`steps` block on the board up to this 0-based step while speaking. Non-decreasing. Step 0 is visible as soon as the block appears. |
+| `moves` | With `step` on a derive: `{ termId: 'spoken line' }`. The beat's `say` is spoken first (what the step does), then the step animates and each listed term slides **while its line is spoken** (the slide waits for the line). **Required for every term that has an arrow** (`arrows`) in the step(s) the beat plays; may also narrate other moving terms. Say what visibly happens: "The plus 3 crosses the equals sign and arrives as minus 3." |
 | `set` | `{ param: value }`: animate sliders of the latest `plot` widget (values within the slider range). |
 | `clear` | `true`: draw a divider and fade the old board (a new section). |
 
@@ -224,6 +225,7 @@ the lesson has no exercise to stop on (they keep their own progress).
 * **Open with why** (one or two beats: what problem this lesson solves, or where it is used later),
   then build the idea **visually first** (show the widget, move a slider with `set`, point at what
   changes), then the rule on a `board`, then the worked example.
+* **Animations are narrated while they play.** In a `step` beat, `say` announces the operation and why; `moves` then narrates each sliding term as it moves (where it goes and what it becomes). Never let a term slide in silence when it has an arrow.
 * **Every derive step gets its own beat** (`step`), saying the operation and the reason ("Subtract 3
   from both sides; that clears the plus 3 on the left"). Never say "move it across" without the
   operation. Symbolic derivations are followed by their numbers example, narrated the same way.

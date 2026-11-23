@@ -189,7 +189,8 @@ export function renderDerive(b) {
     }
   }
 
-  async function playStep(S, fromPlayAll = false) {
+  // onMove(termId) → promise: the lecture narrates each term while it slides (the slide waits for the line)
+  async function playStep(S, fromPlayAll = false, onMove = null) {
     if (busy || (playingAll && !fromPlayAll) || S.st.from === S.st.to) return; // nothing moves in a statement-only step
     busy = true;
     try {
@@ -250,9 +251,10 @@ export function renderDerive(b) {
           w.dataset.tr = `translate(${z.left - a.left + ox - k * ox}px, ${z.top - a.top + oy - k * oy}px) scale(${k})`;
         }
         g.e.classList.add('ghosted');
+        const talk = onMove?.(g.id);
         await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
         g.clones.forEach(([w]) => { w.style.transform = w.dataset.tr; });
-        await wait(SLIDE_MS + 50);
+        await Promise.all([wait(SLIDE_MS + 50), talk]);
         g.clones.forEach(([w], j) => {
           const t = g.targets[j];
           landed.set(t, [...(landed.get(t) || []), w]);
@@ -295,7 +297,7 @@ export function renderDerive(b) {
   const allBtn = h('button', { class: 'btn btn-small btn-ghost', type: 'button' }, 'Show all');
   const playAll = h('button', { class: 'btn btn-small btn-ghost', type: 'button' }, '▶ Play all');
   let revealing = false; // blocks extra clicks between reveal and the start of the animation
-  nextBtn.onclick = async () => {
+  const revealAndPlay = async (onMove = null) => {
     if (busy || revealing || shown >= steps.length) return;
     revealing = true;
     try {
@@ -303,9 +305,10 @@ export function renderDerive(b) {
       await (document.fonts?.ready || Promise.resolve());
       await new Promise((r) => requestAnimationFrame(r));
       draw(S);
-      await playStep(S);
+      await playStep(S, false, onMove);
     } finally { revealing = false; }
   };
+  nextBtn.onclick = () => revealAndPlay();
   allBtn.onclick = () => { while (shown < steps.length) reveal(); };
   let playingAll = false;
   playAll.onclick = async () => {
@@ -328,7 +331,8 @@ export function renderDerive(b) {
   // driven by the lecture player: next() animates one more step, revealTo(n) shows steps 0..n at once
   root.lecture = {
     shown: () => shown,
-    async next() { while (busy || revealing) await wait(50); return nextBtn.onclick(); },
+    async next(onMove) { while (busy || revealing) await wait(50); return revealAndPlay(onMove); },
+    async playFirst(onMove) { while (busy || revealing) await wait(50); await (document.fonts?.ready || Promise.resolve()); draw(built[0]); return playStep(built[0], false, onMove); },
     revealTo(n) { while (shown <= n && shown < steps.length) reveal(); },
   };
   return root;

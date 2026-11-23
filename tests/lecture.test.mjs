@@ -60,3 +60,25 @@ test('validateLecture: set outside the slider range', () => assert.equal(issuesO
 test('validateLecture: long board text', () => assert.equal(issuesOf((l) => { l.lecture[0].show.html = 'word '.repeat(60); }).length, 1));
 test('validateLecture: an exercise left out', () => assert.equal(issuesOf((l) => { l.lecture.splice(5, 1); }).length, 1));
 test('validateLecture: bad board tex', () => assert.equal(issuesOf((l) => { l.lecture[0].show.tex = '\\frac{'; }).length, 1));
+
+// ---- per-term narration of derive moves
+test('lectureLines includes move narration', () => {
+  const mods = [{ lessons: [{ lecture: [{ say: 'a', moves: { 't-1': 'b' } }] }] }];
+  assert.deepEqual(lectureLines(mods), ['a', 'b']);
+});
+
+const moving = () => {
+  const l = lesson();
+  l.blocks[1] = { type: 'derive', steps: [
+    { kind: 'start', label: 's', from: String.raw`x + \T{t-1}{3} = 5`, to: String.raw`x + \T{t-1}{3} = 5`, why: 'w' },
+    { kind: 'both', label: 'b', to: String.raw`x = 5 - \T{t-1}{3}`, arrows: { 't-1': '−3 on both sides' }, why: 'w' },
+  ] };
+  return l;
+};
+const movingIssues = (mut) => { const l = moving(); mut(l); const out = []; validateLecture(l, 'L', out); return out; };
+
+test('validateLecture: an arrowed move without narration', () => assert.equal(movingIssues(() => {}).length, 1));
+test('validateLecture: narrated arrowed move passes', () => assert.deepEqual(movingIssues((l) => { l.lecture[4].moves = { 't-1': 'The 3 crosses over and becomes minus 3.' }; }), []));
+test('validateLecture: moves naming a term that does not move', () => assert.equal(movingIssues((l) => { l.lecture[4].moves = { 't-1': 'ok', 'q-9': 'nope' }; }).length, 1));
+test('validateLecture: moves without a step', () => assert.equal(movingIssues((l) => { l.lecture[4].moves = { 't-1': 'ok' }; l.lecture[2].moves = { 't-1': 'x' }; }).length, 1));
+test('validateLecture: moves with LaTeX', () => assert.equal(movingIssues((l) => { l.lecture[4].moves = { 't-1': '$3$ crosses' }; }).length, 1));

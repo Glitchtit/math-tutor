@@ -13,7 +13,7 @@ import { Matlab } from '../js/matlab/interp.js';
 import { runMatlabChecks } from '../js/matlab/checks.js';
 import { checkPart, checkText } from '../js/check.js';
 import { parse } from '../js/matlab/parser.js';
-import { TAG_MACROS, KATEX_TRUST, KINDS, TAG_ID, tagIds, resolveSteps } from '../js/derive-core.js';
+import { TAG_MACROS, KATEX_TRUST, KINDS, TAG_ID, tagIds, tagParents, resolveSteps, plan } from '../js/derive-core.js';
 
 // expression-valued widget config keys and the variables they use
 const EXPR_KEYS = {
@@ -308,12 +308,30 @@ export function validateLecture(l, where, issues) {
     }
     if (b && (b.type === 'derive' || b.type === 'steps')) { steps = b; stepAt = -1; }
     if (b && b.type === 'widget') widget = b;
+    for (const m of Object.values(beat.moves || {})) if (typeof m !== 'string' || !m.trim() || /[$\\{}]/.test(m)) issues.push(`${w}: moves lines are spoken aloud — plain words, no $, \\, { or }: "${String(m).slice(0, 60)}"`);
+    if (beat.moves && beat.step === undefined) issues.push(`${w}: moves needs a step (it narrates that derive step's moving terms)`);
+    const before = stepAt;
     if (beat.step !== undefined) {
       const n = steps ? (steps.type === 'derive' ? resolveSteps(steps).length : steps.steps.length) : 0;
       if (!steps) issues.push(`${w}: step without a derive/steps block on the board`);
       else if (!Number.isInteger(beat.step) || beat.step < 0 || beat.step >= n) issues.push(`${w}: step ${beat.step} out of range (0..${n - 1})`);
       else if (beat.step < stepAt) issues.push(`${w}: step ${beat.step} goes back (was ${stepAt})`);
       else stepAt = beat.step;
+    }
+    // every step this beat animates: its arrowed terms must be narrated in moves, and moves may only name moving terms
+    if (steps?.type === 'derive' && beat.step !== undefined && Number.isInteger(beat.step)) {
+      const all = resolveSteps(steps);
+      const first = typeof beat.show === 'number' || (beat.show && typeof beat.show === 'object') ? 0 : Math.max(before + 1, 1); // a freshly shown derive plays step 0 too
+      const moving = new Set(), arrowed = new Set();
+      for (let k = first; k <= beat.step && k < all.length; k++) {
+        const st = all[k];
+        if (st.from === st.to) continue;
+        const ids = plan(tagIds(st.from), tagIds(st.to), st.map || {}, tagParents(st.from)).moves.map((mv) => mv.id);
+        ids.forEach((id) => moving.add(id));
+        Object.keys(st.arrows || {}).filter((id) => ids.includes(id)).forEach((id) => arrowed.add(id));
+      }
+      for (const id of arrowed) if (!beat.moves?.[id]) issues.push(`${w}: the term "${id}" moves along an arrow in this step — add moves: { '${id}': 'what happens to it, in words' }`);
+      for (const id of Object.keys(beat.moves || {})) if (!moving.has(id)) issues.push(`${w}: moves names "${id}", which does not move in the step(s) this beat plays`);
     }
     if (beat.set) {
       const params = widget?.name === 'plot' ? widget.config?.params || {} : null;
