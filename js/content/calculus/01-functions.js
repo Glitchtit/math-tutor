@@ -13,6 +13,12 @@ export default {
       title: 'Functions, graphs and domains',
       lecture: [
         { say: 'A function is a rule: give it a number x, and it gives back exactly one number, f of x.', show: { type: 'board', tex: String.raw`x \;\longmapsto\; f(x)` } },
+        { say: 'Here is the sine curve, and a copy we can shift and stretch.', show: 1 },
+        { say: 'Make a bigger, and the wave gets taller.', set: { a: 3 } },
+        { say: 'Now the domain. First the square-root condition.', show: 5, step: 0 },
+        { say: 'Subtract three from both sides.', step: 1 },
+        { say: 'Your turn. Same recipe, new numbers.', show: 6 },
+        { say: 'Quick check before we move on.', show: 10, clear: true },
       ],
       blocks: [
         { type: 'text', html: String.raw`<p>A <b>function</b> $f$ is a rule that takes an input number $x$ and gives back exactly one output number $f(x)$. For example $f(x) = x^2$ takes $3$ and gives back $9$. The <b>graph</b> of $f$ is the curve made of all the points $(x, f(x))$.</p><p>Most functions in this course are built from a few basic shapes by shifting and stretching them. Move the sliders and watch what each number does to the graph of $y = a\sin\big(b(x - c)\big) + d$.</p>` },

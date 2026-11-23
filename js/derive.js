@@ -325,5 +325,11 @@ export function renderDerive(b) {
   };
   root.appendChild(h('div', { class: 'derive-controls' }, nextBtn, allBtn, playAll));
   reveal(); // the first step is always visible
+  // driven by the lecture player: next() animates one more step, revealTo(n) shows steps 0..n at once
+  root.lecture = {
+    shown: () => shown,
+    async next() { while (busy || revealing) await wait(50); return nextBtn.onclick(); },
+    revealTo(n) { while (shown <= n && shown < steps.length) reveal(); },
+  };
   return root;
 }

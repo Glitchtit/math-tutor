@@ -172,6 +172,7 @@ WIDGETS.plot = (container, cfg) => {
   names.forEach((k) => {
     const pr = params[k];
     sliders[k] = slider(controls, pr.label || `$${k}$`, { min: pr.min, max: pr.max, step: pr.step || (pr.max - pr.min) / 200, value: vals[k] }, (v) => { vals[k] = v; p.redraw(); update(); });
+    sliders[k].el.dataset.param = k; // lecture beats animate sliders by name
   });
   if (cfg.animate && sliders[cfg.animate.param]) {
     animator(controls, { ...cfg.animate, onFrame: (v) => sliders[cfg.animate.param].set(v) });

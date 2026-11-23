@@ -5,6 +5,7 @@ import { MODULES, PARTS, COURSES, HOMEWORK_TEMPLATE } from './content/index.js';
 import { renderBlocks, renderAssignment } from './blocks.js';
 import { progress, moduleKeys } from './progress.js';
 import { renderTrainPage } from './train.js';
+import { mountLecture } from './lecture.js';
 import { hasDrills } from './train-core.js';
 import { LiveScript } from './livescript.js';
 import { TutorPanel } from './tutorpanel.js';
@@ -205,7 +206,22 @@ function lessonPage(m, kind, id) {
   const key = `${m.id}/${kind}/${l.id}`;
   progress.visit(`${m.id}/${kind}/${l.id}`);
   const body = h('article', { class: 'lesson' });
-  renderBlocks(body, l.blocks || [], { key, module: m.id });
+  let modeBar = null, player = null;
+  if (kind === 'learn' && l.lecture?.length) {
+    // lecture mode by default; Read shows the classic page
+    const show = (mode) => {
+      store.set('learn:mode', mode);
+      player?.destroy(); player = null;
+      body.innerHTML = '';
+      if (mode === 'lecture') player = mountLecture(body, l, { key, module: m.id });
+      else { renderBlocks(body, l.blocks || [], { key, module: m.id }); renderMath(body); }
+      modeBar.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
+    };
+    modeBar = h('div', { class: 'lec-mode', role: 'group', 'aria-label': 'Lesson view' },
+      h('button', { class: 'btn btn-small', type: 'button', 'data-mode': 'lecture', onclick: () => show('lecture') }, '▶ Lecture'),
+      h('button', { class: 'btn btn-small', type: 'button', 'data-mode': 'read', onclick: () => show('read') }, 'Read'));
+    show(store.get('learn:mode', 'lecture'));
+  } else renderBlocks(body, l.blocks || [], { key, module: m.id });
   const seq = sequenceOf(m);
   const pos = seq.findIndex((s) => s.kind === kind && s.item.id === id);
   const prev = seq[pos - 1], next = seq[pos + 1];
@@ -218,6 +234,7 @@ function lessonPage(m, kind, id) {
   page(l.title,
     crumbs({ label: 'Course', href: '#/' }, { label: `Module ${m.number}: ${m.title}`, href: `#/module/${m.id}` }, { label: kind === 'learn' ? 'Learn' : 'MATLAB' }),
     h('header', { class: 'lesson-head' }, h('div', { class: 'mod-num' }, kind === 'learn' ? 'Learn' : 'MATLAB Live Editor'), h('h1', {}, l.title)),
+    modeBar || '',
     body,
     h('div', { class: 'lesson-nav' },
       prev ? h('a', { class: 'btn btn-ghost', href: href(prev) }, `← ${prev.item.title}`) : h('span'),

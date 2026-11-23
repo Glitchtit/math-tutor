@@ -107,6 +107,7 @@ RENDER.guided = (b, ctx) => {
   let i = 0;
   const finish = () => {
     if (b.finale) list.after(html(h('div', { class: 'callout key guided-finale' }), b.finale));
+    el.dispatchEvent(new CustomEvent('block:done', { bubbles: true }));
     if (key) progress.attempt(key, true, { module: ctx.module, kind: 'guided', label: stripHtml(b.title || b.problem).slice(0, 80) });
   };
   const nextStep = () => {
@@ -190,6 +191,7 @@ RENDER.quiz = (b, ctx) => {
     opts.forEach((o, i) => { o.lab.classList.toggle('right', correct.includes(i)); o.lab.classList.toggle('wrong', o.inp.checked && !correct.includes(i)); });
     fb.className = `feedback ${ok ? 'ok' : 'bad'}`;
     html(fb, `${ok ? '<b>Correct.</b> ' : '<b>Not quite.</b> '}${b.explain || ''}`);
+    el.dispatchEvent(new CustomEvent('block:done', { bubbles: true }));
     if (key) progress.attempt(key, ok, { module: ctx.module, kind: 'quiz', label: stripHtml(b.question).slice(0, 80), input: chosen.join(',') });
   } }, 'Check');
   el.append(h('div', { class: 'row' }, check), fb);
@@ -279,6 +281,14 @@ RENDER.livescript = (b, ctx) => {
 };
 
 RENDER.derive = (b) => renderDerive(b);
+// lecture board note: one display formula and/or a few words
+RENDER.board = (b) => {
+  const el = h('div', { class: 'blk-board' });
+  if (b.title) el.appendChild(html(h('div', { class: 'board-title' }), b.title));
+  if (b.tex) { const m = h('div', { class: 'board-tex' }); m.innerHTML = tex(b.tex, true); el.appendChild(m); }
+  if (b.html) el.appendChild(html(h('div', { class: 'board-html prose' }), b.html));
+  return el;
+};
 RENDER.figure = (b) => renderFigure(b);
 RENDER.reveal = (b, ctx) => renderReveal(b, ctx, renderBlocks);
 RENDER.blanks = (b) => renderBlanks(b);
@@ -286,17 +296,19 @@ RENDER.examquiz = (b) => renderExamQuiz(b);
 
 RENDER.answer = (b, ctx) => renderPart(b.part, ctx?.key ? `${ctx.key}/answer/${ctx.index}` : null, ctx);
 
+export function renderBlock(b, ctx = {}) {
+  const r = RENDER[b.type];
+  if (!r) return h('div', { class: 'callout warn' }, `Unknown block type: ${b.type}`);
+  try {
+    return r(b, ctx);
+  } catch (e) {
+    console.error(e);
+    return h('div', { class: 'callout warn' }, `Could not render block (${b.type}): ${e.message}`);
+  }
+}
+
 export function renderBlocks(container, blocks, ctx = {}) {
-  blocks.forEach((b, index) => {
-    const r = RENDER[b.type];
-    if (!r) { container.appendChild(h('div', { class: 'callout warn' }, `Unknown block type: ${b.type}`)); return; }
-    try {
-      container.appendChild(r(b, { ...ctx, index }));
-    } catch (e) {
-      console.error(e);
-      container.appendChild(h('div', { class: 'callout warn' }, `Could not render block (${b.type}): ${e.message}`));
-    }
-  });
+  blocks.forEach((b, index) => container.appendChild(renderBlock(b, { ...ctx, index })));
 }
 
 // ------------------------------------------------------------------ assignments
